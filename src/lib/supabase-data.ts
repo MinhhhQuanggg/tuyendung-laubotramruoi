@@ -64,6 +64,9 @@ export async function fetchAllJobs(): Promise<JobItem[]> {
       isUrgent: j.is_urgent,
       isActive: j.is_active,
       contactZalo: j.contact_zalo || "0981256712",
+      images: (j.images as string[]) || [],
+      videoUrl: j.video_url || undefined,
+      videoPoster: j.video_poster || undefined,
     }));
   } catch (err) {
     console.error("Supabase fetchAllJobs exception:", err);
@@ -120,6 +123,9 @@ export async function fetchJobBySlug(slug: string): Promise<JobItem | null> {
       isUrgent: data.is_urgent,
       isActive: data.is_active,
       contactZalo: data.contact_zalo || "0981256712",
+      images: (data.images as string[]) || [],
+      videoUrl: data.video_url || undefined,
+      videoPoster: data.video_poster || undefined,
     };
   } catch (err) {
     console.error(`Supabase fetchJobBySlug(${slug}) exception:`, err);

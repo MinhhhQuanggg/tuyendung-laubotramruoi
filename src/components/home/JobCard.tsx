@@ -66,7 +66,7 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
               <Calendar className="w-4 h-4 text-gray-700" />
             </div>
             <span className="truncate">
-              <b>Yêu cầu:</b> {job.ageRequirement} | {job.experienceDisplay}
+              <b>Yêu cầu:</b> {job.ageRequirement}
             </span>
           </div>
         </div>
