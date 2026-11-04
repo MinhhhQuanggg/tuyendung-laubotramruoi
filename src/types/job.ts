@@ -13,43 +13,46 @@ export interface ConcisePoint {
 }
 
 export interface ConciseJobPost {
-  headline: string;
   intro: string;
-  points: ConcisePoint[];
   zalo: string;
+  headline?: string;
+  points?: ConcisePoint[];
 }
 
 export interface JobItem {
+  // === THUỘC TÍNH HIỂN THỊ TRỰC TIẾP TRÊN WEB ===
   id: string;
   slug: string;
   title: string;
   category: JobCategory;
-  badge?: string;
   badges?: string[];
   salaryDisplay: string;
-  minSalary?: number;
-  maxSalary?: number;
-  salaryUnit?: "MONTH" | "HOUR";
-  locations: string[]; // List of districts or locations
+  locations: string[]; // Danh sách khu vực / chi nhánh
   ageRequirement: string;
-  workType: EmploymentType;
-  workTypeDisplay: string;
-  workHours?: string;
   experienceDisplay: string;
-  experienceRequirements: string;
-  descriptionHtml?: string;
-  concisePost?: ConciseJobPost;
-  responsibilities: string[];
-  requirements: string[];
-  benefits: string[];
-  datePosted: string;
-  validThrough: string;
-  isUrgent?: boolean;
+  workHours?: string; // Ca làm việc
   isActive: boolean;
   contactZalo?: string;
   images?: string[]; // 4 hình ảnh
-  videoUrl?: string; // 1 video
+  videoUrl?: string; // Video thực tế
   videoPoster?: string;
+  concisePost?: ConciseJobPost; // Nội dung bài đăng công việc (Long Text)
+
+  // === THUỘC TÍNH PHỤ TRỢ / LEGACY (Không hiển thị trực tiếp) ===
+  badge?: string;
+  workType?: EmploymentType;
+  workTypeDisplay?: string;
+  minSalary?: number;
+  maxSalary?: number;
+  salaryUnit?: "MONTH" | "HOUR";
+  experienceRequirements?: string;
+  descriptionHtml?: string;
+  responsibilities?: string[];
+  requirements?: string[];
+  benefits?: string[];
+  datePosted?: string;
+  validThrough?: string;
+  isUrgent?: boolean;
 }
 
 export interface CandidateApplication {

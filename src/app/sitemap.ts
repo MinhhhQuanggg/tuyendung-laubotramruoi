@@ -5,7 +5,7 @@ import { MetadataRoute } from "next";
 export default function sitemap(): MetadataRoute.Sitemap {
   const jobUrls = JOBS_DATA.map((job) => ({
     url: `${siteConfig.url}/viec-lam/${job.slug}`,
-    lastModified: new Date(job.datePosted),
+    lastModified: new Date(job.datePosted || Date.now()),
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }));

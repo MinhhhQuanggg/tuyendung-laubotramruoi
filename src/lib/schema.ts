@@ -6,29 +6,21 @@ export function generateJobPostingSchema(job: JobItem) {
     "@context": "https://schema.org/",
     "@type": "JobPosting",
     title: job.title,
-    description: `
-      <h3>Mô tả công việc</h3>
-      <ul>
-        ${job.responsibilities.map((r) => `<li>${r}</li>`).join("")}
-      </ul>
-      <h3>Yêu cầu công việc</h3>
-      <ul>
-        ${job.requirements.map((r) => `<li>${r}</li>`).join("")}
-      </ul>
-      <h3>Quyền lợi được hưởng</h3>
-      <ul>
-        ${job.benefits.map((b) => `<li>${b}</li>`).join("")}
-      </ul>
-    `.trim(),
+    description: (
+      job.concisePost?.intro ||
+      (job.responsibilities && job.responsibilities.length > 0
+        ? job.responsibilities.map((r) => `<li>${r}</li>`).join("")
+        : job.title)
+    ).trim(),
     identifier: {
       "@type": "PropertyValue",
       name: siteConfig.companyName,
       value: job.id,
     },
-    datePosted: job.datePosted,
-    validThrough: job.validThrough,
-    employmentType: job.workType,
-    experienceRequirements: job.experienceRequirements,
+    datePosted: job.datePosted || "2026-10-28",
+    validThrough: job.validThrough || "2027-10-28T23:59:59+07:00",
+    employmentType: job.workType || "FULL_TIME",
+    experienceRequirements: job.experienceRequirements || job.experienceDisplay || "Không yêu cầu",
     hiringOrganization: {
       "@type": "Organization",
       name: siteConfig.hiringOrgName,

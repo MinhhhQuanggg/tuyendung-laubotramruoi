@@ -18,16 +18,16 @@ import {
   ImageIcon,
   Upload,
   X,
-  Users,
   Eye,
   Building,
   RefreshCw,
   Sparkles,
-  PhoneCall,
   FileText,
   MapPin,
+  Check,
 } from "lucide-react";
-import { JobItem, JobCategory, EmploymentType } from "@/types/job";
+import { JobItem, JobCategory } from "@/types/job";
+import { extractFirstFrameFromFile } from "@/lib/video-thumbnail";
 import LifeVideosTab from "@/components/admin/LifeVideosTab";
 import BranchesTab from "@/components/admin/BranchesTab";
 import QuickApplyConfigTab from "@/components/admin/QuickApplyConfigTab";
@@ -37,6 +37,26 @@ const CATEGORIES: JobCategory[] = [
   "Part-time, Thời vụ",
   "Full-time",
   "Trưởng, Quản lý",
+];
+
+const PRESET_AGE_TAGS = [
+  "18 – 30 tuổi",
+  "18 – 25 tuổi",
+  "20 – 30 tuổi",
+  "22 – 35 tuổi",
+  "Đủ 18 tuổi trở lên",
+  "Không giới hạn độ tuổi",
+];
+
+const PRESET_EXPERIENCE_TAGS = [
+  "Chưa có kinh nghiệm (Đào tạo từ số 0)",
+  "Không yêu cầu kinh nghiệm",
+  "Ưu tiên kinh nghiệm F&B",
+  "Kinh nghiệm 6 tháng – 1 năm",
+  "Kinh nghiệm 1 – 2 năm",
+  "Kinh nghiệm từ 2 năm trở lên",
+  "Có tay nghề làm bếp / thớt",
+  "Có kinh nghiệm phục vụ / order",
 ];
 
 const PRESET_GALLERY = [
@@ -52,7 +72,7 @@ const PRESET_GALLERY = [
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [adminEmail, setAdminEmail] = useState("tuyendung.admin@gmail.com");
+  const adminEmail = "tuyendung.admin@gmail.com";
 
   // Jobs state
   const [jobs, setJobs] = useState<JobItem[]>([]);
@@ -65,24 +85,43 @@ export default function AdminDashboardPage() {
   const [editingJob, setEditingJob] = useState<Partial<JobItem> | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [quickMediaUrl, setQuickMediaUrl] = useState("");
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<"jobs" | "life_videos" | "branches" | "quick_apply">("jobs");
 
   // Check auth
   useEffect(() => {
+    let isMounted = true;
+    const fallbackTimer = setTimeout(() => {
+      if (isMounted && isAuthenticated === null) {
+        window.location.replace("/admin/login");
+      }
+    }, 2500);
+
     fetch("/api/admin/me")
       .then((res) => {
+        if (!isMounted) return;
         if (res.ok) {
           setIsAuthenticated(true);
         } else {
-          router.push("/admin/login");
+          window.location.replace("/admin/login");
         }
       })
       .catch(() => {
-        router.push("/admin/login");
+        if (isMounted) {
+          window.location.replace("/admin/login");
+        }
+      })
+      .finally(() => {
+        clearTimeout(fallbackTimer);
       });
-  }, [router]);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(fallbackTimer);
+    };
+  }, []);
 
   // Load jobs
   const fetchJobs = async () => {
@@ -108,8 +147,7 @@ export default function AdminDashboardPage() {
 
   const handleLogout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
-    router.push("/admin/login");
-    router.refresh();
+    window.location.replace("/admin/login");
   };
 
   const showToast = (text: string, type: "success" | "error" = "success") => {
@@ -139,24 +177,13 @@ export default function AdminDashboardPage() {
       contactZalo: "0981256712",
       isUrgent: true,
       isActive: true,
-      images: [
-        "/images/jobs/all_img_1.jpg",
-        "/images/jobs/all_img_2.jpg",
-        "/images/jobs/all_img_3.jpg",
-        "/images/jobs/all_img_4.jpg",
-      ],
-      videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-      videoPoster: "/images/jobs/all_img_1.jpg",
+      images: [],
+      videoUrl: "",
+      videoPoster: "",
       concisePost: {
-        headline: "🔥 TUYỂN DỤNG HỌC VIỆC BẾP - BAO ĂN Ở, CÓ LƯƠNG ĐỦ 🔥",
-        intro: "Học nghề bếp bài bản từ A-Z, không lo học phí, thu nhập ổn áp mỗi tháng tại Tiệm Lẩu Bò Trăm Rưỡi!",
-        points: [
-          { icon: "🔹", label: "Khởi đầu nhẹ nhàng:", content: "Làm quen gian bếp, sơ chế rau nấm và chuẩn bị topping." },
-          { icon: "🔹", label: "Chưa có kinh nghiệm?", content: "Được các anh bếp chính kèm cặp 1:1." },
-          { icon: "🌙", label: "Ca làm việc:", content: "14h00 – 24h00 mỗi ngày" },
-          { icon: "👤", label: "Độ tuổi:", content: "18 – 30 tuổi" },
-          { icon: "✨", label: "Khởi điểm:", content: "7,5 củ – 10 củ / tháng" },
-        ],
+        headline: "",
+        intro: "",
+        points: [],
         zalo: "0981256712",
       },
       responsibilities: [
@@ -178,21 +205,52 @@ export default function AdminDashboardPage() {
 
   // Open Edit Form
   const handleOpenEdit = (job: JobItem) => {
-    // Ensure images array has 4 items
-    const images = job.images && job.images.length > 0
-      ? [...job.images]
-      : [
-          "/images/jobs/all_img_1.jpg",
-          "/images/jobs/all_img_2.jpg",
-          "/images/jobs/all_img_3.jpg",
-          "/images/jobs/all_img_4.jpg",
-        ];
+    const images = job.images && Array.isArray(job.images) ? [...job.images] : [];
+
+    // Lấy chính xác nội dung đang hiển thị bên trang chi tiết client
+    const getClientContent = (j: JobItem): string => {
+      if (j.concisePost) {
+        const intro = (j.concisePost.intro || "").trim();
+        const pointLines: string[] = [];
+
+        if (j.concisePost.points && j.concisePost.points.length > 0) {
+          j.concisePost.points.forEach((pt) => {
+            const icon = pt.icon ? `${pt.icon} ` : "";
+            const label = pt.label ? `${pt.label} ` : "";
+            const content = pt.content || "";
+            const line = `${icon}${label}${content}`.trim();
+            if (line && (!intro || !intro.includes(line))) {
+              pointLines.push(line);
+            }
+          });
+        }
+
+        if (pointLines.length > 0) {
+          return intro ? `${intro}\n\n${pointLines.join("\n\n")}` : pointLines.join("\n\n");
+        }
+        return intro;
+      }
+
+      if (j.responsibilities && j.responsibilities.length > 0) {
+        return j.responsibilities.map((r) => `• ${r}`).join("\n\n");
+      }
+
+      return "";
+    };
+
+    const existingContent = getClientContent(job);
 
     setEditingJob({
       ...job,
       images,
       videoUrl: job.videoUrl || "",
-      videoPoster: job.videoPoster || (images.length > 0 ? images[0] : ""),
+      videoPoster: job.videoPoster || "",
+      concisePost: {
+        headline: job.concisePost?.headline || "",
+        intro: existingContent,
+        points: [],
+        zalo: job.contactZalo || job.concisePost?.zalo || "0981256712",
+      },
     });
     setIsModalOpen(true);
   };
@@ -208,10 +266,21 @@ export default function AdminDashboardPage() {
       const url = isUpdating ? `/api/admin/jobs/${editingJob.id}` : "/api/admin/jobs";
       const method = isUpdating ? "PUT" : "POST";
 
+      const derivedBadges = [editingJob.ageRequirement, editingJob.experienceDisplay].filter(Boolean) as string[];
+      const cleanImages = (editingJob.images || []).filter((img) => Boolean(img && img.trim() !== ""));
+      const jobPayload = {
+        ...editingJob,
+        images: cleanImages,
+        videoUrl: editingJob.videoUrl?.trim() || undefined,
+        videoPoster: editingJob.videoPoster?.trim() || undefined,
+        badges: derivedBadges.length > 0 ? derivedBadges : (editingJob.badges || []),
+        badge: derivedBadges.join(", "),
+      };
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editingJob),
+        body: JSON.stringify(jobPayload),
       });
 
       const data = await res.json();
@@ -274,8 +343,9 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // Image Upload Handler
-  const handleFileUpload = async (file: File, targetIndex?: number, isVideo: boolean = false) => {
+  // Upload video handler
+  const handleUploadVideo = async (file: File) => {
+    showToast("Đang tải video lên máy chủ...", "success");
     const formData = new FormData();
     formData.append("file", file);
 
@@ -286,39 +356,112 @@ export default function AdminDashboardPage() {
       });
       const data = await res.json();
       if (data.success && data.url) {
-        if (isVideo) {
-          setEditingJob((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  videoUrl: data.url,
-                  videoPoster: prev.videoPoster || (prev.images && prev.images[0]) || "/images/jobs/all_img_1.jpg",
-                }
-              : prev
-          );
-          showToast("Đã tải video bài đăng thành công!", "success");
-        } else if (targetIndex !== undefined) {
-          setEditingJob((prev) => {
-            if (!prev) return prev;
-            const images = [...(prev.images || [])];
-            images[targetIndex] = data.url;
-            return { ...prev, images };
-          });
-          showToast(`Đã thay đổi ảnh ${targetIndex + 1} thành công!`, "success");
-        } else {
-          setEditingJob((prev) => {
-            if (!prev) return prev;
-            const images = [...(prev.images || []), data.url];
-            return { ...prev, images };
-          });
-          showToast("Đã thêm ảnh mới vào bài đăng thành công!", "success");
+        let thumb = "";
+        try {
+          thumb = await extractFirstFrameFromFile(file);
+        } catch (e) {
+          console.debug("Failed extracting video thumb:", e);
         }
+        setEditingJob((prev) =>
+          prev
+            ? {
+                ...prev,
+                videoUrl: data.url,
+                videoPoster: thumb || prev.videoPoster || "",
+              }
+            : prev
+        );
+        showToast("Đã tải video thành công!", "success");
       } else {
-        showToast(data.error || "Tải file thất bại", "error");
+        showToast(data.error || "Tải video thất bại", "error");
       }
     } catch {
-      showToast("Lỗi khi tải file", "error");
+      showToast("Lỗi khi tải video", "error");
     }
+  };
+
+  // Upload multiple images handler (user có thể thêm bao nhiêu tùy thích)
+  const handleUploadMultipleImages = async (files: FileList | File[]) => {
+    const fileList = Array.from(files);
+    if (fileList.length === 0) return;
+
+    showToast(`Đang tải ${fileList.length} ảnh lên...`, "success");
+    try {
+      const uploadedUrls: string[] = [];
+      for (const file of fileList) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("/api/admin/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.success && data.url) {
+          uploadedUrls.push(data.url);
+        }
+      }
+
+      if (uploadedUrls.length > 0) {
+        setEditingJob((prev) => {
+          if (!prev) return prev;
+          const current = (prev.images || []).filter(Boolean);
+          return { ...prev, images: [...current, ...uploadedUrls] };
+        });
+        showToast(`Đã thêm thành công ${uploadedUrls.length} ảnh!`, "success");
+      }
+    } catch {
+      showToast("Lỗi khi tải ảnh lên", "error");
+    }
+  };
+
+  // Thay thế ảnh tại vị trí index
+  const handleReplaceImage = async (file: File, index: number) => {
+    showToast(`Đang thay đổi ảnh #${index + 1}...`, "success");
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        setEditingJob((prev) => {
+          if (!prev) return prev;
+          const updated = [...(prev.images || [])];
+          updated[index] = data.url;
+          return { ...prev, images: updated };
+        });
+        showToast(`Đã thay đổi ảnh #${index + 1} thành công!`, "success");
+      }
+    } catch {
+      showToast("Lỗi khi tải ảnh", "error");
+    }
+  };
+
+  // Thêm nhanh qua URL
+  const handleAddQuickUrl = () => {
+    if (!quickMediaUrl.trim()) return;
+    const url = quickMediaUrl.trim();
+    const isVideo =
+      url.endsWith(".mp4") ||
+      url.endsWith(".mov") ||
+      url.endsWith(".webm") ||
+      url.includes("/videos/");
+
+    if (isVideo) {
+      setEditingJob((prev) => (prev ? { ...prev, videoUrl: url } : prev));
+      showToast("Đã thêm link video!", "success");
+    } else {
+      setEditingJob((prev) => {
+        if (!prev) return prev;
+        const current = (prev.images || []).filter(Boolean);
+        return { ...prev, images: [...current, url] };
+      });
+      showToast("Đã thêm hình ảnh qua link!", "success");
+    }
+    setQuickMediaUrl("");
   };
 
   // Filtered jobs
@@ -372,9 +515,6 @@ export default function AdminDashboardPage() {
               <div className="flex items-center gap-2">
                 <span className="font-black text-gray-950 text-base sm:text-lg tracking-tight">
                   LẨU BÒ TRĂM RƯỠI
-                </span>
-                <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                  CMS ADMIN
                 </span>
               </div>
               <p className="text-xs text-gray-500 font-medium">Hệ thống quản trị việc làm & ứng viên</p>
@@ -845,13 +985,13 @@ export default function AdminDashboardPage() {
 
             {/* Modal Body Form */}
             <form onSubmit={handleSaveJob} className="p-6 overflow-y-auto space-y-8 flex-1">
-              {/* SECTION 1: THÔNG TIN CƠ BẢN (KHỚP 1:1 VỚI CLIENT) */}
-              <div className="space-y-4">
+              {/* SECTION 1: TIÊU ĐỀ & MỨC LƯƠNG & TRẠNG THÁI */}
+              <div className="space-y-4 bg-gray-50/60 p-4 sm:p-5 rounded-2xl border border-gray-200">
                 <h4 className="text-xs font-black uppercase tracking-wider text-brand-900 border-b border-gray-200 pb-2 flex items-center gap-2">
-                  <span>📌 1. Tiêu Đề, Mức Lương & Thẻ Tag (Badges)</span>
+                  <span>📌 1. Tiêu Đề Công Việc & Mức Lương</span>
                 </h4>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1">
                       Tiêu đề công việc <span className="text-red-500">*</span>
@@ -876,7 +1016,7 @@ export default function AdminDashboardPage() {
                         });
                       }}
                       placeholder="Ví dụ: Học việc bếp"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold focus:ring-2 focus:ring-brand-700 outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold focus:ring-2 focus:ring-brand-700 outline-none bg-white"
                     />
                   </div>
 
@@ -890,36 +1030,14 @@ export default function AdminDashboardPage() {
                       value={editingJob.salaryDisplay || ""}
                       onChange={(e) => setEditingJob({ ...editingJob, salaryDisplay: e.target.value })}
                       placeholder="Ví dụ: 7,5 - 10 triệu/tháng hoặc 22.000 - 35.000 đ/h"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm font-black text-brand-900 focus:ring-2 focus:ring-brand-700 outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm font-black text-brand-900 focus:ring-2 focus:ring-brand-700 outline-none bg-white"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1">
-                      Thẻ Badges trên đầu tiêu đề (cách nhau dấu phẩy)
+                      Số Hotline / Zalo liên hệ phỏng vấn
                     </label>
-                    <input
-                      type="text"
-                      value={
-                        editingJob.badges && editingJob.badges.length > 0
-                          ? editingJob.badges.join(", ")
-                          : editingJob.badge || "18–30 tuổi, Chưa có tay nghề"
-                      }
-                      onChange={(e) => {
-                        const arr = e.target.value.split(",").map((s) => s.trim()).filter(Boolean);
-                        setEditingJob({
-                          ...editingJob,
-                          badges: arr,
-                          badge: arr.join(", "),
-                        });
-                      }}
-                      placeholder="Ví dụ: 18–30 tuổi, Chưa có tay nghề"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm font-medium focus:ring-2 focus:ring-brand-700 outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1">Hotline / Zalo liên hệ</label>
                     <input
                       type="text"
                       value={editingJob.contactZalo || editingJob.concisePost?.zalo || "0981256712"}
@@ -934,19 +1052,19 @@ export default function AdminDashboardPage() {
                         });
                       }}
                       placeholder="0981256712"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold text-blue-600 focus:ring-2 focus:ring-brand-700 outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold text-blue-600 focus:ring-2 focus:ring-brand-700 outline-none bg-white"
                     />
                   </div>
                 </div>
 
                 {/* Urgent & Active Toggles */}
-                <div className="flex flex-wrap gap-6 pt-2">
+                <div className="flex flex-wrap gap-6 pt-1">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={editingJob.isActive ?? true}
                       onChange={(e) => setEditingJob({ ...editingJob, isActive: e.target.checked })}
-                      className="w-4 h-4 text-brand-700 rounded focus:ring-brand-700"
+                      className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
                     />
                     <span className="text-xs font-bold text-gray-800">Hiển thị bài đăng trên website</span>
                   </label>
@@ -963,38 +1081,210 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* SECTION 3: NỘI DUNG BÀI ĐĂNG (CONCISE POST) */}
-              <div className="space-y-4">
-                <h4 className="text-xs font-black uppercase tracking-wider text-brand-900 border-b border-gray-200 pb-2 flex items-center gap-2">
-                  <span>📝 3. Nội Dung Bài Đăng (Headline, Intro & Điểm Nhấn)</span>
-                </h4>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Tiêu đề giật tít (Headline)</label>
-                  <input
-                    type="text"
-                    value={editingJob.concisePost?.headline || ""}
-                    onChange={(e) =>
-                      setEditingJob({
-                        ...editingJob,
-                        concisePost: {
-                          ...editingJob.concisePost,
-                          headline: e.target.value,
-                          intro: editingJob.concisePost?.intro || "",
-                          points: editingJob.concisePost?.points || [],
-                          zalo: editingJob.concisePost?.zalo || "0981256712",
-                        },
-                      })
-                    }
-                    placeholder="🔥 HỌC VIỆC KHÔNG LO MẤT PHÍ – LẠI CÒN ĐƯỢC NHẬN LƯƠNG ĐỦ! 🔥"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm font-bold text-red-900 focus:ring-2 focus:ring-brand-700 outline-none"
-                  />
+              {/* SECTION 2: THẺ YÊU CẦU ĐỘ TUỔI (TAGS CHECKBOX + INPUT THỦ CÔNG) */}
+              <div className="space-y-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-2.5">
+                  <div>
+                    <h4 className="text-xs font-black uppercase tracking-wider text-gray-900 flex items-center gap-2">
+                      <span>🎂 2. Yêu Cầu Độ Tuổi (Thẻ Bật/Tắt & Điền Thủ Công)</span>
+                    </h4>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      Bấm vào thẻ để chọn/bỏ chọn độ tuổi, hoặc tự điền độ tuổi thủ công bên dưới nếu không có thẻ phù hợp.
+                    </p>
+                  </div>
+                  {editingJob.ageRequirement && (
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1.5 shadow-sm">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Đang chọn: <strong>{editingJob.ageRequirement}</strong></span>
+                    </span>
+                  )}
                 </div>
 
+                {/* Danh sách thẻ độ tuổi dạng Pill Buttons với icon Checkbox / + / X */}
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  {PRESET_AGE_TAGS.map((tag) => {
+                    const isSelected = editingJob.ageRequirement === tag;
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          const nextAge = isSelected ? "" : tag;
+                          // Also sync badges
+                          const currentBadges = editingJob.badges ? [...editingJob.badges] : [];
+                          const filteredBadges = currentBadges.filter((b) => !PRESET_AGE_TAGS.includes(b));
+                          if (nextAge) filteredBadges.unshift(nextAge);
+                          setEditingJob({
+                            ...editingJob,
+                            ageRequirement: nextAge,
+                            badges: filteredBadges,
+                            badge: filteredBadges.join(", "),
+                          });
+                        }}
+                        className={`group inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold border transition-all cursor-pointer select-none active:scale-95 shadow-sm ${
+                          isSelected
+                            ? "border-emerald-500 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-500/30"
+                            : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        <span
+                          className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
+                            isSelected
+                              ? "bg-emerald-600 border-emerald-600 text-white"
+                              : "border-gray-300 bg-white group-hover:border-gray-400"
+                          }`}
+                        >
+                          {isSelected ? (
+                            <Check className="w-3 h-3 stroke-[3]" />
+                          ) : (
+                            <span className="w-1.5 h-1.5 rounded-full bg-transparent" />
+                          )}
+                        </span>
+
+                        <span>{tag}</span>
+
+                        {isSelected ? (
+                          <X className="w-3.5 h-3.5 text-emerald-700 hover:text-red-600 transition" />
+                        ) : (
+                          <Plus className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Input thủ công nếu không có thẻ phù hợp */}
+                <div className="pt-2.5 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center gap-2.5">
+                  <div className="text-xs font-bold text-gray-700 shrink-0 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-400" />
+                    <span>Hoặc tự điền độ tuổi thủ công:</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={editingJob.ageRequirement || ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setEditingJob({
+                        ...editingJob,
+                        ageRequirement: val,
+                      });
+                    }}
+                    placeholder="Nhập độ tuổi tùy chỉnh nếu không có thẻ tag phù hợp ở trên (VD: 19 – 27 tuổi, Đủ 20 tuổi trở lên)..."
+                    className="flex-1 px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-medium focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* SECTION 3: THẺ YÊU CẦU KINH NGHIỆM (TAGS CHECKBOX + INPUT THỦ CÔNG) */}
+              <div className="space-y-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-2.5">
+                  <div>
+                    <h4 className="text-xs font-black uppercase tracking-wider text-gray-900 flex items-center gap-2">
+                      <span>⭐ 3. Yêu Cầu Kinh Nghiệm (Thẻ Bật/Tắt & Điền Thủ Công)</span>
+                    </h4>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      Bấm vào thẻ để chọn/bỏ chọn yêu cầu kinh nghiệm, hoặc tự điền kinh nghiệm thủ công.
+                    </p>
+                  </div>
+                  {editingJob.experienceDisplay && (
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1.5 shadow-sm">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Đang chọn: <strong>{editingJob.experienceDisplay}</strong></span>
+                    </span>
+                  )}
+                </div>
+
+                {/* Danh sách thẻ kinh nghiệm dạng Pill Buttons với icon Checkbox / + / X */}
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  {PRESET_EXPERIENCE_TAGS.map((tag) => {
+                    const isSelected = editingJob.experienceDisplay === tag;
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          const nextExp = isSelected ? "" : tag;
+                          // Also sync badges
+                          const currentBadges = editingJob.badges ? [...editingJob.badges] : [];
+                          const filteredBadges = currentBadges.filter((b) => !PRESET_EXPERIENCE_TAGS.includes(b));
+                          if (nextExp) filteredBadges.push(nextExp);
+                          setEditingJob({
+                            ...editingJob,
+                            experienceDisplay: nextExp,
+                            badges: filteredBadges,
+                            badge: filteredBadges.join(", "),
+                          });
+                        }}
+                        className={`group inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold border transition-all cursor-pointer select-none active:scale-95 shadow-sm ${
+                          isSelected
+                            ? "border-emerald-500 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-500/30"
+                            : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        <span
+                          className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
+                            isSelected
+                              ? "bg-emerald-600 border-emerald-600 text-white"
+                              : "border-gray-300 bg-white group-hover:border-gray-400"
+                          }`}
+                        >
+                          {isSelected ? (
+                            <Check className="w-3 h-3 stroke-[3]" />
+                          ) : (
+                            <span className="w-1.5 h-1.5 rounded-full bg-transparent" />
+                          )}
+                        </span>
+
+                        <span>{tag}</span>
+
+                        {isSelected ? (
+                          <X className="w-3.5 h-3.5 text-emerald-700 hover:text-red-600 transition" />
+                        ) : (
+                          <Plus className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Input thủ công kinh nghiệm */}
+                <div className="pt-2.5 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center gap-2.5">
+                  <div className="text-xs font-bold text-gray-700 shrink-0 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-400" />
+                    <span>Hoặc tự điền kinh nghiệm thủ công:</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={editingJob.experienceDisplay || ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setEditingJob({
+                        ...editingJob,
+                        experienceDisplay: val,
+                      });
+                    }}
+                    placeholder="Nhập yêu cầu kinh nghiệm khác nếu có (VD: Ưu tiên có kinh nghiệm làm đồ nướng, phục vụ bàn...)..."
+                    className="flex-1 px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-medium focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* SECTION 4: NỘI DUNG CÔNG VIỆC */}
+              <div className="space-y-4 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <h4 className="text-xs font-black uppercase tracking-wider text-brand-900 border-b border-gray-100 pb-2.5 flex items-center gap-2">
+                  <span>📝 4. Nội Dung Công Việc</span>
+                </h4>
+
+                {/* Long Text Input */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Đoạn giới thiệu mở đầu (Intro)</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-bold text-gray-700">
+                      Nội dung công việc <span className="text-red-500">*</span>
+                    </label>
+                    <span className="text-[11px] text-gray-400">Hiển thị nổi bật ở trang tuyển dụng</span>
+                  </div>
                   <textarea
-                    rows={3}
+                    rows={6}
                     value={editingJob.concisePost?.intro || ""}
                     onChange={(e) =>
                       setEditingJob({
@@ -1008,347 +1298,212 @@ export default function AdminDashboardPage() {
                         },
                       })
                     }
-                    placeholder="Bạn muốn học nghề bếp bài bản nhưng ngại đóng học phí?..."
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-700 outline-none"
+                    className="w-full px-3.5 py-3 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-700 outline-none leading-relaxed"
                   />
-                </div>
-
-                {/* Points List */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-gray-700">Các gạch đầu dòng điểm nhấn (Points)</label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const points = [...(editingJob.concisePost?.points || [])];
-                        points.push({ icon: "🔹", label: "Điểm nhấn mới:", content: "" });
-                        setEditingJob({
-                          ...editingJob,
-                          concisePost: {
-                            ...editingJob.concisePost,
-                            headline: editingJob.concisePost?.headline || "",
-                            intro: editingJob.concisePost?.intro || "",
-                            points,
-                            zalo: editingJob.concisePost?.zalo || "0981256712",
-                          },
-                        });
-                      }}
-                      className="text-xs font-bold text-brand-800 hover:underline flex items-center gap-1"
-                    >
-                      <Plus className="w-3.5 h-3.5" /> Thêm dòng
-                    </button>
-                  </div>
-
-                  {editingJob.concisePost?.points?.map((pt, idx) => (
-                    <div key={idx} className="flex items-center gap-2 bg-gray-50 p-2 rounded-xl border border-gray-200">
-                      <input
-                        type="text"
-                        value={pt.icon}
-                        onChange={(e) => {
-                          const points = [...(editingJob.concisePost?.points || [])];
-                          points[idx].icon = e.target.value;
-                          setEditingJob({
-                            ...editingJob,
-                            concisePost: { ...editingJob.concisePost!, points },
-                          });
-                        }}
-                        className="w-10 text-center py-1.5 rounded-lg border border-gray-300 text-base"
-                        title="Emoji Icon"
-                      />
-                      <input
-                        type="text"
-                        value={pt.label || ""}
-                        onChange={(e) => {
-                          const points = [...(editingJob.concisePost?.points || [])];
-                          points[idx].label = e.target.value;
-                          setEditingJob({
-                            ...editingJob,
-                            concisePost: { ...editingJob.concisePost!, points },
-                          });
-                        }}
-                        placeholder="Nhãn (ví dụ: Độ tuổi:)"
-                        className="w-1/3 px-2.5 py-1.5 rounded-lg border border-gray-300 text-xs font-bold"
-                      />
-                      <input
-                        type="text"
-                        value={pt.content}
-                        onChange={(e) => {
-                          const points = [...(editingJob.concisePost?.points || [])];
-                          points[idx].content = e.target.value;
-                          setEditingJob({
-                            ...editingJob,
-                            concisePost: { ...editingJob.concisePost!, points },
-                          });
-                        }}
-                        placeholder="Nội dung chi tiết..."
-                        className="flex-1 px-2.5 py-1.5 rounded-lg border border-gray-300 text-xs"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const points = editingJob.concisePost!.points.filter((_, i) => i !== idx);
-                          setEditingJob({
-                            ...editingJob,
-                            concisePost: { ...editingJob.concisePost!, points },
-                          });
-                        }}
-                        className="text-gray-400 hover:text-red-600 p-1"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
                 </div>
               </div>
 
-              {/* SECTION 4: HÌNH ẢNH & VIDEO TRANG CHI TIẾT */}
-              <div className="space-y-6 bg-amber-50/50 p-5 rounded-2xl border border-amber-200/80">
-                <div className="flex items-center justify-between border-b border-amber-200 pb-3">
+              {/* SECTION 5: QUẢN LÝ MEDIA TỰ DO (VIDEO & ẢNH KHÔNG GIỚI HẠN) */}
+              <div className="space-y-4 bg-amber-50/50 p-4 sm:p-5 rounded-2xl border border-amber-200/90 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-200 pb-3">
                   <div>
-                    <h4 className="text-sm font-black uppercase tracking-wider text-amber-950 flex items-center gap-2">
+                    <h4 className="text-xs font-black uppercase tracking-wider text-amber-950 flex items-center gap-2">
                       <ImageIcon className="w-4 h-4 text-amber-800" />
-                      <span>📸 4. Quản Lý Media: Hình Ảnh & Video Trang Chi Tiết</span>
+                      <span>📸 5. Quản Lý Media: Video & Hình Ảnh Tự Do</span>
                     </h4>
-                    <p className="text-xs text-amber-800 mt-0.5">
-                      Thêm, xóa, sửa ảnh thực tế và video hiển thị trực tiếp ở trang chi tiết công việc.
+                    <p className="text-[11px] text-amber-800 mt-0.5">
+                      Thêm video và hình ảnh tùy thích (không giới hạn số lượng). Bấm icon để tải từ máy hoặc dán link.
                     </p>
                   </div>
-                </div>
 
-                {/* 1 Video Section */}
-                <div className="space-y-3 bg-white p-4 rounded-xl border border-amber-200 shadow-sm">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <label className="text-xs font-black uppercase text-gray-800 flex items-center gap-2">
-                      <Video className="w-4 h-4 text-red-600" />
-                      <span>Video Vị Trí Việc Làm (MP4 / WebM / Link)</span>
+                  {/* Icon Actions Bar */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Icon Thêm Video */}
+                    <label
+                      className="cursor-pointer inline-flex items-center justify-center w-8 h-8 rounded-xl bg-red-600 hover:bg-red-700 text-white shadow-sm transition active:scale-95 shrink-0"
+                      title={editingJob.videoUrl ? "Đổi video" : "Thêm video"}
+                    >
+                      <Video className="w-4 h-4" />
+                      <input
+                        type="file"
+                        accept="video/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            handleUploadVideo(e.target.files[0]);
+                          }
+                        }}
+                      />
                     </label>
 
-                    <div className="flex items-center gap-2">
+                    {/* Icon Thêm Hình Ảnh */}
+                    <label
+                      className="cursor-pointer inline-flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm transition active:scale-95 shrink-0"
+                      title="Thêm ảnh (Chọn nhiều ảnh)"
+                    >
+                      <ImageIcon className="w-4 h-4" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            handleUploadMultipleImages(e.target.files);
+                          }
+                        }}
+                      />
+                    </label>
+
+                    {/* Dán link trực tiếp */}
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="text"
+                        placeholder="Dán link ảnh/video..."
+                        value={quickMediaUrl}
+                        onChange={(e) => setQuickMediaUrl(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddQuickUrl();
+                          }
+                        }}
+                        className="w-36 sm:w-44 px-2.5 py-1.5 rounded-xl border border-gray-300 text-xs font-mono outline-none focus:ring-1 focus:ring-brand-700 bg-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddQuickUrl}
+                        className="px-2.5 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-900 text-white font-bold text-xs transition"
+                        title="Thêm link này"
+                      >
+                        Thêm
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* HÀNG MEDIA NẰM TRÊN 1 HÀNG CUỘN NGANG (CHỈ HIỂN THỊ KHI CÓ MEDIA ĐƯỢC THÊM) */}
+                {Boolean(editingJob.videoUrl || (editingJob.images && editingJob.images.filter(Boolean).length > 0)) ? (
+                  <div className="overflow-x-auto pb-3 pt-1 -mx-1 px-1 scrollbar-thin">
+                    <div className="flex items-start gap-3 min-w-max">
+                      
+                      {/* THẺ VIDEO (CHỈ HIỂN THỊ KHI ĐÃ THÊM VIDEO) */}
                       {editingJob.videoUrl && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (confirm("Bạn có chắc muốn xóa video khỏi bài đăng này?")) {
-                              setEditingJob({ ...editingJob, videoUrl: "", videoPoster: "" });
-                              showToast("Đã xóa video khỏi bài đăng!", "success");
-                            }
-                          }}
-                          className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold transition flex items-center gap-1 border border-red-200"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>Xóa video</span>
-                        </button>
+                        <div className="w-40 sm:w-44 aspect-[3/4] bg-white p-2 rounded-2xl border-2 border-red-300 shadow-sm flex flex-col justify-between shrink-0 relative group">
+                          <div className="flex items-center justify-between text-xs font-bold text-red-900 mb-1 z-10">
+                            <span className="flex items-center gap-1 bg-red-100 text-red-800 px-2 py-0.5 rounded-full text-[10px]">
+                              <Video className="w-3 h-3 text-red-600" /> Video
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (confirm("Xóa video này?")) {
+                                  setEditingJob({ ...editingJob, videoUrl: "", videoPoster: "" });
+                                  showToast("Đã xóa video!", "success");
+                                }
+                              }}
+                              className="w-6 h-6 rounded-full bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition shadow-sm"
+                              title="Xóa video"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+
+                          {/* Video player */}
+                          <div className="relative w-full flex-1 rounded-xl overflow-hidden bg-black flex items-center justify-center shadow-inner">
+                            <video
+                              controls
+                              playsInline
+                              preload="metadata"
+                              poster={editingJob.videoPoster && !editingJob.videoPoster.includes("/images/jobs/") ? editingJob.videoPoster : undefined}
+                              className="w-full h-full object-cover"
+                              key={editingJob.videoUrl}
+                            >
+                              <source src={editingJob.videoUrl.includes("#t=") ? editingJob.videoUrl : `${editingJob.videoUrl}#t=0.001`} type="video/mp4" />
+                            </video>
+                          </div>
+
+                          {/* Đổi video */}
+                          <label className="cursor-pointer mt-1.5 w-full text-center py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 font-bold text-[10px] border border-red-200 transition flex items-center justify-center gap-1">
+                            <Upload className="w-3 h-3" />
+                            <span>Đổi video</span>
+                            <input
+                              type="file"
+                              accept="video/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  handleUploadVideo(e.target.files[0]);
+                                }
+                              }}
+                            />
+                          </label>
+                        </div>
                       )}
 
-                      <label className="cursor-pointer text-xs font-bold text-brand-800 hover:underline flex items-center gap-1 px-2.5 py-1 rounded-lg bg-brand-50 border border-brand-200">
-                        <Upload className="w-3.5 h-3.5" />
-                        <span>Tải file video lên</span>
-                        <input
-                          type="file"
-                          accept="video/*"
-                          className="hidden"
-                          onChange={(e) => {
-                            if (e.target.files && e.target.files[0]) {
-                              handleFileUpload(e.target.files[0], undefined, true);
-                            }
-                          }}
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                    <div className="space-y-2">
-                      <input
-                        type="text"
-                        value={editingJob.videoUrl || ""}
-                        onChange={(e) => setEditingJob({ ...editingJob, videoUrl: e.target.value })}
-                        placeholder="Link file video (ví dụ: /uploads/video.mp4 hoặc https://...)"
-                        className="w-full px-3 py-2 rounded-lg border border-gray-300 text-xs font-mono focus:ring-2 focus:ring-brand-700 outline-none"
-                      />
-                      <input
-                        type="text"
-                        value={editingJob.videoPoster || ""}
-                        onChange={(e) => setEditingJob({ ...editingJob, videoPoster: e.target.value })}
-                        placeholder="URL ảnh bìa video (Poster) - Để trống sẽ dùng ảnh đầu tiên"
-                        className="w-full px-3 py-2 rounded-lg border border-gray-300 text-xs font-mono focus:ring-2 focus:ring-brand-700 outline-none"
-                      />
-                    </div>
-
-                    {/* Live Video Preview */}
-                    <div className="relative rounded-xl overflow-hidden bg-black aspect-video shadow-inner flex items-center justify-center">
-                      {editingJob.videoUrl ? (
-                        <video
-                          controls
-                          playsInline
-                          poster={editingJob.videoPoster}
-                          className="w-full h-full object-cover"
-                          key={editingJob.videoUrl}
+                      {/* CÁC THẺ HÌNH ẢNH (CHỈ HIỂN THỊ CÁC ẢNH ĐÃ THÊM, HIỂN THỊ DẦN DẦN, KHÔNG CÓ THẺ TRỐNG) */}
+                      {(editingJob.images || []).filter(Boolean).map((img, idx) => (
+                        <div
+                          key={idx}
+                          className="w-40 sm:w-44 aspect-[3/4] bg-white p-2 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between shrink-0 relative group"
                         >
-                          <source src={editingJob.videoUrl} type="video/mp4" />
-                        </video>
-                      ) : (
-                        <span className="text-xs text-gray-400">Không có video (chỉ hiển thị hình ảnh)</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Danh Sách Hình Ảnh Thực Tế Tiệm */}
-                <div className="space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <label className="text-xs font-black uppercase text-gray-800 flex items-center gap-2">
-                      <ImageIcon className="w-4 h-4 text-blue-600" />
-                      <span>Hình Ảnh Thực Tế Vị Trí ({(editingJob.images || []).length} ảnh)</span>
-                    </label>
-
-                    <div className="flex items-center gap-2">
-                      {/* Nút upload thêm ảnh từ máy tính */}
-                      <label className="cursor-pointer text-xs font-bold text-white bg-brand-800 hover:bg-brand-900 px-3 py-1.5 rounded-xl shadow-sm transition flex items-center gap-1.5">
-                        <Upload className="w-3.5 h-3.5" />
-                        <span>Tải ảnh mới từ máy tính</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => {
-                            if (e.target.files && e.target.files[0]) {
-                              handleFileUpload(e.target.files[0], undefined, false);
-                            }
-                          }}
-                        />
-                      </label>
-
-                      {/* Nút thêm ô ảnh để nhập URL / chọn mẫu */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const current = editingJob.images || [];
-                          const nextPreset = PRESET_GALLERY[current.length % PRESET_GALLERY.length] || "/images/jobs/all_img_1.jpg";
-                          setEditingJob({
-                            ...editingJob,
-                            images: [...current, nextPreset],
-                          });
-                          showToast("Đã thêm 1 ô ảnh mới!", "success");
-                        }}
-                        className="px-3 py-1.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold transition flex items-center gap-1"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>Thêm ảnh từ thư viện</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {(!editingJob.images || editingJob.images.length === 0) ? (
-                    <div className="p-8 bg-white rounded-2xl border border-dashed border-gray-300 text-center space-y-2">
-                      <p className="text-xs text-gray-500">Chưa có hình ảnh nào cho bài đăng này.</p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditingJob({
-                            ...editingJob,
-                            images: PRESET_GALLERY.slice(0, 4),
-                          });
-                        }}
-                        className="px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 text-xs font-bold hover:bg-amber-200"
-                      >
-                        + Tự động thêm 4 ảnh mẫu mặc định
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {editingJob.images.map((currentImg, idx) => (
-                        <div key={idx} className="bg-white p-3 rounded-2xl border border-gray-200 shadow-sm space-y-2.5 relative group">
-                          <div className="flex items-center justify-between text-xs font-bold text-gray-700">
-                            <span>Ảnh {idx + 1}</span>
-
-                            <div className="flex items-center gap-1">
-                              {/* Nút xóa ảnh */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const updated = editingJob.images!.filter((_, i) => i !== idx);
-                                  setEditingJob({ ...editingJob, images: updated });
-                                  showToast(`Đã xóa ảnh ${idx + 1}!`, "success");
-                                }}
-                                className="p-1 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
-                                title="Xóa ảnh này khỏi bài đăng"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-
-                              {/* Nút đổi ảnh */}
-                              <label className="cursor-pointer text-brand-800 hover:text-brand-900 font-bold flex items-center gap-0.5 p-1 rounded-md hover:bg-brand-50" title="Tải ảnh khác đè lên">
-                                <Upload className="w-3 h-3" />
-                                <span className="text-[11px]">Đổi</span>
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  className="hidden"
-                                  onChange={(e) => {
-                                    if (e.target.files && e.target.files[0]) {
-                                      handleFileUpload(e.target.files[0], idx, false);
-                                    }
-                                  }}
-                                />
-                              </label>
-                            </div>
+                          <div className="flex items-center justify-between text-xs font-bold text-gray-700 mb-1 z-10">
+                            <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-[10px]">
+                              Ảnh #{idx + 1}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const current = (editingJob.images || []).filter(Boolean);
+                                current.splice(idx, 1);
+                                setEditingJob({ ...editingJob, images: current });
+                                showToast(`Đã xóa ảnh #${idx + 1}!`, "success");
+                              }}
+                              className="w-6 h-6 rounded-full bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition shadow-sm"
+                              title="Xóa ảnh này"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
 
-                          {/* Preview box */}
-                          <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-gray-100 border border-gray-200 group">
-                            {currentImg ? (
-                              <Image
-                                src={currentImg}
-                                alt={`Ảnh ${idx + 1}`}
-                                fill
-                                unoptimized={currentImg.startsWith("http") || currentImg.startsWith("data:")}
-                                className="object-cover group-hover:scale-105 transition duration-300"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
-                                Chưa có ảnh
-                              </div>
-                            )}
+                          {/* Image Preview */}
+                          <div className="relative w-full flex-1 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center">
+                            <Image
+                              src={img}
+                              alt={`Ảnh ${idx + 1}`}
+                              fill
+                              unoptimized={img.startsWith("http") || img.startsWith("data:")}
+                              className="object-cover group-hover:scale-105 transition duration-300"
+                            />
                           </div>
 
-                          {/* Image URL input */}
-                          <input
-                            type="text"
-                            value={currentImg}
-                            onChange={(e) => {
-                              const images = [...(editingJob.images || [])];
-                              images[idx] = e.target.value;
-                              setEditingJob({ ...editingJob, images });
-                            }}
-                            placeholder="/images/jobs/... hoặc https://"
-                            className="w-full px-2.5 py-1.5 rounded-lg border border-gray-300 text-[11px] font-mono focus:ring-1 focus:ring-brand-700 outline-none"
-                          />
-
-                          {/* Quick preset selector */}
-                          <div className="flex items-center gap-1 overflow-x-auto py-0.5 scrollbar-none">
-                            {PRESET_GALLERY.slice(0, 5).map((pImg, pIdx) => (
-                              <button
-                                key={pIdx}
-                                type="button"
-                                onClick={() => {
-                                  const images = [...(editingJob.images || [])];
-                                  images[idx] = pImg;
-                                  setEditingJob({ ...editingJob, images });
-                                }}
-                                className="w-6 h-6 rounded-md overflow-hidden border border-gray-300 shrink-0 hover:border-brand-700"
-                                title={`Dùng ảnh mẫu ${pIdx + 1}`}
-                              >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={pImg} alt="" className="w-full h-full object-cover" />
-                              </button>
-                            ))}
-                          </div>
+                          {/* Đổi ảnh này */}
+                          <label className="cursor-pointer mt-1.5 w-full text-center py-1 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold text-[10px] border border-gray-200 transition flex items-center justify-center gap-1">
+                            <Upload className="w-3 h-3" />
+                            <span>Đổi ảnh</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  handleReplaceImage(e.target.files[0], idx);
+                                }
+                              }}
+                            />
+                          </label>
                         </div>
                       ))}
+
                     </div>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <div className="py-6 px-4 rounded-xl border border-dashed border-amber-200 bg-amber-50/40 text-center">
+                    <p className="text-xs font-medium text-amber-900/70">
+                      Chưa có video hoặc ảnh nào. Bấm vào icon <strong>Video</strong> hoặc <strong>Ảnh</strong> ở trên để thêm.
+                    </p>
+                  </div>
+                )}
               </div>
 
 

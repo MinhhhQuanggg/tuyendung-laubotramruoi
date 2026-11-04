@@ -4,7 +4,7 @@ import { Sparkles } from "lucide-react";
 
 export default function HeroSection() {
   return (
-    <section className="relative text-white min-h-[420px] sm:min-h-[460px] md:min-h-[480px] flex flex-col justify-between overflow-hidden">
+    <section className="relative text-white min-h-[420px] sm:min-h-[460px] md:min-h-[480px] flex flex-col justify-between overflow-hidden bg-surface">
       {/* Background Image: Full banner chiều dài & chiều rộng */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -52,7 +52,7 @@ export default function HeroSection() {
       </div>
 
       {/* Đường cong vòm phía dưới Hero */}
-      <CurvedWaveDivider fillColor="#F8F9FA" className="w-full relative z-10 mt-auto" />
+      <CurvedWaveDivider fillColor="#F8F9FA" className="w-full relative z-10 mt-auto -mb-[2px]" />
     </section>
   );
 }

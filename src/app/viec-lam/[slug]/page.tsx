@@ -6,7 +6,7 @@ import { getJobByIdOrSlug } from "@/lib/jobs-store";
 import { siteConfig } from "@/config/site";
 import { generateJobPostingSchema } from "@/lib/schema";
 import StickyJobSidebar from "@/components/job-detail/StickyJobSidebar";
-import JobDetailMedia from "@/components/job-detail/JobDetailMedia";
+import { JobDetailImages, JobDetailVideo } from "@/components/job-detail/JobDetailMedia";
 import CurvedWaveDivider from "@/components/common/CurvedWaveDivider";
 import { ChevronRight } from "lucide-react";
 
@@ -15,6 +15,9 @@ interface JobDetailPageProps {
     slug: string;
   };
 }
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export function generateStaticParams() {
   return JOBS_DATA.map((job) => ({
@@ -87,27 +90,35 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
 
       {/* Layout 2 cột bất đối xứng (70% - 30%) theo mẫu 33.JPG */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 -mt-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* CỘT TRÁI (70% - Hộp trắng lớn chứa nội dung JD) */}
-          <div className="lg:col-span-8 space-y-8">
-            <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-gray-100">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Hộp trắng lớn chứa nội dung JD (Cột trái trên desktop) */}
+          <div className="lg:col-span-8 lg:col-start-1 lg:row-start-1 bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-gray-100">
               {/* Badge & Tên vị trí: Tiêu đề tăng 2px lên 26px / 32px */}
               <div className="border-b border-gray-100 pb-6 mb-8">
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  {(job.badges && job.badges.length > 0
-                    ? job.badges
-                    : job.badge
-                    ? job.badge.split(",").map((s) => s.trim())
-                    : [job.category]
-                  ).map((item, idx) => (
-                    <span
-                      key={idx}
-                      className="inline-block px-3 py-0.5 rounded-full text-[11px] sm:text-[12px] font-semibold bg-brand-50 text-brand-800 border border-brand-100"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
+                {/* Pill Badges phân loại đưa lên trên tiêu đề thẻ: hiển thị từ Độ tuổi & Kinh nghiệm */}
+                {(() => {
+                  const reqBadges = [job.ageRequirement, job.experienceDisplay].filter(Boolean);
+                  const displayBadges = reqBadges.length > 0
+                    ? reqBadges
+                    : (job.badges && job.badges.length > 0
+                      ? job.badges
+                      : job.badge
+                      ? job.badge.split(",").map((s) => s.trim())
+                      : [job.category]);
+
+                  return (
+                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                      {displayBadges.map((item, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-block px-3 py-0.5 rounded-full text-[11px] sm:text-[12px] font-semibold bg-brand-50 text-brand-800 border border-brand-100"
+                        >
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  );
+                })()}
                 <h1 className="text-[26px] sm:text-[32px] font-black text-gray-900 leading-tight">
                   {job.title}
                 </h1>
@@ -121,29 +132,32 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
               {/* Nội dung tuyển dụng ngắn gọn trực quan theo mẫu bài post thực tế */}
               {job.concisePost ? (
                 <div className="space-y-6">
-                  {/* Đoạn giới thiệu ngắn */}
-                  <p className="text-[18px] sm:text-[20px] text-gray-800 leading-relaxed font-normal">
+                  {/* Đoạn mô tả nội dung công việc */}
+                  <p className="text-[18px] sm:text-[20px] text-gray-800 leading-relaxed font-normal whitespace-pre-line">
                     {job.concisePost.intro}
                   </p>
 
-                  {/* Danh sách các gạch đầu dòng ngắn gọn với Icon / Emoji chuẩn mẫu */}
                   <div className="space-y-4 pt-1">
-                    {job.concisePost.points.map((point, i) => (
-                      <div
-                        key={i}
-                        className="flex items-start gap-3.5 text-[18px] sm:text-[20px] text-gray-800 leading-relaxed"
-                      >
-                        <span className="text-2xl shrink-0 mt-0.5 select-none">{point.icon}</span>
-                        <div>
-                          {point.label && (
-                            <span className="font-bold text-gray-950 mr-1.5">
-                              {point.label}
-                            </span>
-                          )}
-                          <span>{point.content}</span>
-                        </div>
-                      </div>
-                    ))}
+                    {/* Danh sách các gạch đầu dòng ngắn gọn với Icon / Emoji chuẩn mẫu (nếu chưa có trong intro) */}
+                    {job.concisePost.points &&
+                      job.concisePost.points
+                        .filter((point) => !job.concisePost?.intro?.includes(point.content))
+                        .map((point, i) => (
+                          <div
+                            key={i}
+                            className="flex items-start gap-3.5 text-[18px] sm:text-[20px] text-gray-800 leading-relaxed"
+                          >
+                            <span className="text-2xl shrink-0 mt-0.5 select-none">{point.icon}</span>
+                            <div>
+                              {point.label && (
+                                <span className="font-bold text-gray-950 mr-1.5">
+                                  {point.label}
+                                </span>
+                              )}
+                              <span>{point.content}</span>
+                            </div>
+                          </div>
+                        ))}
 
                     {/* Dòng liên hệ Zalo */}
                     {job.concisePost.zalo && (
@@ -173,27 +187,32 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
                   <div className="space-y-3">
                     <h3 className="text-xl font-bold text-gray-900">Mô tả công việc</h3>
                     <ul className="space-y-2 text-gray-700">
-                      {job.responsibilities.map((res, i) => (
-                        <li key={i}>• {res}</li>
-                      ))}
+                      {job.responsibilities && job.responsibilities.length > 0 ? (
+                        job.responsibilities.map((res, i) => <li key={i}>• {res}</li>)
+                      ) : (
+                        <li>Đang cập nhật nội dung công việc.</li>
+                      )}
                     </ul>
                   </div>
                 </div>
               )}
             </div>
-          </div>
 
-          {/* CỘT PHẢI (30% - Logo thương hiệu & Media thực tế) */}
-          <div className="lg:col-span-4 space-y-6">
+          {/* CỘT LOGO & VIDEO: Trên mobile hiển thị trước 4 ảnh; Trên desktop nằm ở cột phải (30%) */}
+          <div className="lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:row-end-3 space-y-6">
             {/* Logo thương hiệu */}
             <StickyJobSidebar job={job} />
 
-            {/* 4 Thẻ ảnh và 1 Thẻ video bên dưới logo */}
-            <JobDetailMedia
-              images={job.images}
+            {/* 1 Khung video thực tế khung dọc 3:4 (lấy ảnh đầu tiên của video làm ảnh thumbnail) */}
+            <JobDetailVideo
               videoUrl={job.videoUrl}
               videoPoster={job.videoPoster}
             />
+          </div>
+
+          {/* 4 THẺ ẢNH THỰC TẾ: Trên mobile hiển thị sau logo và video; Trên desktop nằm ở cột trái dưới hộp JD */}
+          <div className="lg:col-span-8 lg:col-start-1 lg:row-start-2">
+            <JobDetailImages images={job.images} />
           </div>
         </div>
       </div>

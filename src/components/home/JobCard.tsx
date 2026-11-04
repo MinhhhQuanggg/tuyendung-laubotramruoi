@@ -16,22 +16,30 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
       </div>
 
       <div>
-        {/* Pill Badges phân loại đưa lên trên tiêu đề thẻ, chia ra từng item riêng biệt */}
-        <div className="flex flex-wrap items-center gap-2 mb-2.5">
-          {(job.badges && job.badges.length > 0
-            ? job.badges
-            : job.badge
-            ? job.badge.split(",").map((s) => s.trim())
-            : [job.category]
-          ).map((item, idx) => (
-            <span
-              key={idx}
-              className="inline-block px-3 py-0.5 rounded-full text-[11px] sm:text-[13px] font-semibold bg-brand-50 text-brand-800 border border-brand-100"
-            >
-              {item}
-            </span>
-          ))}
-        </div>
+        {/* Pill Badges phân loại đưa lên trên tiêu đề thẻ: hiển thị từ Độ tuổi & Kinh nghiệm */}
+        {(() => {
+          const reqBadges = [job.ageRequirement, job.experienceDisplay].filter(Boolean);
+          const displayBadges = reqBadges.length > 0
+            ? reqBadges
+            : (job.badges && job.badges.length > 0
+              ? job.badges
+              : job.badge
+              ? job.badge.split(",").map((s) => s.trim())
+              : [job.category]);
+
+          return (
+            <div className="flex flex-wrap items-center gap-2 mb-2.5">
+              {displayBadges.map((item, idx) => (
+                <span
+                  key={idx}
+                  className="inline-block px-3 py-0.5 rounded-full text-[11px] sm:text-[13px] font-semibold bg-brand-50 text-brand-800 border border-brand-100"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          );
+        })()}
 
         {/* Tiêu đề vị trí: Tăng 2px lên 20px (mobile) / 22px (desktop) */}
         <h3 className="text-[20px] sm:text-[22px] font-bold text-gray-900 group-hover:text-brand-800 transition-colors line-clamp-2 mb-4 leading-snug">

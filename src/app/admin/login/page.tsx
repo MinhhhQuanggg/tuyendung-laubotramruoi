@@ -150,6 +150,20 @@ export default function AdminLoginPage() {
                 </>
               )}
             </button>
+
+            {/* Gợi ý điền nhanh tài khoản Admin */}
+            <div className="pt-2 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail("tuyendung.admin@gmail.com");
+                  setPassword("laubotramruoi123#");
+                }}
+                className="text-[11px] text-amber-800 hover:text-amber-950 font-semibold underline transition cursor-pointer inline-flex items-center gap-1"
+              >
+                <span>🔑 Bấm để điền sẵn tài khoản Quản trị viên</span>
+              </button>
+            </div>
           </form>
 
           {/* Back to site */}
