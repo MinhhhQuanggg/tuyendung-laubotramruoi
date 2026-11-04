@@ -113,6 +113,9 @@ async function seed() {
     is_urgent: j.isUrgent ?? false,
     is_active: j.isActive ?? true,
     contact_zalo: j.contactZalo || "0981256712",
+    images: (j.images as any) || [],
+    video_url: j.videoUrl || null,
+    video_poster: j.videoPoster || null,
   }));
 
   const { data: jobData, error: jobError } = await supabase
