@@ -120,64 +120,6 @@
     "contactZalo": "0981256712",
     "images": []
   },
-  "JOB-MW27YK2N": {
-    "id": "JOB-MW27YK2N",
-    "slug": "tai-xe",
-    "title": "Tài xế",
-    "category": "Học nghề có lương",
-    "badge": "20 – 30 tuổi, Kinh nghiệm 6 tháng – 1 năm",
-    "badges": [
-      "20 – 30 tuổi",
-      "Kinh nghiệm 6 tháng – 1 năm"
-    ],
-    "salaryDisplay": "7,5 - 10 triệu/tháng",
-    "minSalary": 7500000,
-    "maxSalary": 10000000,
-    "salaryUnit": "MONTH",
-    "locations": [
-      "Gò Vấp",
-      "Thủ Đức",
-      "Quận 10",
-      "Quận 3"
-    ],
-    "ageRequirement": "20 – 30 tuổi",
-    "workType": "FULL_TIME",
-    "workTypeDisplay": "Toàn thời gian (Ca 14h00 – 24h00)",
-    "workHours": "14h00 – 24h00 mỗi ngày",
-    "experienceDisplay": "Kinh nghiệm 6 tháng – 1 năm",
-    "experienceRequirements": "no requirements",
-    "concisePost": {
-      "headline": "",
-      "intro": "Lái xe đưa đón quản lý và hỗ trợ vận chuyển nội bộ các chi nhánh chuỗi Lẩu Bò Trăm Rưỡi.",
-      "points": [],
-      "zalo": "0981256712"
-    },
-    "responsibilities": [
-      "Lái xe đưa đón quản lý, giám sát các chi nhánh theo lịch trình.",
-      "Hỗ trợ giao nhận hàng hóa, nguyên vật liệu khẩn cấp giữa các cơ sở.",
-      "Bảo dưỡng, vệ sinh xe định kỳ đảm bảo vận hành an toàn."
-    ],
-    "requirements": [
-      "Độ tuổi từ 20 – 30 tuổi, có bằng lái xe B2 trở lên, lái xe cẩn thận, an toàn.",
-      "Chăm chỉ, thật thà, thông thạo đường phố TP.HCM."
-    ],
-    "benefits": [
-      "Lương 7,5 - 10 triệu/tháng, phụ cấp xăng xe công tác và thưởng chuyên cần.",
-      "Bao ăn ca, cấp đồng phục miễn phí, môi trường làm việc thân thiện, đãi ngộ tốt."
-    ],
-    "datePosted": "2026-11-04",
-    "validThrough": "2027-11-04T14:36:48.321Z",
-    "isUrgent": true,
-    "isActive": true,
-    "contactZalo": "0981256712",
-    "images": [
-      "https://fnojlgrgmqajnipxpolu.supabase.co/storage/v1/object/public/media/images/1793802986943-9eaqgf.jpg",
-      "https://fnojlgrgmqajnipxpolu.supabase.co/storage/v1/object/public/media/images/1793802987123-8mfz89.jpg",
-      "https://fnojlgrgmqajnipxpolu.supabase.co/storage/v1/object/public/media/images/1793802987249-1ynq69.jpg",
-      "https://fnojlgrgmqajnipxpolu.supabase.co/storage/v1/object/public/media/images/1793802987374-4ok3lm.jpg",
-      "https://fnojlgrgmqajnipxpolu.supabase.co/storage/v1/object/public/media/images/1793802987504-7nkhfe.jpg"
-    ]
-  },
   "QL-PHO-01": {
     "id": "QL-PHO-01",
     "slug": "pho-quan-ly-tiem",

@@ -347,6 +347,7 @@ export default function AdminDashboardPage() {
       const data = await res.json();
       if (data.success) {
         showToast(`Đã xóa "${title}" thành công!`, "success");
+        setJobs((prev) => prev.filter((j) => j.id !== id && j.slug !== id));
         fetchJobs();
         notifyJobsUpdated();
       } else {

@@ -5,6 +5,7 @@ import { JobItem } from "@/types/job";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase";
 
 const OVERRIDE_FILE_PATH = path.join(process.cwd(), "src", "data", "jobs-override.json");
+const DELETED_FILE_PATH = path.join(process.cwd(), "src", "data", "deleted-jobs.json");
 
 function readOverrideFile(): Record<string, JobItem> {
   try {
@@ -26,16 +27,43 @@ function writeOverrideFile(overrides: Record<string, JobItem>) {
   }
 }
 
+function readDeletedJobs(): string[] {
+  try {
+    if (fs.existsSync(DELETED_FILE_PATH)) {
+      const data = fs.readFileSync(DELETED_FILE_PATH, "utf8");
+      return JSON.parse(data) as string[];
+    }
+  } catch (err) {
+    console.error("Error reading deleted-jobs.json:", err);
+  }
+  return [];
+}
+
+function writeDeletedJobs(deletedIds: string[]) {
+  try {
+    fs.writeFileSync(
+      DELETED_FILE_PATH,
+      JSON.stringify(Array.from(new Set(deletedIds)), null, 2),
+      "utf8"
+    );
+  } catch (err) {
+    console.error("Error writing deleted-jobs.json:", err);
+  }
+}
+
 export async function getJobsList(): Promise<JobItem[]> {
   const overrides = readOverrideFile();
+  const deletedSet = new Set(readDeletedJobs());
   const map = new Map<string, JobItem>();
 
-  // 1. Tải danh mục bài đăng mặc định
+  // 1. Tải danh mục bài đăng mặc định (bỏ qua các bài đã bị xóa)
   for (const job of JOBS_DATA) {
-    map.set(job.id, job);
+    if (!deletedSet.has(job.id) && !deletedSet.has(job.slug)) {
+      map.set(job.id, job);
+    }
   }
 
-  // 2. Nếu Supabase đã kết nối, tải và gộp dữ liệu từ Supabase
+  // 2. Nếu Supabase đã kết nối, tải và gộp dữ liệu từ Supabase (bỏ qua các bài đã bị xóa)
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseAdmin();
@@ -47,41 +75,46 @@ export async function getJobsList(): Promise<JobItem[]> {
 
         if (!error && data && data.length > 0) {
           for (const j of data) {
-            map.set(j.id, {
-              id: j.id,
-              slug: j.slug,
-              title: j.title,
-              category: j.category as any,
-              badge: j.badge || undefined,
-              badges: (j.badges as string[]) || [],
-              salaryDisplay: j.salary_display,
-              minSalary: j.min_salary ?? undefined,
-              maxSalary: j.max_salary ?? undefined,
-              salaryUnit: (j.salary_unit as any) || "MONTH",
-              locations: (j.locations as string[]) || [],
-              ageRequirement: j.age_requirement || "",
-              workType: j.work_type as any,
-              workTypeDisplay: j.work_type_display,
-              workHours: j.work_hours || undefined,
-              experienceDisplay: j.experience_display || "",
-              experienceRequirements: j.experience_requirements || "",
-              descriptionHtml: j.description_html || undefined,
-              concisePost: (j.concise_post as any) || undefined,
-              responsibilities: (j.responsibilities as string[]) || [],
-              requirements: (j.requirements as string[]) || [],
-              benefits: (j.benefits as string[]) || [],
-              datePosted: j.date_posted,
-              validThrough: j.valid_through,
-              isUrgent: j.is_urgent,
-              isActive: j.is_active,
-              showInMenu: (j as any).show_in_menu !== null && (j as any).show_in_menu !== undefined ? (j as any).show_in_menu : true,
-              menuPlacement: ((j as any).menu_placement as any) || "PARENT",
-              parentMenu: (j as any).parent_menu || undefined,
-              contactZalo: j.contact_zalo || "0981256712",
-              images: (j.images as string[]) || [],
-              videoUrl: j.video_url || undefined,
-              videoPoster: j.video_poster || undefined,
-            });
+            if (!deletedSet.has(j.id) && !deletedSet.has(j.slug)) {
+              map.set(j.id, {
+                id: j.id,
+                slug: j.slug,
+                title: j.title,
+                category: j.category as any,
+                badge: j.badge || undefined,
+                badges: (j.badges as string[]) || [],
+                salaryDisplay: j.salary_display,
+                minSalary: j.min_salary ?? undefined,
+                maxSalary: j.max_salary ?? undefined,
+                salaryUnit: (j.salary_unit as any) || "MONTH",
+                locations: (j.locations as string[]) || [],
+                ageRequirement: j.age_requirement || "",
+                workType: j.work_type as any,
+                workTypeDisplay: j.work_type_display,
+                workHours: j.work_hours || undefined,
+                experienceDisplay: j.experience_display || "",
+                experienceRequirements: j.experience_requirements || "",
+                descriptionHtml: j.description_html || undefined,
+                concisePost: (j.concise_post as any) || undefined,
+                responsibilities: (j.responsibilities as string[]) || [],
+                requirements: (j.requirements as string[]) || [],
+                benefits: (j.benefits as string[]) || [],
+                datePosted: j.date_posted,
+                validThrough: j.valid_through,
+                isUrgent: j.is_urgent,
+                isActive: j.is_active,
+                showInMenu:
+                  (j as any).show_in_menu !== null && (j as any).show_in_menu !== undefined
+                    ? (j as any).show_in_menu
+                    : true,
+                menuPlacement: ((j as any).menu_placement as any) || "PARENT",
+                parentMenu: (j as any).parent_menu || undefined,
+                contactZalo: j.contact_zalo || "0981256712",
+                images: (j.images as string[]) || [],
+                videoUrl: j.video_url || undefined,
+                videoPoster: j.video_poster || undefined,
+              });
+            }
           }
         }
       }
@@ -90,20 +123,30 @@ export async function getJobsList(): Promise<JobItem[]> {
     }
   }
 
-  // 3. Gộp các chỉnh sửa từ file local overrides (luôn ưu tiên cao nhất cho cả bài mới lẫn bài chỉnh sửa)
+  // 3. Gộp các chỉnh sửa từ file local overrides (luôn ưu tiên cao nhất cho cả bài mới lẫn bài chỉnh sửa, bỏ qua bài đã xóa)
   for (const id in overrides) {
-    const existing = map.get(id);
-    if (existing) {
-      map.set(id, { ...existing, ...overrides[id] });
-    } else {
-      map.set(id, overrides[id]);
+    const overrideJob = overrides[id];
+    if (!deletedSet.has(id) && (!overrideJob.slug || !deletedSet.has(overrideJob.slug))) {
+      const existing = map.get(id);
+      if (existing) {
+        map.set(id, { ...existing, ...overrideJob });
+      } else {
+        map.set(id, overrideJob);
+      }
     }
   }
 
-  return Array.from(map.values());
+  return Array.from(map.values()).filter(
+    (j) => !deletedSet.has(j.id) && !deletedSet.has(j.slug)
+  );
 }
 
 export async function getJobByIdOrSlug(idOrSlug: string): Promise<JobItem | null> {
+  const deletedSet = new Set(readDeletedJobs());
+  if (deletedSet.has(idOrSlug)) {
+    return null;
+  }
+
   const jobs = await getJobsList();
   const directMatch = jobs.find((j) => j.id === idOrSlug || j.slug === idOrSlug);
   if (directMatch) return directMatch;
@@ -120,6 +163,15 @@ export async function getJobByIdOrSlug(idOrSlug: string): Promise<JobItem | null
 }
 
 export async function upsertJob(job: JobItem): Promise<JobItem> {
+  // Gỡ khỏi deleted-jobs nếu đang tạo mới hoặc cập nhật lại vị trí này
+  const deletedList = readDeletedJobs();
+  const filteredDeleted = deletedList.filter(
+    (item) => item !== job.id && item !== job.slug
+  );
+  if (filteredDeleted.length !== deletedList.length) {
+    writeDeletedJobs(filteredDeleted);
+  }
+
   // 1. Save to local overrides
   const overrides = readOverrideFile();
   overrides[job.id] = job;
@@ -170,14 +222,26 @@ export async function upsertJob(job: JobItem): Promise<JobItem> {
           parent_menu: job.parentMenu || null,
         };
 
-        const { error: fullError } = await supabase.from("jobs").upsert(fullRow as any, { onConflict: "id" });
+        const { error: fullError } = await supabase
+          .from("jobs")
+          .upsert(fullRow as any, { onConflict: "id" });
         if (fullError) {
-          // Nếu bảng Supabase chưa có cột menu mới (mã 42703), tự động lưu với baseRow để không bị mất dữ liệu
-          if (fullError.code === "42703" || fullError.message?.includes("show_in_menu") || fullError.message?.includes("menu_placement")) {
-            console.warn("Supabase jobs table missing menu columns, retrying with baseRow...");
-            const { error: baseError } = await supabase.from("jobs").upsert(baseRow as any, { onConflict: "id" });
+          if (
+            fullError.code === "42703" ||
+            fullError.message?.includes("show_in_menu") ||
+            fullError.message?.includes("menu_placement")
+          ) {
+            console.warn(
+              "Supabase jobs table missing menu columns, retrying with baseRow..."
+            );
+            const { error: baseError } = await supabase
+              .from("jobs")
+              .upsert(baseRow as any, { onConflict: "id" });
             if (baseError) {
-              console.error("Error upserting base job to Supabase:", baseError.message);
+              console.error(
+                "Error upserting base job to Supabase:",
+                baseError.message
+              );
             }
           } else {
             console.error("Error upserting job to Supabase:", fullError.message);
@@ -192,20 +256,70 @@ export async function upsertJob(job: JobItem): Promise<JobItem> {
   return job;
 }
 
-export async function deleteJob(id: string): Promise<boolean> {
-  // 1. Remove from local overrides or mark inactive
+export async function deleteJob(idOrSlug: string): Promise<boolean> {
+  // Tìm job theo ID hoặc Slug để có đủ thông tin
+  const job = await getJobByIdOrSlug(idOrSlug);
+  const targetId = job ? job.id : idOrSlug;
+  const targetSlug = job ? job.slug : idOrSlug;
+
+  // 1. Thêm vào danh sách đã xóa (deleted-jobs.json) để đảm bảo không bao giờ bị nạp lại từ JOBS_DATA
+  const deletedList = readDeletedJobs();
+  if (targetId && !deletedList.includes(targetId)) deletedList.push(targetId);
+  if (targetSlug && !deletedList.includes(targetSlug)) deletedList.push(targetSlug);
+  writeDeletedJobs(deletedList);
+
+  // 2. Xóa khỏi file overrides nếu có
   const overrides = readOverrideFile();
-  if (overrides[id]) {
-    delete overrides[id];
+  let overridesModified = false;
+  if (targetId && overrides[targetId]) {
+    delete overrides[targetId];
+    overridesModified = true;
+  }
+  if (targetSlug && overrides[targetSlug]) {
+    delete overrides[targetSlug];
+    overridesModified = true;
+  }
+  if (overridesModified) {
     writeOverrideFile(overrides);
   }
 
-  // 2. Remove or deactivate in Supabase
+  // 3. Xóa trong Supabase nếu có kết nối
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseAdmin();
       if (supabase) {
-        await supabase.from("jobs").delete().eq("id", id);
+        // Gỡ khóa ngoại trong bảng applications trước để tránh lỗi Foreign Key Constraint
+        try {
+          if (targetId) {
+            await supabase
+              .from("applications")
+              .update({ position_id: null })
+              .eq("position_id", targetId);
+          }
+        } catch (fkErr) {
+          console.warn("Unlink applications foreign key warning:", fkErr);
+        }
+
+        // Xóa hẳn dòng job theo ID và Slug
+        if (targetId) {
+          const { error: delErrorById } = await supabase
+            .from("jobs")
+            .delete()
+            .eq("id", targetId);
+          if (delErrorById) {
+            console.error("Supabase delete job by id error:", delErrorById.message);
+          }
+        }
+
+        if (targetSlug && targetSlug !== targetId) {
+          const { error: delErrorBySlug } = await supabase
+            .from("jobs")
+            .delete()
+            .eq("slug", targetSlug);
+          if (delErrorBySlug) {
+            console.error("Supabase delete job by slug error:", delErrorBySlug.message);
+          }
+        }
       }
     } catch (err) {
       console.error("Exception deleting job from Supabase:", err);

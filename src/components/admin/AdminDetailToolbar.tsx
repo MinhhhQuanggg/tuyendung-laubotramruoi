@@ -132,6 +132,27 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
     showToast("Đã sao chép liên kết tuyển dụng!", "success");
   };
 
+  // Delete job
+  const handleDeleteJob = async () => {
+    if (!confirm(`Bạn có chắc chắn muốn xóa vị trí việc làm "${job.title}"? Thao tác này không thể hoàn tác.`)) return;
+
+    try {
+      const res = await fetch(`/api/admin/jobs/${job.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        notifyJobsUpdated();
+        showToast(`Đã xóa "${job.title}" thành công!`, "success");
+        setTimeout(() => {
+          router.replace("/admin");
+        }, 800);
+      } else {
+        showToast(data.error || "Không thể xóa bài đăng", "error");
+      }
+    } catch {
+      showToast("Lỗi khi xóa bài đăng", "error");
+    }
+  };
+
   // Open Edit Form
   const handleOpenEdit = () => {
     const images = job.images && Array.isArray(job.images) ? [...job.images].filter(Boolean) : [];
@@ -400,6 +421,16 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
         >
           <Edit3 className="w-3.5 h-3.5" />
           <span>Chỉnh Sửa Vị Trí</span>
+        </button>
+
+        {/* Delete Job Button */}
+        <button
+          type="button"
+          onClick={handleDeleteJob}
+          className="p-1.5 rounded-xl bg-red-600/30 hover:bg-red-600/50 text-red-100 border border-red-400/40 transition flex items-center justify-center shadow-sm"
+          title="Xóa vị trí tuyển dụng này"
+        >
+          <Trash2 className="w-4 h-4 text-red-200" />
         </button>
       </div>
 

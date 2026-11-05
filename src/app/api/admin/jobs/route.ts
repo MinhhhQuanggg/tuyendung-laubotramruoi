@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { getJobsList, upsertJob } from "@/lib/jobs-store";
+import { getJobsList, upsertJob, deleteJob } from "@/lib/jobs-store";
 import { JobItem } from "@/types/job";
 import { slugify } from "@/lib/utils";
 
@@ -79,6 +79,33 @@ export async function POST(request: Request) {
 
     const saved = await upsertJob(newJob);
     return NextResponse.json({ success: true, job: saved });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  if (!isAuthenticated()) {
+    return NextResponse.json({ success: false, error: "Chưa đăng nhập quyền Admin" }, { status: 401 });
+  }
+
+  try {
+    const { searchParams } = new URL(request.url);
+    let id = searchParams.get("id");
+
+    if (!id) {
+      try {
+        const body = await request.json();
+        id = body?.id;
+      } catch {}
+    }
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: "Thiếu ID hoặc Slug của công việc cần xóa" }, { status: 400 });
+    }
+
+    await deleteJob(id);
+    return NextResponse.json({ success: true, message: "Đã xóa công việc thành công" });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
