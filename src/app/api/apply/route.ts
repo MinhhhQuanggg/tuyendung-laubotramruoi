@@ -4,6 +4,7 @@ import { sendTelegramLeadNotification } from "@/lib/telegram";
 import { sendSlackApplicationNotification } from "@/lib/slack";
 import { appendCandidateToGoogleSheet } from "@/lib/google-sheets";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase";
+import { saveApplication } from "@/lib/applications-store";
 
 const ApplySchema = z.object({
   fullName: z.string().min(2, "Họ và tên tối thiểu 2 ký tự"),
@@ -42,43 +43,31 @@ export async function POST(request: Request) {
     let dbApplicationId: string | undefined = undefined;
     let dbSaved = false;
 
-    // 1. Lưu hồ sơ ứng viên vào Supabase Database nếu được cấu hình
-    if (isSupabaseConfigured()) {
-      try {
-        const supabase = getSupabaseAdmin();
-        if (supabase) {
-          const { data, error } = await supabase
-            .from("applications")
-            .insert({
-              full_name: validatedData.fullName,
-              age: validatedData.age,
-              phone_zalo: validatedData.phoneZalo,
-              applied_region: region,
-              address: validatedData.address || region,
-              position_id: validatedData.positionId,
-              position_title: validatedData.positionTitle,
-              preferred_branch: validatedData.preferredBranch,
-              cv_file_name: validatedData.cvFileName,
-              cv_base64: validatedData.cvBase64,
-              cv_file_size: validatedData.cvFileSize,
-              cv_file_type: validatedData.cvFileType,
-              note: validatedData.note,
-              status: "pending",
-              telegram_notified: false,
-            })
-            .select("id")
-            .single();
-
-          if (!error && data) {
-            dbApplicationId = data.id;
-            dbSaved = true;
-          } else if (error) {
-            console.error("Supabase insert application error:", error.message);
-          }
-        }
-      } catch (dbErr) {
-        console.error("Supabase insert exception:", dbErr);
+    // 1. Lưu hồ sơ ứng viên vào Hệ thống Quản trị (Supabase + Local Store)
+    try {
+      const savedApp = await saveApplication({
+        fullName: validatedData.fullName,
+        age: validatedData.age,
+        phoneZalo: validatedData.phoneZalo,
+        appliedRegion: region,
+        address: validatedData.address || region,
+        positionId: validatedData.positionId,
+        positionTitle: validatedData.positionTitle,
+        preferredBranch: validatedData.preferredBranch,
+        cvFileName: validatedData.cvFileName,
+        cvBase64: validatedData.cvBase64,
+        cvFileSize: validatedData.cvFileSize,
+        cvFileType: validatedData.cvFileType,
+        note: validatedData.note,
+        status: "pending",
+        telegramNotified: false,
+      });
+      if (savedApp) {
+        dbApplicationId = savedApp.id;
+        dbSaved = true;
       }
+    } catch (saveErr) {
+      console.error("Save application error:", saveErr);
     }
 
     // 2. Chạy song song các kênh lưu trữ & thông báo tức thì (Non-blocking để tối ưu thời gian phản hồi)

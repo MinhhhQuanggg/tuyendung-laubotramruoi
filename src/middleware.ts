@@ -27,6 +27,15 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // Tự động chuyển hướng từ slug jobs cũ sang viec-lam chuẩn trong admin
+  if (pathname.startsWith("/admin/jobs/")) {
+    const target = pathname.replace("/admin/jobs/", "/admin/viec-lam/");
+    return NextResponse.redirect(new URL(target, request.url));
+  }
+  if (pathname === "/admin/jobs" || pathname === "/admin/viec-lam") {
+    return NextResponse.redirect(new URL("/admin", request.url));
+  }
+
   return NextResponse.next();
 }
 

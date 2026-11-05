@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       author: body.author?.trim() || "@tiemlaubotramruoi",
       platform: body.platform?.trim() || "TikTok",
       thumbnail: body.thumbnail.trim(),
-      tag: body.tag?.trim() || "Đời sống Trăm Rưởi",
+      tag: body.tag?.trim() || "Đời sống Trăm Rưỡi",
       url: body.url.trim(),
       displayOrder: body.displayOrder !== undefined ? Number(body.displayOrder) : 0,
       isActive: body.isActive !== undefined ? Boolean(body.isActive) : true,

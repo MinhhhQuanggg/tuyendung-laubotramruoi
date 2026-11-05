@@ -8,6 +8,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        lora: ["var(--font-lora)", "Georgia", "serif"],
+        serif: ["var(--font-lora)", "Georgia", "serif"],
+        sans: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+      },
       colors: {
         brand: {
           50: "#fdf2f2",

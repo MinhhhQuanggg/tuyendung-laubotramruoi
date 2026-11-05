@@ -14,7 +14,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const isAdmin = pathname?.startsWith("/admin");
 
   if (isAdmin) {
-    return <main className="flex-1">{children}</main>;
+    return <main className="flex-1 font-sans">{children}</main>;
   }
 
   return (

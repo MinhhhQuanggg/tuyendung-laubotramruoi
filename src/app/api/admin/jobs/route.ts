@@ -2,11 +2,22 @@ import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
 import { getJobsList, upsertJob } from "@/lib/jobs-store";
 import { JobItem } from "@/types/job";
+import { slugify } from "@/lib/utils";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET() {
   try {
     const jobs = await getJobsList();
-    return NextResponse.json({ success: true, jobs });
+    return NextResponse.json(
+      { success: true, jobs },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        },
+      }
+    );
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
@@ -28,15 +39,7 @@ export async function POST(request: Request) {
     }
 
     const id = body.id || `JOB-${Date.now().toString(36).toUpperCase()}`;
-    const slug =
-      body.slug ||
-      body.title
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[đĐ]/g, "d")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)+/g, "");
+    const slug = slugify(body.slug || body.title);
 
     const newJob: JobItem = {
       id,
@@ -65,6 +68,9 @@ export async function POST(request: Request) {
       validThrough: body.validThrough || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
       isUrgent: body.isUrgent ?? false,
       isActive: body.isActive ?? true,
+      showInMenu: body.showInMenu !== undefined ? body.showInMenu : true,
+      menuPlacement: body.menuPlacement || "PARENT",
+      parentMenu: body.parentMenu,
       contactZalo: body.contactZalo || "0981256712",
       images: body.images || [],
       videoUrl: body.videoUrl,

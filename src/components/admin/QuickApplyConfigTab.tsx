@@ -118,6 +118,12 @@ export default function QuickApplyConfigTab() {
             <p className="text-xs sm:text-sm text-gray-300 mt-1 max-w-2xl leading-relaxed">
               Bạn có thể tùy chỉnh tiêu đề popup nộp đơn, số điện thoại Hotline/Zalo của HR, thông điệp phản hồi sau khi nộp và nội dung banner chân trang.
             </p>
+            <div className="mt-2.5 flex items-center gap-2 text-[11px] text-amber-300 bg-amber-950/40 px-3 py-1.5 rounded-xl border border-amber-500/30">
+              <span>🔗</span>
+              <span>
+                <b>Liên kết hệ thống:</b> Danh mục <b>Công việc tuyển dụng</b> và <b>Địa chỉ chi nhánh</b> trong form được tự động đồng bộ trực tiếp từ mục &quot;Vị Trí Tuyển Dụng&quot; &amp; &quot;Địa Chỉ Chi Nhánh&quot;.
+              </span>
+            </div>
           </div>
         </div>
 
@@ -152,7 +158,7 @@ export default function QuickApplyConfigTab() {
                 required
                 value={config.formTitle}
                 onChange={(e) => setConfig({ ...config, formTitle: e.target.value })}
-                placeholder="Ứng Tuyển Lẩu Bò Trăm Rưởi"
+                placeholder="Ứng Tuyển Lẩu Bò Trăm Rưỡi"
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold focus:ring-2 focus:ring-brand-700 outline-none"
               />
             </div>
@@ -215,7 +221,16 @@ export default function QuickApplyConfigTab() {
                   type="text"
                   required
                   value={config.hrPhone}
-                  onChange={(e) => setConfig({ ...config, hrPhone: e.target.value })}
+                  onChange={(e) => {
+                    const phone = e.target.value;
+                    const cleanPhone = phone.replace(/[^0-9]/g, "");
+                    const isDefaultZalo = !config.zaloUrl || config.zaloUrl.includes("zalo.me");
+                    setConfig({
+                      ...config,
+                      hrPhone: phone,
+                      zaloUrl: isDefaultZalo && cleanPhone ? `https://zalo.me/${cleanPhone}` : config.zaloUrl,
+                    });
+                  }}
                   placeholder="0981256712"
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-bold text-brand-900 focus:ring-2 focus:ring-brand-700 outline-none"
                 />
@@ -223,9 +238,12 @@ export default function QuickApplyConfigTab() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-                Đường Dẫn Chat Zalo Trực Tiếp
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  Đường Dẫn Chat Zalo Trực Tiếp
+                </label>
+                <span className="text-[11px] text-emerald-700 font-semibold">Tự động tạo theo SĐT</span>
+              </div>
               <input
                 type="text"
                 value={config.zaloUrl}
@@ -381,7 +399,7 @@ export default function QuickApplyConfigTab() {
             <div className="space-y-2">
               <span className="text-[11px] font-bold text-gray-300">Popup Ứng Tuyển Nhanh:</span>
               <div className="bg-white text-gray-900 rounded-2xl overflow-hidden shadow-md border border-gray-200 text-xs">
-                {/* Header đỏ Trăm Rưởi */}
+                {/* Header đỏ Trăm Rưỡi */}
                 <div className="bg-gradient-to-r from-brand-900 to-brand-800 text-white p-3.5 flex items-center gap-3">
                   <Image src="/logo.png" alt="" width={32} height={32} className="object-contain shrink-0" />
                   <div>
@@ -398,8 +416,15 @@ export default function QuickApplyConfigTab() {
                   <div className="p-2 rounded-lg bg-white border border-gray-200 text-gray-500 text-[11px]">
                     Số điện thoại / Zalo...
                   </div>
-                  <div className="p-2 rounded-lg bg-white border border-gray-200 text-gray-500 text-[11px]">
-                    Chọn vị trí công việc...
+                  {/* Trường vị trí công việc liên kết */}
+                  <div className="p-2 rounded-lg bg-brand-50/60 border border-brand-200 text-brand-950 text-[11px] font-bold flex items-center justify-between">
+                    <span>📌 Vị trí: Nhân Viên Phục Vụ (Full-time)</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-300 text-brand-950 font-black">Liên kết việc làm</span>
+                  </div>
+                  {/* Trường địa chỉ chi nhánh liên kết */}
+                  <div className="p-2 rounded-lg bg-brand-50/60 border border-brand-200 text-brand-950 text-[11px] font-bold flex items-center justify-between">
+                    <span>📍 Chi nhánh: CN 01 (Bình Thạnh) - 257 Phan Văn Trị</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-300 text-brand-950 font-black">Liên kết chi nhánh</span>
                   </div>
 
                   {config.allowCvUpload && (

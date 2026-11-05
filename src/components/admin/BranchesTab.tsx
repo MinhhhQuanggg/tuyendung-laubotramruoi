@@ -14,6 +14,7 @@ import {
   Phone,
   RefreshCw,
   X,
+  EyeOff,
   Navigation,
 } from "lucide-react";
 import { Branch, RegionType } from "@/types/branch";
@@ -29,6 +30,7 @@ export default function BranchesTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRegion, setSelectedRegion] = useState<string>("ALL");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -174,7 +176,11 @@ export default function BranchesTab() {
       `cn ${b.cnNumber}`.includes(q);
 
     const matchesRegion = selectedRegion === "ALL" || b.region === selectedRegion;
-    return matchesSearch && matchesRegion;
+    const matchesStatus =
+      statusFilter === "ALL" ||
+      (statusFilter === "ACTIVE" && b.isActive !== false) ||
+      (statusFilter === "INACTIVE" && b.isActive === false);
+    return matchesSearch && matchesRegion && matchesStatus;
   });
 
   return (
@@ -225,53 +231,171 @@ export default function BranchesTab() {
         </button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-            <Building className="w-6 h-6" />
+      {/* Stats Cards - Các nút lọc trạng thái & khu vực chi nhánh */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        {/* Card 1: Tất Cả */}
+        <button
+          type="button"
+          onClick={() => {
+            setStatusFilter("ALL");
+            setSelectedRegion("ALL");
+          }}
+          className={`p-4 sm:p-5 rounded-2xl border text-left flex items-center gap-3.5 transition duration-200 cursor-pointer active:scale-95 ${
+            statusFilter === "ALL" && selectedRegion === "ALL"
+              ? "bg-blue-50/70 border-blue-400 ring-2 ring-blue-500/40 shadow-md scale-[1.01]"
+              : "bg-white border-gray-200/80 shadow-sm hover:border-blue-300 hover:shadow-md"
+          }`}
+          title="Bấm để hiển thị tất cả chi nhánh"
+        >
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold transition shrink-0 ${
+              statusFilter === "ALL" && selectedRegion === "ALL" ? "bg-blue-600 text-white shadow-sm" : "bg-blue-50 text-blue-600"
+            }`}
+          >
+            <Building className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xl font-black text-gray-900">{branches.length}</div>
-            <div className="text-xs font-semibold text-gray-500">Tổng Số Chi Nhánh</div>
+            <div className="text-xl sm:text-2xl font-black text-gray-900">{branches.length}</div>
+            <div className="text-xs font-semibold text-gray-500 flex items-center gap-1">
+              <span>Tổng Chi Nhánh</span>
+              {statusFilter === "ALL" && selectedRegion === "ALL" && (
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+              )}
+            </div>
           </div>
-        </div>
+        </button>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-            <CheckCircle2 className="w-6 h-6" />
+        {/* Card 2: Đang Hoạt Động */}
+        <button
+          type="button"
+          onClick={() => setStatusFilter(statusFilter === "ACTIVE" ? "ALL" : "ACTIVE")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left flex items-center gap-3.5 transition duration-200 cursor-pointer active:scale-95 ${
+            statusFilter === "ACTIVE"
+              ? "bg-emerald-50/70 border-emerald-400 ring-2 ring-emerald-500/40 shadow-md scale-[1.01]"
+              : "bg-white border-gray-200/80 shadow-sm hover:border-emerald-300 hover:shadow-md"
+          }`}
+          title="Bấm để lọc chi nhánh đang hoạt động"
+        >
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold transition shrink-0 ${
+              statusFilter === "ACTIVE" ? "bg-emerald-600 text-white shadow-sm" : "bg-emerald-50 text-emerald-600"
+            }`}
+          >
+            <CheckCircle2 className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xl font-black text-gray-900">
+            <div className="text-xl sm:text-2xl font-black text-emerald-700">
               {branches.filter((b) => b.isActive !== false).length}
             </div>
-            <div className="text-xs font-semibold text-gray-500">Đang Hoạt Động</div>
+            <div className="text-xs font-semibold text-gray-500 flex items-center gap-1">
+              <span>Đang Hoạt Động</span>
+              {statusFilter === "ACTIVE" && (
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                  Lọc
+                </span>
+              )}
+            </div>
           </div>
-        </div>
+        </button>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold">
-            <MapPin className="w-6 h-6" />
+        {/* Card 3: Đã Tạm Ẩn / Đóng */}
+        <button
+          type="button"
+          onClick={() => setStatusFilter(statusFilter === "INACTIVE" ? "ALL" : "INACTIVE")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left flex items-center gap-3.5 transition duration-200 cursor-pointer active:scale-95 ${
+            statusFilter === "INACTIVE"
+              ? "bg-gray-100/80 border-gray-400 ring-2 ring-gray-400/50 shadow-md scale-[1.01]"
+              : "bg-white border-gray-200/80 shadow-sm hover:border-gray-300 hover:shadow-md"
+          }`}
+          title="Bấm để lọc chi nhánh đã tạm ẩn hoặc tạm ngưng"
+        >
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold transition shrink-0 ${
+              statusFilter === "INACTIVE" ? "bg-gray-700 text-white shadow-sm" : "bg-gray-100 text-gray-600"
+            }`}
+          >
+            <EyeOff className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xl font-black text-gray-900">
+            <div className="text-xl sm:text-2xl font-black text-gray-700">
+              {branches.filter((b) => b.isActive === false).length}
+            </div>
+            <div className="text-xs font-semibold text-gray-500 flex items-center gap-1">
+              <span>Tạm Ẩn / Đóng</span>
+              {statusFilter === "INACTIVE" && (
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-200 text-gray-800">
+                  Lọc
+                </span>
+              )}
+            </div>
+          </div>
+        </button>
+
+        {/* Card 4: Gò Vấp & Phú Nhuận */}
+        <button
+          type="button"
+          onClick={() => setSelectedRegion(selectedRegion === "go-vap-phu-nhuan" ? "ALL" : "go-vap-phu-nhuan")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left flex items-center gap-3.5 transition duration-200 cursor-pointer active:scale-95 ${
+            selectedRegion === "go-vap-phu-nhuan"
+              ? "bg-amber-50/70 border-amber-400 ring-2 ring-amber-500/40 shadow-md scale-[1.01]"
+              : "bg-white border-gray-200/80 shadow-sm hover:border-amber-300 hover:shadow-md"
+          }`}
+          title="Bấm để lọc chi nhánh khu vực Gò Vấp & Phú Nhuận"
+        >
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold transition shrink-0 ${
+              selectedRegion === "go-vap-phu-nhuan" ? "bg-amber-600 text-white shadow-sm" : "bg-amber-50 text-amber-700"
+            }`}
+          >
+            <MapPin className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl sm:text-2xl font-black text-amber-700">
               {branches.filter((b) => b.region === "go-vap-phu-nhuan").length}
             </div>
-            <div className="text-xs font-semibold text-gray-500">Gò Vấp & Phú Nhuận</div>
+            <div className="text-xs font-semibold text-gray-500 flex items-center gap-1">
+              <span>Gò Vấp & P.Nhuận</span>
+              {selectedRegion === "go-vap-phu-nhuan" && (
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900">
+                  Lọc
+                </span>
+              )}
+            </div>
           </div>
-        </div>
+        </button>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
-            <Navigation className="w-6 h-6" />
+        {/* Card 5: Thủ Đức & Khu Đông */}
+        <button
+          type="button"
+          onClick={() => setSelectedRegion(selectedRegion === "thu-duc-khu-dong" ? "ALL" : "thu-duc-khu-dong")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left flex items-center gap-3.5 transition duration-200 cursor-pointer active:scale-95 ${
+            selectedRegion === "thu-duc-khu-dong"
+              ? "bg-purple-50/70 border-purple-400 ring-2 ring-purple-500/40 shadow-md scale-[1.01]"
+              : "bg-white border-gray-200/80 shadow-sm hover:border-purple-300 hover:shadow-md"
+          }`}
+          title="Bấm để lọc chi nhánh khu vực Thủ Đức & Khu Đông"
+        >
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold transition shrink-0 ${
+              selectedRegion === "thu-duc-khu-dong" ? "bg-purple-600 text-white shadow-sm" : "bg-purple-50 text-purple-600"
+            }`}
+          >
+            <Navigation className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xl font-black text-gray-900">
+            <div className="text-xl sm:text-2xl font-black text-purple-700">
               {branches.filter((b) => b.region === "thu-duc-khu-dong").length}
             </div>
-            <div className="text-xs font-semibold text-gray-500">Thủ Đức & Khu Đông</div>
+            <div className="text-xs font-semibold text-gray-500 flex items-center gap-1">
+              <span>Thủ Đức & Đông</span>
+              {selectedRegion === "thu-duc-khu-dong" && (
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-900">
+                  Lọc
+                </span>
+              )}
+            </div>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Action Bar & Region Filter */}
@@ -334,6 +458,20 @@ export default function BranchesTab() {
               {reg.label} ({branches.filter((b) => b.region === reg.value).length})
             </button>
           ))}
+
+          {statusFilter !== "ALL" && (
+            <button
+              type="button"
+              onClick={() => setStatusFilter("ALL")}
+              className="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition flex items-center gap-1 shrink-0 ml-auto"
+              title="Bấm để xóa lọc trạng thái và hiển thị lại tất cả"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>
+                Đang lọc: {statusFilter === "ACTIVE" ? "Đang Hoạt Động" : "Đã Tạm Ẩn"} (Xóa lọc)
+              </span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -467,7 +605,7 @@ export default function BranchesTab() {
                       : "Thêm Chi Nhánh Mới"}
                   </h3>
                   <p className="text-xs text-gray-500">
-                    Cập nhật vị trí và địa chỉ tiệm trong chuỗi Lẩu Bò Trăm Rưởi
+                    Cập nhật vị trí và địa chỉ tiệm trong chuỗi Lẩu Bò Trăm Rưỡi
                   </p>
                 </div>
               </div>

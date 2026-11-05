@@ -19,18 +19,24 @@ import {
   Upload,
   X,
   Eye,
+  EyeOff,
   Building,
   RefreshCw,
   Sparkles,
   FileText,
   MapPin,
   Check,
+  Users,
 } from "lucide-react";
 import { JobItem, JobCategory } from "@/types/job";
 import { extractFirstFrameFromFile } from "@/lib/video-thumbnail";
+import { uploadMediaFile } from "@/lib/upload-client";
+import { slugify } from "@/lib/utils";
+import { savePreviewDraft } from "@/lib/job-preview";
 import LifeVideosTab from "@/components/admin/LifeVideosTab";
 import BranchesTab from "@/components/admin/BranchesTab";
 import QuickApplyConfigTab from "@/components/admin/QuickApplyConfigTab";
+import ApplicationsTab from "@/components/admin/ApplicationsTab";
 
 const CATEGORIES: JobCategory[] = [
   "Học nghề có lương",
@@ -79,6 +85,7 @@ export default function AdminDashboardPage() {
   const [isLoadingJobs, setIsLoadingJobs] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE" | "URGENT">("ALL");
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -88,7 +95,7 @@ export default function AdminDashboardPage() {
   const [quickMediaUrl, setQuickMediaUrl] = useState("");
 
   // Active Tab
-  const [activeTab, setActiveTab] = useState<"jobs" | "life_videos" | "branches" | "quick_apply">("jobs");
+  const [activeTab, setActiveTab] = useState<"jobs" | "applications" | "life_videos" | "branches" | "quick_apply">("jobs");
 
   // Check auth
   useEffect(() => {
@@ -127,7 +134,7 @@ export default function AdminDashboardPage() {
   const fetchJobs = async () => {
     setIsLoadingJobs(true);
     try {
-      const res = await fetch("/api/admin/jobs");
+      const res = await fetch(`/api/admin/jobs?t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       if (data.success && data.jobs) {
         setJobs(data.jobs);
@@ -155,6 +162,19 @@ export default function AdminDashboardPage() {
     setTimeout(() => setToastMessage(null), 4000);
   };
 
+  const notifyJobsUpdated = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("jobs-updated"));
+      try {
+        if ("BroadcastChannel" in window) {
+          const ch = new BroadcastChannel("jobs-sync");
+          ch.postMessage({ type: "jobs-updated" });
+          ch.close();
+        }
+      } catch {}
+    }
+  };
+
   // Open Create Form
   const handleOpenCreate = () => {
     const newId = `JOB-${Date.now().toString(36).toUpperCase()}`;
@@ -177,6 +197,9 @@ export default function AdminDashboardPage() {
       contactZalo: "0981256712",
       isUrgent: true,
       isActive: true,
+      showInMenu: true,
+      menuPlacement: "PARENT",
+      parentMenu: "Học nghề có lương",
       images: [],
       videoUrl: "",
       videoPoster: "",
@@ -242,6 +265,9 @@ export default function AdminDashboardPage() {
 
     setEditingJob({
       ...job,
+      showInMenu: job.showInMenu !== false,
+      menuPlacement: job.menuPlacement || "PARENT",
+      parentMenu: job.parentMenu || job.category || "Học nghề có lương",
       images,
       videoUrl: job.videoUrl || "",
       videoPoster: job.videoPoster || "",
@@ -266,10 +292,18 @@ export default function AdminDashboardPage() {
       const url = isUpdating ? `/api/admin/jobs/${editingJob.id}` : "/api/admin/jobs";
       const method = isUpdating ? "PUT" : "POST";
 
+      const finalSlug = slugify(editingJob.slug || editingJob.title || "");
       const derivedBadges = [editingJob.ageRequirement, editingJob.experienceDisplay].filter(Boolean) as string[];
       const cleanImages = (editingJob.images || []).filter((img) => Boolean(img && img.trim() !== ""));
       const jobPayload = {
         ...editingJob,
+        showInMenu: editingJob.showInMenu !== false,
+        menuPlacement: editingJob.menuPlacement || "PARENT",
+        parentMenu:
+          editingJob.menuPlacement === "PARENT"
+            ? (editingJob.parentMenu || editingJob.category || "Học nghề có lương")
+            : undefined,
+        slug: finalSlug,
         images: cleanImages,
         videoUrl: editingJob.videoUrl?.trim() || undefined,
         videoPoster: editingJob.videoPoster?.trim() || undefined,
@@ -293,6 +327,7 @@ export default function AdminDashboardPage() {
         );
         setIsModalOpen(false);
         fetchJobs();
+        notifyJobsUpdated();
       } else {
         showToast(data.error || "Không thể lưu dữ liệu", "error");
       }
@@ -313,6 +348,7 @@ export default function AdminDashboardPage() {
       if (data.success) {
         showToast(`Đã xóa "${title}" thành công!`, "success");
         fetchJobs();
+        notifyJobsUpdated();
       } else {
         showToast(data.error || "Không thể xóa bài đăng", "error");
       }
@@ -337,6 +373,7 @@ export default function AdminDashboardPage() {
           "success"
         );
         fetchJobs();
+        notifyJobsUpdated();
       }
     } catch {
       showToast("Lỗi cập nhật trạng thái", "error");
@@ -346,15 +383,8 @@ export default function AdminDashboardPage() {
   // Upload video handler
   const handleUploadVideo = async (file: File) => {
     showToast("Đang tải video lên máy chủ...", "success");
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
+      const data = await uploadMediaFile(file);
       if (data.success && data.url) {
         let thumb = "";
         try {
@@ -389,13 +419,7 @@ export default function AdminDashboardPage() {
     try {
       const uploadedUrls: string[] = [];
       for (const file of fileList) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const res = await fetch("/api/admin/upload", {
-          method: "POST",
-          body: formData,
-        });
-        const data = await res.json();
+        const data = await uploadMediaFile(file);
         if (data.success && data.url) {
           uploadedUrls.push(data.url);
         }
@@ -417,23 +441,19 @@ export default function AdminDashboardPage() {
   // Thay thế ảnh tại vị trí index
   const handleReplaceImage = async (file: File, index: number) => {
     showToast(`Đang thay đổi ảnh #${index + 1}...`, "success");
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
+      const data = await uploadMediaFile(file);
       if (data.success && data.url) {
+        const newImageUrl = data.url;
         setEditingJob((prev) => {
           if (!prev) return prev;
           const updated = [...(prev.images || [])];
-          updated[index] = data.url;
+          updated[index] = newImageUrl;
           return { ...prev, images: updated };
         });
         showToast(`Đã thay đổi ảnh #${index + 1} thành công!`, "success");
+      } else {
+        showToast(data.error || "Tải ảnh thất bại", "error");
       }
     } catch {
       showToast("Lỗi khi tải ảnh", "error");
@@ -472,7 +492,12 @@ export default function AdminDashboardPage() {
       (job.locations && job.locations.some((l) => l.toLowerCase().includes(searchQuery.toLowerCase())));
     const matchesCategory =
       selectedCategory === "ALL" || job.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesStatus =
+      statusFilter === "ALL" ||
+      (statusFilter === "ACTIVE" && job.isActive) ||
+      (statusFilter === "INACTIVE" && !job.isActive) ||
+      (statusFilter === "URGENT" && job.isUrgent);
+    return matchesSearch && matchesCategory && matchesStatus;
   });
 
   if (isAuthenticated === null) {
@@ -571,6 +596,27 @@ export default function AdminDashboardPage() {
           </button>
 
           <button
+            onClick={() => setActiveTab("applications")}
+            className={`flex items-center gap-2.5 px-5 py-2.5 rounded-2xl font-black text-xs sm:text-sm transition-all duration-200 whitespace-nowrap ${
+              activeTab === "applications"
+                ? "bg-brand-800 text-white shadow-md shadow-brand-900/20"
+                : "bg-white text-gray-600 hover:text-gray-900 border border-gray-200 hover:bg-gray-50"
+            }`}
+          >
+            <Users className="w-4 h-4" />
+            <span>Hồ Sơ Ứng Tuyển</span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                activeTab === "applications"
+                  ? "bg-amber-400 text-brand-950 font-extrabold"
+                  : "bg-amber-100 text-amber-900"
+              }`}
+            >
+              Hồ sơ & CV
+            </span>
+          </button>
+
+          <button
             onClick={() => setActiveTab("life_videos")}
             className={`flex items-center gap-2.5 px-5 py-2.5 rounded-2xl font-black text-xs sm:text-sm transition-all duration-200 whitespace-nowrap ${
               activeTab === "life_videos"
@@ -579,7 +625,7 @@ export default function AdminDashboardPage() {
             }`}
           >
             <Video className="w-4 h-4" />
-            <span>Video Đời Sống Trăm Rưởi</span>
+            <span>Video Đời Sống Trăm Rưỡi</span>
             <span
               className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
                 activeTab === "life_videos"
@@ -634,6 +680,7 @@ export default function AdminDashboardPage() {
           </button>
         </div>
 
+        {activeTab === "applications" && <ApplicationsTab />}
         {activeTab === "life_videos" && <LifeVideosTab />}
         {activeTab === "branches" && <BranchesTab />}
         {activeTab === "quick_apply" && <QuickApplyConfigTab />}
@@ -676,62 +723,145 @@ export default function AdminDashboardPage() {
                 <span>Chỉnh Sửa "Học Việc Bếp" Ngay</span>
               </button>
               <Link
-                href="/viec-lam/hoc-viec-bep"
-                target="_blank"
+                href="/admin/viec-lam/hoc-viec-bep"
                 className="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition flex items-center gap-1"
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span>Xem Live</span>
+                <span>Xem Chi Tiết</span>
               </Link>
             </div>
           </div>
         )}
 
-        {/* Stats Grid */}
+        {/* Stats Grid - Các nút lọc trạng thái công việc */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+          {/* Card 1: Tất Cả */}
+          <button
+            type="button"
+            onClick={() => setStatusFilter("ALL")}
+            className={`p-5 rounded-2xl border text-left flex items-center gap-4 transition duration-200 cursor-pointer active:scale-95 ${
+              statusFilter === "ALL"
+                ? "bg-blue-50/70 border-blue-400 ring-2 ring-blue-500/40 shadow-md scale-[1.01]"
+                : "bg-white border-gray-200/80 shadow-sm hover:border-blue-300 hover:shadow-md"
+            }`}
+            title="Bấm để hiển thị tất cả vị trí việc làm"
+          >
+            <div
+              className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold transition ${
+                statusFilter === "ALL" ? "bg-blue-600 text-white shadow-sm" : "bg-blue-50 text-blue-600"
+              }`}
+            >
               <Briefcase className="w-6 h-6" />
             </div>
             <div>
               <div className="text-2xl font-black text-gray-900">{jobs.length}</div>
-              <div className="text-xs font-semibold text-gray-500">Tổng Vị Trí Việc Làm</div>
+              <div className="text-xs font-semibold text-gray-500 flex items-center gap-1.5">
+                <span>Tổng Vị Trí Việc Làm</span>
+                {statusFilter === "ALL" && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                )}
+              </div>
             </div>
-          </div>
+          </button>
 
-          <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+          {/* Card 2: Đang Bật */}
+          <button
+            type="button"
+            onClick={() => setStatusFilter(statusFilter === "ACTIVE" ? "ALL" : "ACTIVE")}
+            className={`p-5 rounded-2xl border text-left flex items-center gap-4 transition duration-200 cursor-pointer active:scale-95 ${
+              statusFilter === "ACTIVE"
+                ? "bg-emerald-50/70 border-emerald-400 ring-2 ring-emerald-500/40 shadow-md scale-[1.01]"
+                : "bg-white border-gray-200/80 shadow-sm hover:border-emerald-300 hover:shadow-md"
+            }`}
+            title="Bấm để lọc chỉ các vị trí đang bật tuyển dụng"
+          >
+            <div
+              className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold transition ${
+                statusFilter === "ACTIVE" ? "bg-emerald-600 text-white shadow-sm" : "bg-emerald-50 text-emerald-600"
+              }`}
+            >
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <div>
-              <div className="text-2xl font-black text-gray-900">
+              <div className="text-2xl font-black text-emerald-700">
                 {jobs.filter((j) => j.isActive).length}
               </div>
-              <div className="text-xs font-semibold text-gray-500">Đang Bật Tuyển Dụng</div>
+              <div className="text-xs font-semibold text-gray-500 flex items-center gap-1.5">
+                <span>Đang Bật Tuyển Dụng</span>
+                {statusFilter === "ACTIVE" && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                    Đang lọc
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
+          </button>
 
-          <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+          {/* Card 3: Đã Ẩn */}
+          <button
+            type="button"
+            onClick={() => setStatusFilter(statusFilter === "INACTIVE" ? "ALL" : "INACTIVE")}
+            className={`p-5 rounded-2xl border text-left flex items-center gap-4 transition duration-200 cursor-pointer active:scale-95 ${
+              statusFilter === "INACTIVE"
+                ? "bg-gray-100/80 border-gray-400 ring-2 ring-gray-400/50 shadow-md scale-[1.01]"
+                : "bg-white border-gray-200/80 shadow-sm hover:border-gray-300 hover:shadow-md"
+            }`}
+            title="Bấm để lọc chỉ các vị trí đã tạm ẩn"
+          >
+            <div
+              className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold transition ${
+                statusFilter === "INACTIVE" ? "bg-gray-700 text-white shadow-sm" : "bg-gray-100 text-gray-600"
+              }`}
+            >
+              <EyeOff className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="text-2xl font-black text-gray-700">
+                {jobs.filter((j) => !j.isActive).length}
+              </div>
+              <div className="text-xs font-semibold text-gray-500 flex items-center gap-1.5">
+                <span>Đã Ẩn Tuyển Dụng</span>
+                {statusFilter === "INACTIVE" && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-200 text-gray-800">
+                    Đang lọc
+                  </span>
+                )}
+              </div>
+            </div>
+          </button>
+
+          {/* Card 4: Tuyển Gấp */}
+          <button
+            type="button"
+            onClick={() => setStatusFilter(statusFilter === "URGENT" ? "ALL" : "URGENT")}
+            className={`p-5 rounded-2xl border text-left flex items-center gap-4 transition duration-200 cursor-pointer active:scale-95 ${
+              statusFilter === "URGENT"
+                ? "bg-amber-50/80 border-amber-400 ring-2 ring-amber-500/40 shadow-md scale-[1.01]"
+                : "bg-white border-gray-200/80 shadow-sm hover:border-amber-300 hover:shadow-md"
+            }`}
+            title="Bấm để lọc chỉ các vị trí tuyển gấp"
+          >
+            <div
+              className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold transition ${
+                statusFilter === "URGENT" ? "bg-amber-500 text-amber-950 shadow-sm" : "bg-amber-50 text-amber-600"
+              }`}
+            >
               <Sparkles className="w-6 h-6" />
             </div>
             <div>
-              <div className="text-2xl font-black text-gray-900">
+              <div className="text-2xl font-black text-amber-600">
                 {jobs.filter((j) => j.isUrgent).length}
               </div>
-              <div className="text-xs font-semibold text-gray-500">Vị Trí Tuyển Gấp 🔥</div>
+              <div className="text-xs font-semibold text-gray-500 flex items-center gap-1.5">
+                <span>Vị Trí Tuyển Gấp 🔥</span>
+                {statusFilter === "URGENT" && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900">
+                    Đang lọc
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-
-          <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
-              <Building className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="text-2xl font-black text-gray-900">12 Tiệm</div>
-              <div className="text-xs font-semibold text-gray-500">Chi Nhánh Áp Dụng</div>
-            </div>
-          </div>
+          </button>
         </div>
 
         {/* Action Bar & Filters */}
@@ -796,6 +926,20 @@ export default function AdminDashboardPage() {
                 {cat} ({jobs.filter((j) => j.category === cat).length})
               </button>
             ))}
+
+            {statusFilter !== "ALL" && (
+              <button
+                type="button"
+                onClick={() => setStatusFilter("ALL")}
+                className="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition flex items-center gap-1 shrink-0 ml-auto"
+                title="Bấm để xóa bộ lọc trạng thái và hiển thị lại tất cả"
+              >
+                <X className="w-3.5 h-3.5" />
+                <span>
+                  Đang lọc: {statusFilter === "ACTIVE" ? "Đang Bật" : statusFilter === "INACTIVE" ? "Đã Ẩn" : "Tuyển Gấp"} (Xóa lọc)
+                </span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -843,9 +987,13 @@ export default function AdminDashboardPage() {
                             <div>
                               <div className="flex items-center gap-2">
                                 <Link
-                                  href={`/admin/jobs/${job.id}`}
-                                  className="font-bold text-gray-950 text-sm hover:text-brand-900 transition flex items-center gap-1.5 group"
-                                  title="Bấm để xem trang chi tiết vị trí"
+                                  href={`/admin/viec-lam/${job.slug}`}
+                                  className={`font-bold text-sm transition flex items-center gap-1.5 group ${
+                                    job.isActive
+                                      ? "text-emerald-600 hover:text-emerald-700"
+                                      : "text-gray-400 hover:text-gray-500"
+                                  }`}
+                                  title="Bấm để xem trang chi tiết vị trí trong quản trị"
                                 >
                                   <span className="group-hover:underline">{job.title}</span>
                                 </Link>
@@ -854,11 +1002,44 @@ export default function AdminDashboardPage() {
                                     Tuyển gấp
                                   </span>
                                 )}
+                                {job.showInMenu !== false ? (
+                                  job.isActive ? (
+                                    job.menuPlacement === "DIRECT" ? (
+                                      <span
+                                        className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 shrink-0"
+                                        title="Hiển thị trực tiếp ở menu điều hướng Header"
+                                      >
+                                        Menu riêng
+                                      </span>
+                                    ) : (
+                                      <span
+                                        className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 shrink-0"
+                                        title={`Gắn vào menu cha: ${job.parentMenu || job.category || "Học nghề có lương"}`}
+                                      >
+                                        Menu: {job.parentMenu || job.category || "Cha"}
+                                      </span>
+                                    )
+                                  ) : (
+                                    <span
+                                      className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-500 border border-gray-200 shrink-0"
+                                      title="Thuộc menu nhưng đang tạm ẩn theo bài đăng"
+                                    >
+                                      Menu (ẩn)
+                                    </span>
+                                  )
+                                ) : (
+                                  <span
+                                    className="px-2 py-0.5 rounded-full text-[10px] font-normal bg-gray-100 text-gray-400 border border-gray-200 shrink-0"
+                                    title="Không hiển thị trên menu Header"
+                                  >
+                                    Không menu
+                                  </span>
+                                )}
                               </div>
                               <div className="text-[11px] text-gray-400 font-mono mt-0.5 flex items-center gap-2">
                                 <span>ID: <strong className="text-gray-600 font-semibold">{job.id}</strong></span>
                                 <span>•</span>
-                                <span>/viec-lam/{job.slug}</span>
+                                <span>/admin/viec-lam/{job.slug}</span>
                               </div>
                             </div>
                           </div>
@@ -902,9 +1083,9 @@ export default function AdminDashboardPage() {
                           <div className="flex items-center justify-end gap-1">
                             {/* Chi tiết vị trí */}
                             <Link
-                              href={`/admin/jobs/${job.id}`}
+                              href={`/admin/viec-lam/${job.slug}`}
                               className="px-2.5 py-1.5 rounded-xl bg-gray-100 hover:bg-brand-50 hover:text-brand-900 text-gray-700 text-xs font-bold transition flex items-center gap-1"
-                              title="Xem trang chi tiết vị trí"
+                              title="Xem trang chi tiết vị trí trong quản trị"
                             >
                               <FileText className="w-3.5 h-3.5" />
                               <span>Chi tiết</span>
@@ -924,7 +1105,7 @@ export default function AdminDashboardPage() {
                               href={`/viec-lam/${job.slug}`}
                               target="_blank"
                               className="p-1.5 rounded-xl text-gray-500 hover:text-brand-900 hover:bg-gray-100 transition"
-                              title="Xem trang ngoài website"
+                              title="Xem trang ngoài website (giao diện khách)"
                             >
                               <ExternalLink className="w-4 h-4" />
                             </Link>
@@ -955,7 +1136,7 @@ export default function AdminDashboardPage() {
       {/* MODAL EDIT / CREATE JOB */}
       {/* ========================================================================= */}
       {isModalOpen && editingJob && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden my-8 max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
             <div className="px-6 py-4 bg-gradient-to-r from-brand-900 to-[#701313] text-white flex items-center justify-between shrink-0">
@@ -991,7 +1172,8 @@ export default function AdminDashboardPage() {
                   <span>📌 1. Tiêu Đề Công Việc & Mức Lương</span>
                 </h4>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Hàng 1: Tiêu đề công việc & Slug URL (2 cột) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1">
                       Tiêu đề công việc <span className="text-red-500">*</span>
@@ -1002,24 +1184,65 @@ export default function AdminDashboardPage() {
                       value={editingJob.title || ""}
                       onChange={(e) => {
                         const title = e.target.value;
-                        const slug = title
-                          .toLowerCase()
-                          .normalize("NFD")
-                          .replace(/[\u0300-\u036f]/g, "")
-                          .replace(/[đĐ]/g, "d")
-                          .replace(/[^a-z0-9]+/g, "-")
-                          .replace(/(^-|-$)+/g, "");
+                        const isCreateMode = !jobs.some((j) => j.id === editingJob.id);
+                        const autoSlug = slugify(title);
+                        // Khi tạo mới vị trí: tự động tạo slug tiếng Việt không dấu (Ví dụ: 'lái xe' -> 'lai-xe')
+                        const shouldAutoSlug = isCreateMode || !editingJob.slug || editingJob.slug === slugify(editingJob.title || "");
                         setEditingJob({
                           ...editingJob,
                           title,
-                          slug: editingJob.slug && editingJob.id !== "HV-BEP-01" ? editingJob.slug : slug,
+                          slug: shouldAutoSlug ? autoSlug : editingJob.slug,
                         });
                       }}
-                      placeholder="Ví dụ: Học việc bếp"
+                      placeholder="Ví dụ: Lái xe"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold focus:ring-2 focus:ring-brand-700 outline-none bg-white"
                     />
                   </div>
 
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-bold text-gray-700">
+                        Đường dẫn Slug (URL) <span className="text-red-500">*</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (editingJob.title) {
+                            setEditingJob({
+                              ...editingJob,
+                              slug: slugify(editingJob.title),
+                            });
+                          }
+                        }}
+                        className="text-[11px] text-brand-900 font-semibold hover:underline"
+                        title="Tự động đồng bộ slug theo tiêu đề"
+                      >
+                        Đồng bộ tiêu đề
+                      </button>
+                    </div>
+                    <div className="relative flex items-center">
+                      <span className="absolute left-3 text-xs text-gray-400 font-mono select-none pointer-events-none">
+                        /viec-lam/
+                      </span>
+                      <input
+                        type="text"
+                        required
+                        value={editingJob.slug || ""}
+                        onChange={(e) => {
+                          setEditingJob({
+                            ...editingJob,
+                            slug: slugify(e.target.value),
+                          });
+                        }}
+                        placeholder="lai-xe"
+                        className="w-full pl-24 pr-3 py-2.5 rounded-xl border border-gray-300 text-sm font-mono font-bold text-brand-950 focus:ring-2 focus:ring-brand-700 outline-none bg-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hàng 2: Mức lương hiển thị & Số Hotline / Zalo (Đưa xuống dòng rộng rãi) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1">
                       Mức lương hiển thị <span className="text-red-500">*</span>
@@ -1078,7 +1301,135 @@ export default function AdminDashboardPage() {
                     />
                     <span className="text-xs font-bold text-red-700">Đánh dấu tuyển gấp (Urgent 🔥)</span>
                   </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer" title="Hiển thị công việc này trong danh mục menu trên thanh điều hướng Header">
+                    <input
+                      type="checkbox"
+                      checked={editingJob.showInMenu !== false}
+                      onChange={(e) => setEditingJob({ ...editingJob, showInMenu: e.target.checked })}
+                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
+                      <span>Hiển thị trên Menu điều hướng</span>
+                      {!(editingJob.isActive ?? true) && (
+                        <span className="text-[11px] font-normal text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                          (tự động ẩn khi bài đăng Tắt)
+                        </span>
+                      )}
+                    </span>
+                  </label>
                 </div>
+
+                {/* Khối tùy chọn vị trí hiển thị Menu khi showInMenu = true */}
+                {editingJob.showInMenu !== false && (
+                  <div className="mt-3 p-3.5 bg-blue-50/70 rounded-xl border border-blue-200 space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-xs font-bold text-blue-950 flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-blue-600" />
+                        <span>Vị trí hiển thị trên Menu điều hướng:</span>
+                      </span>
+                      {!(editingJob.isActive ?? true) ? (
+                        <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">
+                          ⚠️ Đang tạm ẩn trên Header vì bài đăng Tắt
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">
+                          ✓ Đang sẵn sàng hiển thị trên Header
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {/* Lựa chọn 1: Gắn vào menu cha có sẵn */}
+                      <label
+                        className={`flex items-start gap-2.5 p-2.5 rounded-lg border text-xs cursor-pointer transition ${
+                          (editingJob.menuPlacement || "PARENT") === "PARENT"
+                            ? "bg-white border-blue-500 shadow-sm ring-1 ring-blue-500/20"
+                            : "bg-white/60 border-blue-100 hover:bg-white"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="adminJobMenuPlacement"
+                          value="PARENT"
+                          checked={(editingJob.menuPlacement || "PARENT") === "PARENT"}
+                          onChange={() =>
+                            setEditingJob({
+                              ...editingJob,
+                              menuPlacement: "PARENT",
+                              parentMenu: editingJob.parentMenu || editingJob.category || "Học nghề có lương",
+                            })
+                          }
+                          className="w-4 h-4 mt-0.5 text-blue-600 focus:ring-blue-500"
+                        />
+                        <div className="flex-1">
+                          <span className="font-bold text-gray-800 block">
+                            📂 Gắn vào Menu cha có sẵn (Dropdown)
+                          </span>
+                          <span className="text-[11px] text-gray-500 block mt-0.5">
+                            Nằm trong danh sách thả xuống của menu cha được chọn
+                          </span>
+                        </div>
+                      </label>
+
+                      {/* Lựa chọn 2: Hiển thị trực tiếp ở menu điều hướng */}
+                      <label
+                        className={`flex items-start gap-2.5 p-2.5 rounded-lg border text-xs cursor-pointer transition ${
+                          editingJob.menuPlacement === "DIRECT"
+                            ? "bg-white border-blue-500 shadow-sm ring-1 ring-blue-500/20"
+                            : "bg-white/60 border-blue-100 hover:bg-white"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="adminJobMenuPlacement"
+                          value="DIRECT"
+                          checked={editingJob.menuPlacement === "DIRECT"}
+                          onChange={() =>
+                            setEditingJob({
+                              ...editingJob,
+                              menuPlacement: "DIRECT",
+                            })
+                          }
+                          className="w-4 h-4 mt-0.5 text-blue-600 focus:ring-blue-500"
+                        />
+                        <div className="flex-1">
+                          <span className="font-bold text-gray-800 block">
+                            📌 Hiển thị ở Menu điều hướng (Trực tiếp)
+                          </span>
+                          <span className="text-[11px] text-gray-500 block mt-0.5">
+                            Tên job hiển thị trực tiếp như một nút bấm trên thanh Header
+                          </span>
+                        </div>
+                      </label>
+                    </div>
+
+                    {/* Chọn Menu cha khi chọn PARENT */}
+                    {(editingJob.menuPlacement || "PARENT") === "PARENT" && (
+                      <div className="pt-1.5 flex flex-col sm:flex-row sm:items-center gap-2">
+                        <label className="text-xs font-semibold text-gray-700 whitespace-nowrap">
+                          Chọn Menu cha gắn vào:
+                        </label>
+                        <select
+                          value={editingJob.parentMenu || editingJob.category || "Học nghề có lương"}
+                          onChange={(e) =>
+                            setEditingJob({
+                              ...editingJob,
+                              parentMenu: e.target.value,
+                            })
+                          }
+                          className="flex-1 px-3 py-1.5 rounded-lg border border-blue-200 bg-white text-xs font-bold text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none"
+                        >
+                          {CATEGORIES.map((cat) => (
+                            <option key={cat} value={cat}>
+                              📁 {cat}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* SECTION 2: THẺ YÊU CẦU ĐỘ TUỔI (TAGS CHECKBOX + INPUT THỦ CÔNG) */}
@@ -1518,15 +1869,21 @@ export default function AdminDashboardPage() {
                 </button>
 
                 <div className="flex items-center gap-3">
-                  {editingJob.slug && (
-                    <Link
-                      href={`/viec-lam/${editingJob.slug}`}
-                      target="_blank"
-                      className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gray-100 text-gray-800 font-bold text-xs hover:bg-gray-200 transition"
+                  {editingJob && (
+                    <a
+                      href="/viec-lam/xem-truoc"
+                      target="job_preview_tab"
+                      rel="noopener noreferrer"
+                      onClick={() => {
+                        savePreviewDraft(editingJob);
+                        showToast("Đang mở trang xem trước bản nháp...", "success");
+                      }}
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gray-100 text-gray-800 font-bold text-xs hover:bg-gray-200 transition"
+                      title="Xem trước trang chi tiết với dữ liệu đang chỉnh sửa"
                     >
-                      <Eye className="w-3.5 h-3.5" />
+                      <Eye className="w-3.5 h-3.5 text-brand-900" />
                       <span>Xem Trước</span>
-                    </Link>
+                    </a>
                   )}
 
                   <button

@@ -17,11 +17,13 @@ import {
   RefreshCw,
   Sparkles,
   Eye,
+  EyeOff,
   SlidersHorizontal,
   LayoutGrid,
   List,
 } from "lucide-react";
 import { LifeVideo } from "@/types/life-video";
+import { uploadMediaFile } from "@/lib/upload-client";
 
 const PRESET_VIDEO_THUMBNAILS = [
   "/images/tiktok/tiktok-1.jpg",
@@ -42,7 +44,7 @@ const SUGGESTED_TAGS = [
   "Gian bếp & Đồng đội",
   "Đào tạo nghề bếp",
   "Phục vụ chu đáo",
-  "Văn hóa Trăm Rưởi",
+  "Văn hóa Trăm Rưỡi",
 ];
 
 const PLATFORMS = ["TikTok", "Facebook Reels", "YouTube", "Instagram"];
@@ -51,6 +53,7 @@ export default function LifeVideosTab() {
   const [videos, setVideos] = useState<LifeVideo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [videoFilter, setVideoFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE" | "TIKTOK" | "OTHER">("ALL");
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
 
   // Modal State
@@ -93,7 +96,7 @@ export default function LifeVideosTab() {
       author: "@tiemlaubotramruoi",
       platform: "TikTok",
       thumbnail: "/images/tiktok/tiktok-1.jpg",
-      tag: "Đời sống Trăm Rưởi",
+      tag: "Đời sống Trăm Rưỡi",
       url: "",
       displayOrder: nextOrder,
       isActive: true,
@@ -190,13 +193,7 @@ export default function LifeVideosTab() {
   const handleUploadThumbnail = async (file: File) => {
     setIsUploadingThumb(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
+      const data = await uploadMediaFile(file);
       if (data.success && data.url) {
         setEditingVideo((prev) => (prev ? { ...prev, thumbnail: data.url } : prev));
         showToast("Đã tải ảnh thumbnail thành công!", "success");
@@ -212,12 +209,19 @@ export default function LifeVideosTab() {
 
   const filteredVideos = videos.filter((video) => {
     const q = searchQuery.toLowerCase();
-    return (
+    const matchesSearch =
       video.title.toLowerCase().includes(q) ||
       video.tag.toLowerCase().includes(q) ||
       video.author.toLowerCase().includes(q) ||
-      video.platform.toLowerCase().includes(q)
-    );
+      video.platform.toLowerCase().includes(q);
+
+    let matchesFilter = true;
+    if (videoFilter === "ACTIVE") matchesFilter = video.isActive;
+    else if (videoFilter === "INACTIVE") matchesFilter = !video.isActive;
+    else if (videoFilter === "TIKTOK") matchesFilter = video.platform === "TikTok";
+    else if (videoFilter === "OTHER") matchesFilter = video.platform !== "TikTok";
+
+    return matchesSearch && matchesFilter;
   });
 
   return (
@@ -247,7 +251,7 @@ export default function LifeVideosTab() {
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-black tracking-tight text-white">
-                Quản Lý Video "Đời Sống Tại Lẩu Bò Trăm Rưởi"
+                Quản Lý Video "Đời Sống Tại Lẩu Bò Trăm Rưỡi"
               </h2>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-amber-950 uppercase tracking-wider">
                 Mạng Xã Hội
@@ -269,53 +273,168 @@ export default function LifeVideosTab() {
         </button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold">
-            <Video className="w-6 h-6" />
+      {/* Stats Cards - Các nút lọc trạng thái & nền tảng video */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        {/* Card 1: Tất Cả */}
+        <button
+          type="button"
+          onClick={() => setVideoFilter("ALL")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left flex items-center gap-3.5 transition duration-200 cursor-pointer active:scale-95 ${
+            videoFilter === "ALL"
+              ? "bg-amber-50/80 border-amber-400 ring-2 ring-amber-500/40 shadow-md scale-[1.01]"
+              : "bg-white border-gray-200/80 shadow-sm hover:border-amber-300 hover:shadow-md"
+          }`}
+          title="Bấm để hiển thị tất cả video"
+        >
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold transition shrink-0 ${
+              videoFilter === "ALL" ? "bg-amber-600 text-white shadow-sm" : "bg-amber-50 text-amber-700"
+            }`}
+          >
+            <Video className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xl font-black text-gray-900">{videos.length}</div>
-            <div className="text-xs font-semibold text-gray-500">Tổng Video Đời Sống</div>
+            <div className="text-xl sm:text-2xl font-black text-gray-900">{videos.length}</div>
+            <div className="text-xs font-semibold text-gray-500 flex items-center gap-1">
+              <span>Tổng Video</span>
+              {videoFilter === "ALL" && (
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
+              )}
+            </div>
           </div>
-        </div>
+        </button>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-            <CheckCircle2 className="w-6 h-6" />
+        {/* Card 2: Đang Hiển Thị */}
+        <button
+          type="button"
+          onClick={() => setVideoFilter(videoFilter === "ACTIVE" ? "ALL" : "ACTIVE")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left flex items-center gap-3.5 transition duration-200 cursor-pointer active:scale-95 ${
+            videoFilter === "ACTIVE"
+              ? "bg-emerald-50/70 border-emerald-400 ring-2 ring-emerald-500/40 shadow-md scale-[1.01]"
+              : "bg-white border-gray-200/80 shadow-sm hover:border-emerald-300 hover:shadow-md"
+          }`}
+          title="Bấm để lọc các video đang hiển thị trên website"
+        >
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold transition shrink-0 ${
+              videoFilter === "ACTIVE" ? "bg-emerald-600 text-white shadow-sm" : "bg-emerald-50 text-emerald-600"
+            }`}
+          >
+            <CheckCircle2 className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xl font-black text-gray-900">
+            <div className="text-xl sm:text-2xl font-black text-emerald-700">
               {videos.filter((v) => v.isActive).length}
             </div>
-            <div className="text-xs font-semibold text-gray-500">Đang Hiển Thị Ngoài Web</div>
+            <div className="text-xs font-semibold text-gray-500 flex items-center gap-1">
+              <span>Đang Hiển Thị</span>
+              {videoFilter === "ACTIVE" && (
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                  Lọc
+                </span>
+              )}
+            </div>
           </div>
-        </div>
+        </button>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-gray-100 text-gray-900 flex items-center justify-center font-bold">
+        {/* Card 3: Đã Ẩn */}
+        <button
+          type="button"
+          onClick={() => setVideoFilter(videoFilter === "INACTIVE" ? "ALL" : "INACTIVE")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left flex items-center gap-3.5 transition duration-200 cursor-pointer active:scale-95 ${
+            videoFilter === "INACTIVE"
+              ? "bg-gray-100/80 border-gray-400 ring-2 ring-gray-400/50 shadow-md scale-[1.01]"
+              : "bg-white border-gray-200/80 shadow-sm hover:border-gray-300 hover:shadow-md"
+          }`}
+          title="Bấm để lọc các video đã tạm ẩn"
+        >
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold transition shrink-0 ${
+              videoFilter === "INACTIVE" ? "bg-gray-700 text-white shadow-sm" : "bg-gray-100 text-gray-600"
+            }`}
+          >
+            <EyeOff className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl sm:text-2xl font-black text-gray-700">
+              {videos.filter((v) => !v.isActive).length}
+            </div>
+            <div className="text-xs font-semibold text-gray-500 flex items-center gap-1">
+              <span>Đã Tạm Ẩn</span>
+              {videoFilter === "INACTIVE" && (
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-200 text-gray-800">
+                  Lọc
+                </span>
+              )}
+            </div>
+          </div>
+        </button>
+
+        {/* Card 4: TikTok */}
+        <button
+          type="button"
+          onClick={() => setVideoFilter(videoFilter === "TIKTOK" ? "ALL" : "TIKTOK")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left flex items-center gap-3.5 transition duration-200 cursor-pointer active:scale-95 ${
+            videoFilter === "TIKTOK"
+              ? "bg-gray-100/90 border-gray-800 ring-2 ring-gray-800/40 shadow-md scale-[1.01]"
+              : "bg-white border-gray-200/80 shadow-sm hover:border-gray-400 hover:shadow-md"
+          }`}
+          title="Bấm để lọc các video từ nền tảng TikTok"
+        >
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold transition shrink-0 ${
+              videoFilter === "TIKTOK" ? "bg-black text-white shadow-sm" : "bg-gray-100 text-gray-900"
+            }`}
+          >
             <span className="text-lg">🎵</span>
           </div>
           <div>
-            <div className="text-2xl font-black text-gray-900">
+            <div className="text-xl sm:text-2xl font-black text-gray-900">
               {videos.filter((v) => v.platform === "TikTok").length}
             </div>
-            <div className="text-xs font-semibold text-gray-500">Video TikTok</div>
+            <div className="text-xs font-semibold text-gray-500 flex items-center gap-1">
+              <span>TikTok</span>
+              {videoFilter === "TIKTOK" && (
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-200 text-gray-900">
+                  Lọc
+                </span>
+              )}
+            </div>
           </div>
-        </div>
+        </button>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-            <Sparkles className="w-6 h-6" />
+        {/* Card 5: Reels / Shorts khác */}
+        <button
+          type="button"
+          onClick={() => setVideoFilter(videoFilter === "OTHER" ? "ALL" : "OTHER")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left flex items-center gap-3.5 transition duration-200 cursor-pointer active:scale-95 ${
+            videoFilter === "OTHER"
+              ? "bg-blue-50/70 border-blue-400 ring-2 ring-blue-500/40 shadow-md scale-[1.01]"
+              : "bg-white border-gray-200/80 shadow-sm hover:border-blue-300 hover:shadow-md"
+          }`}
+          title="Bấm để lọc các video từ Reels, Shorts, YouTube, Instagram"
+        >
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold transition shrink-0 ${
+              videoFilter === "OTHER" ? "bg-blue-600 text-white shadow-sm" : "bg-blue-50 text-blue-600"
+            }`}
+          >
+            <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xl font-black text-gray-900">
+            <div className="text-xl sm:text-2xl font-black text-blue-700">
               {videos.filter((v) => v.platform !== "TikTok").length}
             </div>
-            <div className="text-xs font-semibold text-gray-500">Reels / Shorts khác</div>
+            <div className="text-xs font-semibold text-gray-500 flex items-center gap-1">
+              <span>Reels / Khác</span>
+              {videoFilter === "OTHER" && (
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-900">
+                  Lọc
+                </span>
+              )}
+            </div>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Action Bar: Search & View Toggle */}
@@ -334,7 +453,21 @@ export default function LifeVideosTab() {
             />
           </div>
 
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            {videoFilter !== "ALL" && (
+              <button
+                type="button"
+                onClick={() => setVideoFilter("ALL")}
+                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-200 transition flex items-center gap-1.5"
+                title="Bấm để xóa lọc và hiển thị tất cả video"
+              >
+                <X className="w-3.5 h-3.5" />
+                <span>
+                  Đang lọc: {videoFilter === "ACTIVE" ? "Đang Hiển Thị" : videoFilter === "INACTIVE" ? "Đã Ẩn" : videoFilter === "TIKTOK" ? "TikTok" : "Reels / Khác"} (Xóa lọc)
+                </span>
+              </button>
+            )}
+
             {/* View Mode Toggle */}
             <div className="flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200">
               <button
@@ -624,7 +757,7 @@ export default function LifeVideosTab() {
                       : "Thêm Video Đời Sống Mới"}
                   </h3>
                   <p className="text-xs text-gray-500">
-                    Video xuất hiện tại mục "Kênh Truyền Thông & Đời Sống" Lẩu Bò Trăm Rưởi
+                    Video xuất hiện tại mục "Kênh Truyền Thông & Đời Sống" Lẩu Bò Trăm Rưỡi
                   </p>
                 </div>
               </div>
@@ -649,7 +782,7 @@ export default function LifeVideosTab() {
                   required
                   value={editingVideo.title || ""}
                   onChange={(e) => setEditingVideo({ ...editingVideo, title: e.target.value })}
-                  placeholder="Ví dụ: Chính thức ra mắt lẩu bò 2 ngăn nóng hổi tại Lẩu Bò Trăm Rưởi"
+                  placeholder="Ví dụ: Chính thức ra mắt lẩu bò 2 ngăn nóng hổi tại Lẩu Bò Trăm Rưỡi"
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-medium focus:ring-2 focus:ring-brand-700 outline-none"
                 />
               </div>

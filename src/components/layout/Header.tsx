@@ -1,71 +1,194 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { siteConfig } from "@/config/site";
 import { ChevronDown, Menu, X, Sparkles } from "lucide-react";
 import QuickApplyModal from "../common/QuickApplyModal";
+import { JOBS_DATA } from "@/data/jobs";
+import { JobItem } from "@/types/job";
+
+// Thứ tự hiển thị menu con chuẩn
+const ORDERED_SLUGS = [
+  "hoc-viec-bep",
+  "phu-bep-hoc-nghe",
+  "hoc-viec-to-truong",
+  "phuc-vu-part-time",
+  "phuc-vu-full-time",
+  "phu-bep-full-time",
+  "thu-ngan",
+  "pha-che-full-time",
+  "quan-ly-vung",
+  "quan-ly-tiem",
+  "pho-quan-ly-tiem",
+  "bep-truong",
+  "to-truong",
+];
+
+interface HeaderMenuItem {
+  title: string;
+  line1: string;
+  line2?: string;
+  isSingleLine?: boolean;
+  hasDropdown: boolean;
+  href: string;
+  subItems?: { title: string; href: string }[];
+}
 
 export default function Header() {
   const [activeMobileDropdown, setActiveMobileDropdown] = useState<string | null>(null);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [jobs, setJobs] = useState<JobItem[]>(JOBS_DATA);
 
-  const menuItems = [
+  // Tải danh sách công việc và lắng nghe cập nhật realtime từ admin
+  useEffect(() => {
+    const loadJobs = () => {
+      fetch(`/api/admin/jobs?t=${Date.now()}`, { cache: "no-store" })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.jobs && data.jobs.length > 0) {
+            setJobs(data.jobs);
+          }
+        })
+        .catch(() => {});
+    };
+
+    loadJobs();
+
+    const handleJobsUpdated = () => {
+      loadJobs();
+    };
+
+    window.addEventListener("jobs-updated", handleJobsUpdated);
+
+    let channel: BroadcastChannel | null = null;
+    if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+      channel = new BroadcastChannel("jobs-sync");
+      channel.onmessage = () => {
+        loadJobs();
+      };
+    }
+
+    return () => {
+      window.removeEventListener("jobs-updated", handleJobsUpdated);
+      if (channel) channel.close();
+    };
+  }, []);
+
+  // Điều kiện hiển thị trên menu:
+  // 1. Phải đang BẬT tuyển dụng (isActive === true) -> "công việc nào ẩn thì menu của job đó cũng sẽ ẩn theo"
+  // 2. Tùy chọn hiển thị menu phải được bật (showInMenu !== false) -> "ô option để thêm vào hiển thị trên menu"
+  const isJobVisibleOnMenu = (job: JobItem) => {
+    return Boolean(job.isActive) && job.showInMenu !== false;
+  };
+
+  // 1. Các job gắn vào Menu cha có sẵn (Dropdown)
+  const getSubItemsForCategory = (parentMenuName: string) => {
+    return [...jobs]
+      .filter(
+        (j) =>
+          isJobVisibleOnMenu(j) &&
+          (j.menuPlacement || "PARENT") === "PARENT" &&
+          (j.parentMenu || j.category) === parentMenuName
+      )
+      .sort((a, b) => {
+        const indexA = ORDERED_SLUGS.indexOf(a.slug);
+        const indexB = ORDERED_SLUGS.indexOf(b.slug);
+        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+      })
+      .map((j) => ({
+        title: j.title,
+        href: `/viec-lam/${j.slug}`,
+      }));
+  };
+
+  const hocNgheSubItems = getSubItemsForCategory("Học nghề có lương");
+  const partTimeSubItems = getSubItemsForCategory("Part-time, Thời vụ");
+  const fullTimeSubItems = getSubItemsForCategory("Full-time");
+  const quanLySubItems = getSubItemsForCategory("Trưởng, Quản lý");
+
+  // 2. Các job hiển thị TRỰC TIẾP ở menu điều hướng (menuPlacement === "DIRECT")
+  const directJobs: HeaderMenuItem[] = [...jobs]
+    .filter((j) => isJobVisibleOnMenu(j) && j.menuPlacement === "DIRECT")
+    .map((j) => {
+      const words = j.title.trim().split(" ");
+      let line1 = j.title;
+      let line2 = "";
+      if (words.length >= 3) {
+        line1 = words.slice(0, 2).join(" ");
+        line2 = words.slice(2).join(" ");
+      } else if (words.length === 2) {
+        line1 = words[0];
+        line2 = words[1];
+      }
+      return {
+        title: j.title,
+        line1,
+        line2,
+        isSingleLine: !line2,
+        hasDropdown: false,
+        href: `/viec-lam/${j.slug}`,
+      };
+    });
+
+  const parentMenuItems: HeaderMenuItem[] = [
     {
       title: "Học nghề có lương",
       line1: "Học nghề",
       line2: "có lương",
-      hasDropdown: true,
-      subItems: [
-        { title: "Học việc bếp", href: "/viec-lam/hoc-viec-bep" },
-        { title: "Phụ bếp", href: "/viec-lam/phu-bep-hoc-nghe" },
-        { title: "Học việc tổ trưởng", href: "/viec-lam/hoc-viec-to-truong" },
-      ],
+      isSingleLine: false,
+      hasDropdown: hocNgheSubItems.length > 0,
+      href: hocNgheSubItems.length === 1 ? hocNgheSubItems[0].href : "/#danh-sach-viec-lam",
+      subItems: hocNgheSubItems,
     },
     {
       title: "Part-time, Thời vụ",
       line1: "Part-time,",
       line2: "Thời vụ",
-      hasDropdown: false,
-      href: "/viec-lam/phuc-vu-part-time",
+      isSingleLine: false,
+      hasDropdown: partTimeSubItems.length > 0,
+      href: partTimeSubItems.length === 1 ? partTimeSubItems[0].href : "/#danh-sach-viec-lam",
+      subItems: partTimeSubItems,
     },
     {
       title: "Full-time",
       line1: "Full-time",
+      line2: "",
       isSingleLine: true,
-      hasDropdown: true,
-      subItems: [
-        { title: "Phục vụ", href: "/viec-lam/phuc-vu-full-time" },
-        { title: "Phụ bếp", href: "/viec-lam/phu-bep-full-time" },
-        { title: "Thu ngân", href: "/viec-lam/thu-ngan" },
-        { title: "Pha chế", href: "/viec-lam/pha-che-full-time" },
-      ],
+      hasDropdown: fullTimeSubItems.length > 0,
+      href: fullTimeSubItems.length === 1 ? fullTimeSubItems[0].href : "/#danh-sach-viec-lam",
+      subItems: fullTimeSubItems,
     },
     {
       title: "Trưởng, Quản lý",
       line1: "Trưởng,",
       line2: "Quản lý",
-      hasDropdown: true,
-      subItems: [
-        { title: "Quản lý vùng", href: "/viec-lam/quan-ly-vung" },
-        { title: "Quản lý tiệm", href: "/viec-lam/quan-ly-tiem" },
-        { title: "Phó quản lý tiệm", href: "/viec-lam/pho-quan-ly-tiem" },
-        { title: "Bếp trưởng", href: "/viec-lam/bep-truong" },
-        { title: "Tổ trưởng", href: "/viec-lam/to-truong" },
-      ],
-    },
-    {
-      title: "Hệ thống Chi nhánh",
-      line1: "Hệ thống",
-      line2: "Chi nhánh",
-      hasDropdown: false,
-      href: "#he-thong-chi-nhanh",
+      isSingleLine: false,
+      hasDropdown: quanLySubItems.length > 0,
+      href: quanLySubItems.length === 1 ? quanLySubItems[0].href : "/#danh-sach-viec-lam",
+      subItems: quanLySubItems,
     },
   ];
 
-  const menuRow1 = menuItems.slice(0, 3);
-  const menuRow2 = menuItems.slice(3, 5);
+  const chiNhanhMenuItem: HeaderMenuItem = {
+    title: "Hệ thống Chi nhánh",
+    line1: "Hệ thống",
+    line2: "Chi nhánh",
+    isSingleLine: false,
+    hasDropdown: false,
+    href: "#he-thong-chi-nhanh",
+  };
+
+  const menuItems: HeaderMenuItem[] = [
+    ...parentMenuItems,
+    ...directJobs,
+    chiNhanhMenuItem,
+  ];
+
+  const half = Math.ceil(menuItems.length / 2);
+  const menuRow1 = menuItems.slice(0, half);
+  const menuRow2 = menuItems.slice(half);
   const activeDropdownItem = menuItems.find((it) => it.title === activeMobileDropdown);
 
   const handleSmoothScroll = (
@@ -137,13 +260,19 @@ export default function Header() {
                       onClick={(e) => handleSmoothScroll(e, item.href || "#")}
                       className="px-3 xl:px-3.5 py-2 rounded-xl text-[20px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-all flex flex-col items-center justify-center leading-tight text-center"
                     >
-                      <span className="whitespace-nowrap">{item.line1}</span>
-                      <span className="whitespace-nowrap">{item.line2}</span>
+                      {item.isSingleLine || !item.line2 ? (
+                        <span className="whitespace-nowrap">{item.line1}</span>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center leading-tight">
+                          <span className="whitespace-nowrap">{item.line1}</span>
+                          <span className="whitespace-nowrap">{item.line2}</span>
+                        </div>
+                      )}
                     </Link>
                   )}
 
                   {/* Dropdown Menu Desktop */}
-                  {item.hasDropdown && item.subItems && (
+                  {item.hasDropdown && item.subItems && item.subItems.length > 0 && (
                     <div className="absolute top-full left-0 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50">
                       <div className="w-80 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 overflow-hidden text-gray-800">
                         {item.subItems.map((sub, sIdx) => (
@@ -277,7 +406,7 @@ export default function Header() {
           </div>
 
           {/* Floating Dropdown Sub-menu khi người dùng bấm vào các mục có menu con */}
-          {activeDropdownItem && activeDropdownItem.subItems && (
+          {activeDropdownItem && activeDropdownItem.subItems && activeDropdownItem.subItems.length > 0 && (
             <>
               <div
                 className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
@@ -295,7 +424,7 @@ export default function Header() {
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-0.5 max-h-[60vh] overflow-y-auto">
                   {activeDropdownItem.subItems.map((sub, sIdx) => (
                     <Link
                       key={sIdx}

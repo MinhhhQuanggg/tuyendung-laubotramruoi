@@ -27,16 +27,41 @@ export default function JobGridSection() {
   const [selectedJobForModal, setSelectedJobForModal] = useState<JobItem | null>(null);
   const [jobsList, setJobsList] = useState<JobItem[]>(JOBS_DATA);
 
-  // Cập nhật dữ liệu việc làm tức thì khi Admin chỉnh sửa
+  // Cập nhật dữ liệu việc làm tức thì khi Admin tạo mới hoặc chỉnh sửa
   useEffect(() => {
-    fetch("/api/admin/jobs")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && data.jobs && data.jobs.length > 0) {
-          setJobsList(data.jobs);
-        }
-      })
-      .catch(() => {});
+    const loadJobs = () => {
+      fetch(`/api/jobs?t=${Date.now()}`, { cache: "no-store" })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.jobs && data.jobs.length > 0) {
+            setJobsList(data.jobs);
+          }
+        })
+        .catch(() => {});
+    };
+
+    loadJobs();
+
+    const handleJobsUpdated = () => {
+      loadJobs();
+    };
+
+    window.addEventListener("jobs-updated", handleJobsUpdated);
+
+    let channel: BroadcastChannel | null = null;
+    if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+      try {
+        channel = new BroadcastChannel("jobs-sync");
+        channel.onmessage = () => {
+          loadJobs();
+        };
+      } catch {}
+    }
+
+    return () => {
+      window.removeEventListener("jobs-updated", handleJobsUpdated);
+      if (channel) channel.close();
+    };
   }, []);
 
   // Hiển thị đầy đủ tất cả các thẻ có tên như menu con
@@ -66,6 +91,7 @@ export default function JobGridSection() {
           isOpen={!!selectedJobForModal}
           onClose={() => setSelectedJobForModal(null)}
           defaultPositionSlug={selectedJobForModal.slug}
+          defaultPositionId={selectedJobForModal.id}
         />
       )}
     </section>

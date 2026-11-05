@@ -1,7 +1,15 @@
 import type { Metadata, Viewport } from "next";
+import { Lora } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import AppLayout from "@/components/layout/AppLayout";
 import "./globals.css";
+
+const lora = Lora({
+  subsets: ["vietnamese", "latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-lora",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   themeColor: "#8B1E1E",
@@ -64,8 +72,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi">
-      <body className="flex flex-col min-h-screen bg-surface">
+    <html lang="vi" className={lora.variable}>
+      <body className={`${lora.className} flex flex-col min-h-screen bg-surface font-normal`}>
         <AppLayout>{children}</AppLayout>
       </body>
     </html>

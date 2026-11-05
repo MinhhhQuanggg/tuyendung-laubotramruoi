@@ -28,9 +28,14 @@ function writeOverrideFile(overrides: Record<string, JobItem>) {
 
 export async function getJobsList(): Promise<JobItem[]> {
   const overrides = readOverrideFile();
-  const baseJobs = [...JOBS_DATA];
+  const map = new Map<string, JobItem>();
 
-  // If Supabase is connected, try fetching from Supabase first
+  // 1. Tải danh mục bài đăng mặc định
+  for (const job of JOBS_DATA) {
+    map.set(job.id, job);
+  }
+
+  // 2. Nếu Supabase đã kết nối, tải và gộp dữ liệu từ Supabase
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseAdmin();
@@ -41,52 +46,58 @@ export async function getJobsList(): Promise<JobItem[]> {
           .order("date_posted", { ascending: false });
 
         if (!error && data && data.length > 0) {
-          return data.map((j) => ({
-            id: j.id,
-            slug: j.slug,
-            title: j.title,
-            category: j.category as any,
-            badge: j.badge || undefined,
-            badges: (j.badges as string[]) || [],
-            salaryDisplay: j.salary_display,
-            minSalary: j.min_salary ?? undefined,
-            maxSalary: j.max_salary ?? undefined,
-            salaryUnit: (j.salary_unit as any) || "MONTH",
-            locations: (j.locations as string[]) || [],
-            ageRequirement: j.age_requirement || "",
-            workType: j.work_type as any,
-            workTypeDisplay: j.work_type_display,
-            workHours: j.work_hours || undefined,
-            experienceDisplay: j.experience_display || "",
-            experienceRequirements: j.experience_requirements || "",
-            descriptionHtml: j.description_html || undefined,
-            concisePost: (j.concise_post as any) || undefined,
-            responsibilities: (j.responsibilities as string[]) || [],
-            requirements: (j.requirements as string[]) || [],
-            benefits: (j.benefits as string[]) || [],
-            datePosted: j.date_posted,
-            validThrough: j.valid_through,
-            isUrgent: j.is_urgent,
-            isActive: j.is_active,
-            contactZalo: j.contact_zalo || "0981256712",
-            images: (j.images as string[]) || [],
-            videoUrl: j.video_url || undefined,
-            videoPoster: j.video_poster || undefined,
-          }));
+          for (const j of data) {
+            map.set(j.id, {
+              id: j.id,
+              slug: j.slug,
+              title: j.title,
+              category: j.category as any,
+              badge: j.badge || undefined,
+              badges: (j.badges as string[]) || [],
+              salaryDisplay: j.salary_display,
+              minSalary: j.min_salary ?? undefined,
+              maxSalary: j.max_salary ?? undefined,
+              salaryUnit: (j.salary_unit as any) || "MONTH",
+              locations: (j.locations as string[]) || [],
+              ageRequirement: j.age_requirement || "",
+              workType: j.work_type as any,
+              workTypeDisplay: j.work_type_display,
+              workHours: j.work_hours || undefined,
+              experienceDisplay: j.experience_display || "",
+              experienceRequirements: j.experience_requirements || "",
+              descriptionHtml: j.description_html || undefined,
+              concisePost: (j.concise_post as any) || undefined,
+              responsibilities: (j.responsibilities as string[]) || [],
+              requirements: (j.requirements as string[]) || [],
+              benefits: (j.benefits as string[]) || [],
+              datePosted: j.date_posted,
+              validThrough: j.valid_through,
+              isUrgent: j.is_urgent,
+              isActive: j.is_active,
+              showInMenu: (j as any).show_in_menu !== null && (j as any).show_in_menu !== undefined ? (j as any).show_in_menu : true,
+              menuPlacement: ((j as any).menu_placement as any) || "PARENT",
+              parentMenu: (j as any).parent_menu || undefined,
+              contactZalo: j.contact_zalo || "0981256712",
+              images: (j.images as string[]) || [],
+              videoUrl: j.video_url || undefined,
+              videoPoster: j.video_poster || undefined,
+            });
+          }
         }
       }
     } catch (err) {
-      console.warn("Supabase load in getJobsList failed, fallback to local:", err);
+      console.warn("Supabase load in getJobsList failed:", err);
     }
   }
 
-  // Fallback to base + overrides
-  const map = new Map<string, JobItem>();
-  for (const job of baseJobs) {
-    map.set(job.id, job);
-  }
+  // 3. Gộp các chỉnh sửa từ file local overrides (luôn ưu tiên cao nhất cho cả bài mới lẫn bài chỉnh sửa)
   for (const id in overrides) {
-    map.set(id, overrides[id]);
+    const existing = map.get(id);
+    if (existing) {
+      map.set(id, { ...existing, ...overrides[id] });
+    } else {
+      map.set(id, overrides[id]);
+    }
   }
 
   return Array.from(map.values());
@@ -94,7 +105,18 @@ export async function getJobsList(): Promise<JobItem[]> {
 
 export async function getJobByIdOrSlug(idOrSlug: string): Promise<JobItem | null> {
   const jobs = await getJobsList();
-  return jobs.find((j) => j.id === idOrSlug || j.slug === idOrSlug) || null;
+  const directMatch = jobs.find((j) => j.id === idOrSlug || j.slug === idOrSlug);
+  if (directMatch) return directMatch;
+
+  // Graceful alias fallback for lai-xe / tai-xe
+  if (idOrSlug === "lai-xe") {
+    return jobs.find((j) => j.slug === "tai-xe" || j.id === "JOB-MW27YK2N") || null;
+  }
+  if (idOrSlug === "tai-xe") {
+    return jobs.find((j) => j.slug === "lai-xe" || j.id === "JOB-MW27YK2N") || null;
+  }
+
+  return null;
 }
 
 export async function upsertJob(job: JobItem): Promise<JobItem> {
@@ -103,12 +125,12 @@ export async function upsertJob(job: JobItem): Promise<JobItem> {
   overrides[job.id] = job;
   writeOverrideFile(overrides);
 
-  // 2. Also sync to Supabase if configured
+  // 2. Đồng bộ sang Supabase nếu đã cấu hình
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseAdmin();
       if (supabase) {
-        const row = {
+        const baseRow = {
           id: job.id,
           slug: job.slug,
           title: job.title,
@@ -141,9 +163,25 @@ export async function upsertJob(job: JobItem): Promise<JobItem> {
           video_poster: job.videoPoster || null,
         };
 
-        const { error } = await supabase.from("jobs").upsert(row as any, { onConflict: "id" });
-        if (error) {
-          console.error("Error upserting job to Supabase:", error.message);
+        const fullRow = {
+          ...baseRow,
+          show_in_menu: job.showInMenu !== undefined ? job.showInMenu : true,
+          menu_placement: job.menuPlacement || "PARENT",
+          parent_menu: job.parentMenu || null,
+        };
+
+        const { error: fullError } = await supabase.from("jobs").upsert(fullRow as any, { onConflict: "id" });
+        if (fullError) {
+          // Nếu bảng Supabase chưa có cột menu mới (mã 42703), tự động lưu với baseRow để không bị mất dữ liệu
+          if (fullError.code === "42703" || fullError.message?.includes("show_in_menu") || fullError.message?.includes("menu_placement")) {
+            console.warn("Supabase jobs table missing menu columns, retrying with baseRow...");
+            const { error: baseError } = await supabase.from("jobs").upsert(baseRow as any, { onConflict: "id" });
+            if (baseError) {
+              console.error("Error upserting base job to Supabase:", baseError.message);
+            }
+          } else {
+            console.error("Error upserting job to Supabase:", fullError.message);
+          }
         }
       }
     } catch (err) {

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { X } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { extractFirstFrameFromVideo } from "@/lib/video-thumbnail";
 
 const DEFAULT_IMAGES = [
@@ -19,68 +19,147 @@ interface JobDetailImagesProps {
 }
 
 export function JobDetailImages({ images }: JobDetailImagesProps) {
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
   const validImages = (images || []).filter((src) => Boolean(src && src.trim() !== ""));
-  if (validImages.length === 0) return null;
+  const displayImages = validImages.length > 0 ? validImages : DEFAULT_IMAGES;
 
-  const displayImages = validImages;
+  // Xử lý phím tắt (Escape, ArrowLeft, ArrowRight) và khóa cuộn trang khi mở modal
+  useEffect(() => {
+    if (selectedPhotoIndex === null) return;
+
+    // Khóa cuộn trang khi đang xem ảnh full
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedPhotoIndex(null);
+      } else if (e.key === "ArrowRight") {
+        setSelectedPhotoIndex((prev) =>
+          prev !== null ? (prev + 1) % displayImages.length : null
+        );
+      } else if (e.key === "ArrowLeft") {
+        setSelectedPhotoIndex((prev) =>
+          prev !== null
+            ? (prev - 1 + displayImages.length) % displayImages.length
+            : null
+        );
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [selectedPhotoIndex, displayImages.length]);
+
+  if (displayImages.length === 0) return null;
 
   return (
     <>
-      {/* CÁC KHUNG ẢNH THỰC TẾ: TỈ LỆ DỌC 3:4 */}
-      <div className={`grid gap-3 sm:gap-4 ${
-        displayImages.length === 1 ? "grid-cols-1" : "grid-cols-2"
-      }`}>
+      {/* 2 CỘT ẢNH THỰC TẾ: TỈ LỆ DỌC 3:4, KHUNG THUMBNAIL NHỎ GỌN (~50% SO VỚI TRƯỚC) */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
         {displayImages.map((src, idx) => (
           <div
             key={idx}
-            onClick={() => setSelectedPhoto(src)}
-            className="group cursor-pointer relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all bg-gray-100 border border-gray-100"
+            onClick={() => setSelectedPhotoIndex(idx)}
+            className="group cursor-pointer relative w-full aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 bg-gray-100 border border-gray-100"
+            title="Nhấn để xem ảnh gốc phóng to"
           >
+            {/* Ảnh thumbnail tối ưu hóa dung lượng nhẹ, sắc nét không bị vỡ */}
             <Image
               src={src}
               alt={`Hình ảnh việc làm thực tế ${idx + 1}`}
               fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 400px"
-              unoptimized={src.startsWith("http") || src.startsWith("data:")}
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 250px"
+              quality={85}
+              loading="lazy"
+              unoptimized={src.startsWith("data:")}
+              className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
             />
+            {/* Hiệu ứng overlay khi hover để người dùng biết có thể click mở full */}
+            <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+              <div className="w-8 h-8 rounded-full bg-white/95 text-gray-900 flex items-center justify-center shadow-lg transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
+                <Maximize2 className="w-4 h-4" />
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* MODAL XEM ẢNH LỚN */}
-      {selectedPhoto && (
+      {/* MODAL XEM ẢNH FULL (HIỂN THỊ ẢNH GỐC ĐỘ PHÂN GIẢI CAO NHẤT) */}
+      {selectedPhotoIndex !== null && displayImages[selectedPhotoIndex] && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
-          onClick={() => setSelectedPhoto(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-6 animate-in fade-in duration-200 select-none"
+          onClick={() => setSelectedPhotoIndex(null)}
         >
           <div
-            className="relative max-w-xl w-full max-h-[90vh] bg-black rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center"
+            className="relative max-w-4xl w-full max-h-[92vh] bg-black/90 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center border border-white/10"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Nút đóng modal */}
             <button
-              onClick={() => setSelectedPhoto(null)}
-              className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-black transition"
+              onClick={() => setSelectedPhotoIndex(null)}
+              className="absolute top-3 right-3 z-20 w-10 h-10 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-black/95 hover:scale-105 active:scale-95 transition border border-white/20 shadow-lg cursor-pointer"
               aria-label="Đóng"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="relative w-full aspect-[3/4] max-h-[85vh]">
+            {/* Nút lùi về ảnh trước */}
+            {displayImages.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedPhotoIndex((prev) =>
+                    prev !== null ? (prev - 1 + displayImages.length) % displayImages.length : null
+                  );
+                }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-black/95 hover:scale-105 active:scale-95 transition border border-white/20 shadow-lg cursor-pointer"
+                aria-label="Ảnh trước"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+            )}
+
+            {/* Nút chuyển ảnh tiếp theo */}
+            {displayImages.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedPhotoIndex((prev) =>
+                    prev !== null ? (prev + 1) % displayImages.length : null
+                  );
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-black/95 hover:scale-105 active:scale-95 transition border border-white/20 shadow-lg cursor-pointer"
+                aria-label="Ảnh tiếp"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            )}
+
+            {/* Khung hiển thị ảnh gốc: unoptimized=true đảm bảo load đúng file gốc chất lượng cao */}
+            <div className="relative w-full h-[75vh] sm:h-[85vh] flex items-center justify-center p-2">
               <Image
-                src={selectedPhoto}
-                alt="Hình ảnh phóng to"
+                src={displayImages[selectedPhotoIndex]}
+                alt={`Hình ảnh việc làm thực tế ${selectedPhotoIndex + 1}`}
                 fill
-                sizes="(max-width: 768px) 100vw, 800px"
-                unoptimized={
-                  selectedPhoto.startsWith("http") ||
-                  selectedPhoto.startsWith("data:")
-                }
+                sizes="(max-width: 1024px) 100vw, 1200px"
+                quality={95}
+                priority
+                unoptimized={true}
                 className="object-contain"
               />
             </div>
+
+            {/* Bộ đếm vị trí ảnh */}
+            {displayImages.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 px-3.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-semibold tracking-wide border border-white/10 shadow">
+                {selectedPhotoIndex + 1} / {displayImages.length}
+              </div>
+            )}
           </div>
         </div>
       )}

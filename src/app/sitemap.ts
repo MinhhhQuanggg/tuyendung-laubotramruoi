@@ -10,13 +10,32 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  return [
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: siteConfig.url,
       lastModified: new Date(),
-      changeFrequency: "daily" as const,
+      changeFrequency: "daily",
       priority: 1.0,
     },
-    ...jobUrls,
+    {
+      url: `${siteConfig.url}/ve-chung-toi`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteConfig.url}/chinh-sach-bao-mat`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${siteConfig.url}/dieu-khoan-su-dung`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
   ];
+
+  return [...staticPages, ...jobUrls];
 }

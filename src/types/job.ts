@@ -32,6 +32,9 @@ export interface JobItem {
   experienceDisplay: string;
   workHours?: string; // Ca làm việc
   isActive: boolean;
+  showInMenu?: boolean; // Tùy chọn hiển thị công việc trên Menu điều hướng Header
+  menuPlacement?: "PARENT" | "DIRECT"; // "PARENT": Gắn vào menu cha có sẵn, "DIRECT": Hiển thị trực tiếp ở menu điều hướng
+  parentMenu?: string; // Tên menu cha được gắn vào (mặc định theo category của job)
   contactZalo?: string;
   images?: string[]; // 4 hình ảnh
   videoUrl?: string; // Video thực tế
@@ -70,4 +73,3 @@ export interface CandidateApplication {
   cvFileType?: string;
   note?: string;
 }
-

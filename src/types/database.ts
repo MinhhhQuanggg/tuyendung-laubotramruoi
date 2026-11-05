@@ -23,6 +23,9 @@ export interface Database {
           lat: number | null;
           lng: number | null;
           is_active: boolean;
+          show_in_menu?: boolean | null;
+          menu_placement?: string | null;
+          parent_menu?: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -39,6 +42,9 @@ export interface Database {
           lat?: number | null;
           lng?: number | null;
           is_active?: boolean;
+          show_in_menu?: boolean | null;
+          menu_placement?: string | null;
+          parent_menu?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -55,6 +61,9 @@ export interface Database {
           lat?: number | null;
           lng?: number | null;
           is_active?: boolean;
+          show_in_menu?: boolean | null;
+          menu_placement?: string | null;
+          parent_menu?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -88,6 +97,9 @@ export interface Database {
           valid_through: string;
           is_urgent: boolean;
           is_active: boolean;
+          show_in_menu?: boolean | null;
+          menu_placement?: string | null;
+          parent_menu?: string | null;
           contact_zalo: string | null;
           images: Json | null;
           video_url: string | null;
@@ -122,6 +134,9 @@ export interface Database {
           valid_through: string;
           is_urgent?: boolean;
           is_active?: boolean;
+          show_in_menu?: boolean | null;
+          menu_placement?: string | null;
+          parent_menu?: string | null;
           contact_zalo?: string | null;
           images?: Json | null;
           video_url?: string | null;
@@ -156,6 +171,9 @@ export interface Database {
           valid_through?: string;
           is_urgent?: boolean;
           is_active?: boolean;
+          show_in_menu?: boolean | null;
+          menu_placement?: string | null;
+          parent_menu?: string | null;
           contact_zalo?: string | null;
           images?: Json | null;
           video_url?: string | null;
@@ -250,6 +268,9 @@ export interface Database {
           url: string;
           display_order: number;
           is_active: boolean;
+          show_in_menu?: boolean | null;
+          menu_placement?: string | null;
+          parent_menu?: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -263,6 +284,9 @@ export interface Database {
           url: string;
           display_order?: number;
           is_active?: boolean;
+          show_in_menu?: boolean | null;
+          menu_placement?: string | null;
+          parent_menu?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -276,6 +300,9 @@ export interface Database {
           url?: string;
           display_order?: number;
           is_active?: boolean;
+          show_in_menu?: boolean | null;
+          menu_placement?: string | null;
+          parent_menu?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -289,6 +316,9 @@ export interface Database {
           full_name: string | null;
           role: string;
           is_active: boolean;
+          show_in_menu?: boolean | null;
+          menu_placement?: string | null;
+          parent_menu?: string | null;
           last_login_at: string | null;
           created_at: string;
           updated_at: string;
@@ -300,6 +330,9 @@ export interface Database {
           full_name?: string | null;
           role?: string;
           is_active?: boolean;
+          show_in_menu?: boolean | null;
+          menu_placement?: string | null;
+          parent_menu?: string | null;
           last_login_at?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -311,6 +344,9 @@ export interface Database {
           full_name?: string | null;
           role?: string;
           is_active?: boolean;
+          show_in_menu?: boolean | null;
+          menu_placement?: string | null;
+          parent_menu?: string | null;
           last_login_at?: string | null;
           created_at?: string;
           updated_at?: string;

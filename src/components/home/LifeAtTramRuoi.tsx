@@ -12,7 +12,7 @@ export default function LifeAtTramRuoi({ initialVideos }: LifeAtTramRuoiProps) {
   const fallbackVideos: LifeVideo[] = [
     {
       id: "VID-01",
-      title: "Chính thức ra mắt lẩu bò 2 ngăn nóng hổi tại Lẩu Bò Trăm Rưởi",
+      title: "Chính thức ra mắt lẩu bò 2 ngăn nóng hổi tại Lẩu Bò Trăm Rưỡi",
       author: "@tiemlaubotramruoi",
       platform: "TikTok",
       thumbnail: "/images/tiktok/tiktok-1.jpg",

@@ -5,7 +5,7 @@ import { QuickApplyConfig } from "@/types/quick-apply";
 const CONFIG_FILE_PATH = path.join(process.cwd(), "src", "data", "quick-apply-config.json");
 
 const DEFAULT_CONFIG: QuickApplyConfig = {
-  formTitle: "Ứng Tuyển Lẩu Bò Trăm Rưởi",
+  formTitle: "Ứng Tuyển Lẩu Bò Trăm Rưỡi",
   formSubtitle: "Đào tạo nghề miễn phí có lương • Phỏng vấn đi làm ngay",
   hrName: "Nguyễn Trung Kiên (Kiên HR)",
   hrPhone: "0981256712",

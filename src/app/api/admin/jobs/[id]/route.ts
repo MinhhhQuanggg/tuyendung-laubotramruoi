@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
 import { getJobByIdOrSlug, upsertJob, deleteJob } from "@/lib/jobs-store";
 import { JobItem } from "@/types/job";
+import { slugify } from "@/lib/utils";
 
 interface Params {
   params: {
@@ -9,13 +10,23 @@ interface Params {
   };
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(request: Request, { params }: Params) {
   try {
     const job = await getJobByIdOrSlug(params.id);
     if (!job) {
       return NextResponse.json({ success: false, error: "Không tìm thấy công việc" }, { status: 404 });
     }
-    return NextResponse.json({ success: true, job });
+    return NextResponse.json(
+      { success: true, job },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        },
+      }
+    );
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
@@ -38,7 +49,7 @@ export async function PUT(request: Request, { params }: Params) {
       ...existing,
       ...body,
       id: existing.id, // ID remains invariant
-      slug: body.slug || existing.slug,
+      slug: body.slug ? slugify(body.slug) : existing.slug,
       title: body.title || existing.title,
       category: body.category || existing.category,
       salaryDisplay: body.salaryDisplay !== undefined ? body.salaryDisplay : existing.salaryDisplay,
@@ -58,6 +69,9 @@ export async function PUT(request: Request, { params }: Params) {
       benefits: body.benefits || existing.benefits,
       isUrgent: body.isUrgent !== undefined ? body.isUrgent : existing.isUrgent,
       isActive: body.isActive !== undefined ? body.isActive : existing.isActive,
+      showInMenu: body.showInMenu !== undefined ? body.showInMenu : existing.showInMenu,
+      menuPlacement: body.menuPlacement !== undefined ? body.menuPlacement : existing.menuPlacement,
+      parentMenu: body.parentMenu !== undefined ? body.parentMenu : existing.parentMenu,
       contactZalo: body.contactZalo !== undefined ? body.contactZalo : existing.contactZalo,
       images: body.images !== undefined ? body.images : existing.images,
       videoUrl: body.videoUrl !== undefined ? body.videoUrl : existing.videoUrl,
