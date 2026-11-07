@@ -4,21 +4,6 @@ import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase";
 import fs from "fs";
 import path from "path";
 
-async function ensureBucket(supabaseAdmin: any) {
-  try {
-    const { data: buckets } = await supabaseAdmin.storage.listBuckets();
-    const mediaBucket = buckets?.find((b: any) => b.name === "media");
-    if (!mediaBucket) {
-      await supabaseAdmin.storage.createBucket("media", {
-        public: true,
-        fileSizeLimit: 52428800, // 50MB
-      });
-    }
-  } catch (e) {
-    console.warn("Could not check/create bucket:", e);
-  }
-}
-
 export async function GET(request: Request) {
   if (!isAuthenticated()) {
     return NextResponse.json({ success: false, error: "Chưa đăng nhập quyền Admin" }, { status: 401 });
@@ -38,7 +23,6 @@ export async function GET(request: Request) {
 
     const supabaseAdmin = getSupabaseAdmin();
     if (supabaseAdmin && isSupabaseConfigured()) {
-      await ensureBucket(supabaseAdmin);
       const ext = path.extname(rawFilename) || (isVideo ? ".mp4" : ".jpg");
       const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}${ext}`;
       const subFolder = isVideo ? "videos" : "images";
@@ -97,34 +81,10 @@ export async function POST(request: Request) {
     const storagePath = `${subFolder}/${filename}`;
     const contentType = file.type || (isVideo ? "video/mp4" : "image/jpeg");
 
-    // 1. Nếu Supabase được cấu hình, lưu trực tiếp lên Supabase Storage CDN
+    // 1. Lưu trực tiếp lên Supabase Storage CDN
     if (isSupabaseConfigured()) {
       const supabaseAdmin = getSupabaseAdmin();
       if (supabaseAdmin) {
-        await ensureBucket(supabaseAdmin);
-
-        // Upload trực tiếp qua signed URL để tối ưu hóa tương thích network
-        const { data: signData, error: signError } = await supabaseAdmin.storage
-          .from("media")
-          .createSignedUploadUrl(storagePath, { upsert: true });
-
-        if (!signError && signData?.signedUrl) {
-          const uploadRes = await fetch(signData.signedUrl, {
-            method: "PUT",
-            headers: {
-              "Content-Type": contentType,
-              "Content-Length": buffer.length.toString(),
-            },
-            body: buffer,
-          });
-
-          if (uploadRes.ok) {
-            const { data: pubData } = supabaseAdmin.storage.from("media").getPublicUrl(storagePath);
-            return NextResponse.json({ success: true, url: pubData.publicUrl });
-          }
-        }
-
-        // Dự phòng upload trực tiếp qua Supabase JS
         const { error: uploadError } = await supabaseAdmin.storage
           .from("media")
           .upload(storagePath, buffer, {

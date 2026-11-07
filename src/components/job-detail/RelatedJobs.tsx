@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { JobItem } from "@/types/job";
 import { ArrowRight, MapPin } from "lucide-react";
+import { getJobUrl } from "@/lib/job-url";
 
 interface RelatedJobsProps {
   relatedJobs: JobItem[];
@@ -22,7 +23,7 @@ export default function RelatedJobs({ relatedJobs }: RelatedJobsProps) {
             className="group p-3 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-200 transition-all"
           >
             <h4 className="font-bold text-[16px] sm:text-[18px] text-gray-900 group-hover:text-brand-800 transition line-clamp-2">
-              <Link href={`/viec-lam/${job.slug}`}>{job.title}</Link>
+              <Link href={getJobUrl(job)}>{job.title}</Link>
             </h4>
 
             <div className="mt-2.5 flex items-center justify-between text-[14px] sm:text-[15px]">
@@ -37,7 +38,7 @@ export default function RelatedJobs({ relatedJobs }: RelatedJobsProps) {
 
             <div className="mt-2.5 text-right">
               <Link
-                href={`/viec-lam/${job.slug}`}
+                href={getJobUrl(job)}
                 className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-amber-600 hover:text-amber-700"
               >
                 <span>Xem chi tiết</span>

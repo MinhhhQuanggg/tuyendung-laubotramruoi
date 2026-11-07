@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { JobItem } from "@/types/job";
 import AdminDetailToolbar from "@/components/admin/AdminDetailToolbar";
@@ -11,7 +14,44 @@ interface JobDetailViewProps {
   isAdmin?: boolean;
 }
 
-export default function JobDetailView({ job, isAdmin = false }: JobDetailViewProps) {
+export default function JobDetailView({ job: initialJob, isAdmin = false }: JobDetailViewProps) {
+  const [job, setJob] = useState<JobItem>(initialJob);
+
+  // Đồng bộ lại state khi initialJob thay đổi từ server
+  useEffect(() => {
+    setJob(initialJob);
+  }, [initialJob]);
+
+  // Lắng nghe cập nhật realtime từ Admin hoặc tab khác để hiển thị tức thì
+  useEffect(() => {
+    const handleSync = () => {
+      fetch(`/api/admin/jobs/${job.id}?t=${Date.now()}`, { cache: "no-store" })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.job) {
+            setJob(data.job);
+          }
+        })
+        .catch(() => {});
+    };
+
+    window.addEventListener("jobs-updated", handleSync);
+    let channel: BroadcastChannel | null = null;
+    if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+      try {
+        channel = new BroadcastChannel("jobs-sync");
+        channel.onmessage = () => {
+          handleSync();
+        };
+      } catch {}
+    }
+
+    return () => {
+      window.removeEventListener("jobs-updated", handleSync);
+      if (channel) channel.close();
+    };
+  }, [job.id]);
+
   return (
     <>
       {/* Header Banner với Breadcrumb & Các nút thao tác Admin */}
@@ -19,19 +59,24 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-wrap items-center justify-between gap-3">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-xs text-amber-200/80">
-            <Link href={isAdmin ? "/admin" : "/"} className="hover:text-white transition">
-              {isAdmin ? "Bảng điều khiển" : "Trang chủ"}
+            <Link href="/" className="hover:text-white transition">
+              Trang chủ
             </Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <Link href={isAdmin ? "/admin" : "/#danh-sach-viec-lam"} className="hover:text-white transition">
-              {isAdmin ? "Danh sách việc làm" : "Cơ hội cho bạn"}
+            <Link href="/#danh-sach-viec-lam" className="hover:text-white transition">
+              Việc làm
             </Link>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-white font-medium">{job.title}</span>
           </nav>
 
           {/* Thanh công cụ thao tác quản trị gộp trực tiếp vào Banner */}
-          {isAdmin && <AdminDetailToolbar initialJob={job} />}
+          {isAdmin && (
+            <AdminDetailToolbar
+              initialJob={job}
+              onJobUpdated={(updated) => setJob(updated)}
+            />
+          )}
         </div>
       </section>
 

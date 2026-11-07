@@ -1,16 +1,39 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
-import { ALL_BRANCHES } from "@/data/branches";
+import { Branch } from "@/types/branch";
 import { MapPin, Navigation } from "lucide-react";
 import CurvedWaveDivider from "../common/CurvedWaveDivider";
 import BranchMap from "./BranchMap";
 
 export default function Footer() {
-  // Chia 13 chi nhánh thành 3 cột cân đối: 5 - 4 - 4 theo đúng thứ tự
-  const col1 = ALL_BRANCHES.slice(0, 5);
-  const col2 = ALL_BRANCHES.slice(5, 9);
-  const col3 = ALL_BRANCHES.slice(9, 13);
+  const [branches, setBranches] = useState<Branch[]>([]);
 
+  useEffect(() => {
+    const loadBranches = () => {
+      fetch(`/api/branches?t=${Date.now()}`, { cache: "no-store" })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.branches) {
+            setBranches(data.branches);
+          }
+        })
+        .catch(() => {});
+    };
+
+    loadBranches();
+    window.addEventListener("branches-updated", loadBranches);
+    return () => {
+      window.removeEventListener("branches-updated", loadBranches);
+    };
+  }, []);
+
+  const part = Math.ceil(branches.length / 3) || 1;
+  const col1 = branches.slice(0, part);
+  const col2 = branches.slice(part, part * 2);
+  const col3 = branches.slice(part * 2);
   const columns = [col1, col2, col3];
 
   return (
@@ -35,7 +58,7 @@ export default function Footer() {
           <div className="mb-6">
             <h3 className="text-white font-extrabold text-sm sm:text-base md:text-lg uppercase tracking-wider flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
-              Hệ Thống 13 Chi Nhánh Lẩu Bò Trăm Rưỡi
+              Hệ Thống {branches.length > 0 ? `${branches.length} ` : ""}Chi Nhánh Lẩu Bò Trăm Rưỡi
             </h3>
           </div>
 
@@ -59,14 +82,16 @@ export default function Footer() {
                       CN {b.cnNumber}
                     </span>
 
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-[13px] leading-snug text-gray-200 group-hover:text-white transition-colors">
-                        <strong className="text-amber-300 font-bold">{b.district}: </strong>
-                        <span className="text-gray-100 group-hover:text-amber-100 transition-colors">{b.address}</span>
+                    {/* Tên & Địa chỉ chi nhánh */}
+                    <div className="min-w-0 flex-1">
+                      <div className="text-white text-xs sm:text-sm font-bold group-hover:text-amber-300 transition-colors flex items-center justify-between gap-1">
+                        <span className="truncate">{b.name}</span>
+                        <Navigation className="w-3 h-3 text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                      </div>
+                      <p className="text-gray-400 text-xs sm:text-[13px] leading-snug line-clamp-1 group-hover:text-gray-200 transition-colors mt-0.5">
+                        {b.address}
                       </p>
                     </div>
-
-                    <Navigation className="w-3.5 h-3.5 text-gray-400 group-hover:text-amber-400 shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </a>
                 ))}
               </div>
@@ -74,72 +99,35 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* THANH THÔNG TIN LIÊN HỆ & MẠNG XÃ HỘI */}
-        <div className="py-4 border-b border-brand-900/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-4 text-gray-300">
-            <Link
-              href="/ve-chung-toi"
-              className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
-            >
-              <span>👉</span>
-              <span className="font-medium">Về chúng tôi (Thông tin & Liên hệ)</span>
-            </Link>
-            <span className="text-brand-800 hidden sm:inline">•</span>
-            <Link
-              href="/chinh-sach-bao-mat"
-              className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
-            >
-              <span>🔒</span>
-              <span className="font-medium">Chính sách bảo mật</span>
-            </Link>
-            <span className="text-brand-800 hidden sm:inline">•</span>
-            <Link
-              href="/dieu-khoan-su-dung"
-              className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
-            >
-              <span>📜</span>
-              <span className="font-medium">Điều khoản sử dụng</span>
-            </Link>
+        {/* PHẦN GIỮA: BẢN ĐỒ GOOGLE MAPS TƯƠNG TÁC THỰC CHIẾN (CHỈ DÀNH RIÊNG CHO 13 CHI NHÁNH TP.HCM) */}
+        <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <span className="text-xs font-semibold text-gray-400 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-amber-400" />
+              Bản đồ định vị Google Maps hệ thống chi nhánh
+            </span>
+            <span className="text-[11px] text-amber-200/80 bg-amber-950/40 border border-amber-800/40 px-2.5 py-1 rounded-full w-fit">
+              💡 Bấm vào từng ghim đỏ để xem địa chỉ và mở chỉ đường trực tiếp
+            </span>
           </div>
 
-          {/* Mạng xã hội */}
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] text-gray-400 uppercase font-semibold">Mạng xã hội:</span>
-            <a
-              href={siteConfig.socials.facebookFanpage}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-amber-400 hover:text-brand-950 text-white text-xs font-semibold transition"
-            >
-              Facebook
-            </a>
-            <a
-              href={siteConfig.socials.tiktok}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-amber-400 hover:text-brand-950 text-white text-xs font-semibold transition"
-            >
-              TikTok
-            </a>
-            <a
-              href={siteConfig.socials.recruitmentPage}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-amber-400 hover:text-brand-950 text-white text-xs font-semibold transition"
-            >
-              Tuyển Dụng
-            </a>
+          <BranchMap branches={branches} />
+        </div>
+
+        {/* PHẦN DƯỚI: BẢN QUYỀN & THÔNG TIN DOANH NGHIỆP */}
+        <div className="pt-4 border-t border-brand-900/60 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-gray-400">
+          <p className="text-center md:text-left">
+            © {new Date().getFullYear()} {siteConfig.name}. Tất cả các quyền được bảo lưu.
+          </p>
+          <div className="flex items-center gap-4">
+            <Link href="/chinh-sach-bao-mat" className="hover:text-amber-400 transition">
+              Chính sách bảo mật
+            </Link>
+            <span>•</span>
+            <Link href="/dieu-khoan-su-dung" className="hover:text-amber-400 transition">
+              Điều khoản sử dụng
+            </Link>
           </div>
-        </div>
-
-        {/* PHẦN DƯỚI: BẢN ĐỒ TP.HCM GHIM TỪNG ĐỊA CHỈ CHI NHÁNH */}
-        <div className="pt-2 pb-2">
-          <BranchMap />
-        </div>
-
-        {/* BẢN QUYỀN */}
-        <div className="pt-2 pb-1 text-center text-[12px] text-gray-400/80">
-          Tuyển Dụng Lẩu Bò Trăm Rưỡi
         </div>
       </div>
     </footer>

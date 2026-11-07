@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { isAuthenticated } from "@/lib/auth";
 import { getJobsList, upsertJob, deleteJob } from "@/lib/jobs-store";
 import { JobItem } from "@/types/job";
 import { slugify } from "@/lib/utils";
+import { getJobUrl } from "@/lib/job-url";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -78,6 +80,18 @@ export async function POST(request: Request) {
     };
 
     const saved = await upsertJob(newJob);
+
+    try {
+      revalidatePath("/");
+      revalidatePath("/admin");
+      revalidatePath(getJobUrl(saved));
+      revalidatePath(getJobUrl(saved, true));
+      revalidatePath(`/viec-lam/${saved.slug}`);
+      revalidatePath(`/admin/viec-lam/${saved.slug}`);
+    } catch (e) {
+      console.warn("revalidatePath warning:", e);
+    }
+
     return NextResponse.json({ success: true, job: saved });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
@@ -105,6 +119,14 @@ export async function DELETE(request: Request) {
     }
 
     await deleteJob(id);
+
+    try {
+      revalidatePath("/");
+      revalidatePath("/admin");
+    } catch (e) {
+      console.warn("revalidatePath warning:", e);
+    }
+
     return NextResponse.json({ success: true, message: "Đã xóa công việc thành công" });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

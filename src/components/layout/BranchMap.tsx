@@ -2,9 +2,14 @@
 
 import { useEffect, useState, ComponentType } from "react";
 import { MapPin } from "lucide-react";
+import { Branch } from "@/types/branch";
 
-export default function BranchMap() {
-  const [MapComponent, setMapComponent] = useState<ComponentType | null>(null);
+interface BranchMapProps {
+  branches?: Branch[];
+}
+
+export default function BranchMap({ branches }: BranchMapProps) {
+  const [MapComponent, setMapComponent] = useState<ComponentType<{ branches?: Branch[] }> | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -28,11 +33,11 @@ export default function BranchMap() {
       <div className="w-full h-[320px] sm:h-[380px] md:h-[420px] rounded-2xl bg-brand-900/40 border border-brand-800/80 flex flex-col items-center justify-center gap-3 text-gray-400 animate-pulse">
         <MapPin className="w-8 h-8 text-amber-400 animate-bounce" />
         <span className="text-sm font-semibold text-gray-300">
-          Đang tải bản đồ hệ thống 13 chi nhánh TP.HCM...
+          Đang tải bản đồ hệ thống chi nhánh...
         </span>
       </div>
     );
   }
 
-  return <MapComponent />;
+  return <MapComponent branches={branches} />;
 }

@@ -1,14 +1,18 @@
 import { siteConfig } from "@/config/site";
-import { JOBS_DATA } from "@/data/jobs";
+import { getJobsList } from "@/lib/jobs-store";
+import { getJobUrl } from "@/lib/job-url";
 import { MetadataRoute } from "next";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const jobUrls = JOBS_DATA.map((job) => ({
-    url: `${siteConfig.url}/viec-lam/${job.slug}`,
-    lastModified: new Date(job.datePosted || Date.now()),
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
-  }));
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const jobs = await getJobsList();
+  const jobUrls = jobs
+    .filter((j) => j.isActive)
+    .map((job) => ({
+      url: `${siteConfig.url}${getJobUrl(job)}`,
+      lastModified: new Date(job.datePosted || Date.now()),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
 
   const staticPages: MetadataRoute.Sitemap = [
     {

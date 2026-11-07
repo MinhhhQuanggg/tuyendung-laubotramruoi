@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { QuickApplyConfig } from "@/types/quick-apply";
 
-const CONFIG_FILE_PATH = path.join(process.cwd(), "src", "data", "quick-apply-config.json");
+const CONFIG_FILE_PATH = path.join(process.cwd(), "src", "config", "quick-apply-config.json");
 
 const DEFAULT_CONFIG: QuickApplyConfig = {
   formTitle: "Ứng Tuyển Lẩu Bò Trăm Rưỡi",

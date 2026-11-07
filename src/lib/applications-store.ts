@@ -1,92 +1,60 @@
-import fs from "fs";
-import path from "path";
 import { ApplicationItem, ApplicationStatus } from "@/types/application";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase";
 
-const DATA_FILE_PATH = path.join(process.cwd(), "src", "data", "applications.json");
+export async function getApplicationsList(): Promise<ApplicationItem[]> {
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
 
-function readLocalApplications(): ApplicationItem[] {
   try {
-    if (fs.existsSync(DATA_FILE_PATH)) {
-      const data = fs.readFileSync(DATA_FILE_PATH, "utf8");
-      return JSON.parse(data) as ApplicationItem[];
+    const supabase = getSupabaseAdmin();
+    if (!supabase) return [];
+
+    const { data, error } = await supabase
+      .from("applications")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!error && data && data.length > 0) {
+      return data.map((item: any) => ({
+        id: item.id,
+        fullName: item.full_name,
+        age: item.age,
+        phoneZalo: item.phone_zalo,
+        appliedRegion: item.applied_region || undefined,
+        address: item.address || undefined,
+        positionId: item.position_id || undefined,
+        positionTitle: item.position_title,
+        preferredBranch: item.preferred_branch || undefined,
+        cvFileName: item.cv_file_name || undefined,
+        cvBase64: item.cv_base64 || undefined,
+        cvFileUrl: item.cv_file_url || undefined,
+        cvFileSize: item.cv_file_size || undefined,
+        cvFileType: item.cv_file_type || undefined,
+        note: item.note || undefined,
+        status: (item.status as ApplicationStatus) || "pending",
+        telegramNotified: item.telegram_notified ?? false,
+        createdAt: item.created_at,
+        updatedAt: item.updated_at,
+      }));
     }
   } catch (err) {
-    console.error("Error reading applications.json:", err);
+    console.error("Supabase load in getApplicationsList failed:", err);
   }
+
   return [];
 }
 
-function writeLocalApplications(applications: ApplicationItem[]) {
-  try {
-    fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(applications, null, 2), "utf8");
-  } catch (err) {
-    console.error("Error writing applications.json:", err);
-  }
+export async function getApplicationById(id: string): Promise<ApplicationItem | null> {
+  const list = await getApplicationsList();
+  return list.find((item) => item.id === id) || null;
 }
 
-export async function getApplicationsList(): Promise<ApplicationItem[]> {
-  // 1. Thử lấy từ Supabase nếu đã cấu hình
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = getSupabaseAdmin();
-      if (supabase) {
-        const { data, error } = await supabase
-          .from("applications")
-          .select("*")
-          .order("created_at", { ascending: false });
-
-        if (!error && data && data.length > 0) {
-          const supabaseApps: ApplicationItem[] = data.map((item) => ({
-            id: item.id,
-            fullName: item.full_name,
-            age: item.age,
-            phoneZalo: item.phone_zalo,
-            appliedRegion: item.applied_region || undefined,
-            address: item.address || undefined,
-            positionId: item.position_id || undefined,
-            positionTitle: item.position_title,
-            preferredBranch: item.preferred_branch || undefined,
-            cvFileName: item.cv_file_name || undefined,
-            cvBase64: item.cv_base64 || undefined,
-            cvFileUrl: item.cv_file_url || undefined,
-            cvFileSize: item.cv_file_size || undefined,
-            cvFileType: item.cv_file_type || undefined,
-            note: item.note || undefined,
-            status: (item.status as ApplicationStatus) || "pending",
-            telegramNotified: item.telegram_notified ?? false,
-            createdAt: item.created_at,
-            updatedAt: item.updated_at,
-          }));
-
-          // Đồng bộ nhẹ nhàng vào local để luôn có backup
-          const localApps = readLocalApplications();
-          const merged = [...supabaseApps];
-          for (const local of localApps) {
-            if (!merged.some((m) => m.id === local.id)) {
-              merged.push(local);
-            }
-          }
-          return merged.sort(
-            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-        }
-      }
-    } catch (err) {
-      console.warn("Supabase load applications failed, fallback to local:", err);
-    }
-  }
-
-  // 2. Dự phòng file JSON cục bộ
-  const localList = readLocalApplications();
-  return localList.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
-}
-
-export async function saveApplication(app: Partial<ApplicationItem>): Promise<ApplicationItem> {
+export async function saveApplication(
+  app: Partial<ApplicationItem>
+): Promise<ApplicationItem> {
   const newApp: ApplicationItem = {
-    id: app.id || `app-${Date.now()}`,
+    id: app.id || `app-${Date.now().toString(36)}`,
     fullName: app.fullName || "Ứng viên",
     age: app.age || "Chưa rõ",
     phoneZalo: app.phoneZalo || "",
@@ -107,11 +75,11 @@ export async function saveApplication(app: Partial<ApplicationItem>): Promise<Ap
     updatedAt: new Date().toISOString(),
   };
 
-  // Lưu Supabase nếu có
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseAdmin();
       if (supabase) {
+        const dbStatus = newApp.status === "interviewed" ? "contacted" : newApp.status;
         await supabase.from("applications").upsert({
           id: newApp.id,
           full_name: newApp.fullName,
@@ -128,26 +96,16 @@ export async function saveApplication(app: Partial<ApplicationItem>): Promise<Ap
           cv_file_size: newApp.cvFileSize,
           cv_file_type: newApp.cvFileType,
           note: newApp.note,
-          status: newApp.status,
+          status: dbStatus,
           telegram_notified: newApp.telegramNotified,
           created_at: newApp.createdAt,
           updated_at: newApp.updatedAt,
         });
       }
     } catch (err) {
-      console.warn("Supabase upsert application failed:", err);
+      console.error("Supabase upsert application failed:", err);
     }
   }
-
-  // Luôn lưu local JSON
-  const localList = readLocalApplications();
-  const existingIdx = localList.findIndex((item) => item.id === newApp.id);
-  if (existingIdx >= 0) {
-    localList[existingIdx] = newApp;
-  } else {
-    localList.unshift(newApp);
-  }
-  writeLocalApplications(localList);
 
   return newApp;
 }
@@ -158,50 +116,40 @@ export async function updateApplicationStatus(
 ): Promise<boolean> {
   const updatedAt = new Date().toISOString();
 
-  // Supabase
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseAdmin();
       if (supabase) {
+        const dbStatus = status === "interviewed" ? "contacted" : status;
         await supabase
           .from("applications")
-          .update({ status, updated_at: updatedAt })
+          .update({ status: dbStatus, updated_at: updatedAt })
           .eq("id", id);
+        return true;
       }
     } catch (err) {
-      console.warn("Supabase update application status failed:", err);
+      console.error("Supabase update application status failed:", err);
     }
   }
 
-  // Local JSON
-  const localList = readLocalApplications();
-  const target = localList.find((item) => item.id === id);
-  if (target) {
-    target.status = status;
-    target.updatedAt = updatedAt;
-    writeLocalApplications(localList);
-    return true;
-  }
-
-  return true;
+  return false;
 }
 
 export async function deleteApplication(id: string): Promise<boolean> {
-  // Supabase
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseAdmin();
       if (supabase) {
-        await supabase.from("applications").delete().eq("id", id);
+        const { error } = await supabase.from("applications").delete().eq("id", id);
+        if (error) {
+          console.error("Supabase delete application error:", error.message);
+        }
+        return true;
       }
     } catch (err) {
-      console.warn("Supabase delete application failed:", err);
+      console.error("Supabase delete application exception:", err);
     }
   }
 
-  // Local JSON
-  const localList = readLocalApplications();
-  const filtered = localList.filter((item) => item.id !== id);
-  writeLocalApplications(filtered);
-  return true;
+  return false;
 }

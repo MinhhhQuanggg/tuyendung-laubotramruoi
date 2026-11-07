@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { JobItem } from "@/types/job";
 import { DollarSign, Clock, Calendar, ArrowRight, Flame } from "lucide-react";
+import { getJobUrl } from "@/lib/job-url";
 
 interface JobCardProps {
   job: JobItem;
@@ -43,7 +44,7 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
 
         {/* Tiêu đề vị trí: Tăng 2px lên 20px (mobile) / 22px (desktop) */}
         <h3 className="text-[20px] sm:text-[22px] font-bold text-gray-900 group-hover:text-brand-800 transition-colors line-clamp-2 mb-4 leading-snug">
-          <Link href={`/viec-lam/${job.slug}`}>{job.title}</Link>
+          <Link href={getJobUrl(job)}>{job.title}</Link>
         </h3>
 
         {/* Thông tin: Lương, Ca làm & Yêu cầu */}
@@ -91,7 +92,7 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
           </button>
         )}
         <Link
-          href={`/viec-lam/${job.slug}`}
+          href={getJobUrl(job)}
           className="inline-flex items-center gap-1.5 text-sm sm:text-base font-bold text-brand-800 group-hover:text-brand-900 hover:underline"
         >
           <span>Chi tiết</span>

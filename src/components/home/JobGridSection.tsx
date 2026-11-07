@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { JOBS_DATA } from "@/data/jobs";
 import { JobItem } from "@/types/job";
 import JobCard from "./JobCard";
 import QuickApplyModal from "../common/QuickApplyModal";
@@ -25,7 +24,7 @@ const ORDERED_SLUGS = [
 
 export default function JobGridSection() {
   const [selectedJobForModal, setSelectedJobForModal] = useState<JobItem | null>(null);
-  const [jobsList, setJobsList] = useState<JobItem[]>(JOBS_DATA);
+  const [jobsList, setJobsList] = useState<JobItem[]>([]);
 
   // Cập nhật dữ liệu việc làm tức thì khi Admin tạo mới hoặc chỉnh sửa
   useEffect(() => {

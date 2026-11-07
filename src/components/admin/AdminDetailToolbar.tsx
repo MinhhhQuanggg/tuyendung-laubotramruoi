@@ -25,6 +25,7 @@ import { extractFirstFrameFromFile } from "@/lib/video-thumbnail";
 import { uploadMediaFile } from "@/lib/upload-client";
 import { slugify } from "@/lib/utils";
 import { savePreviewDraft } from "@/lib/job-preview";
+import { getJobUrl } from "@/lib/job-url";
 
 const CATEGORIES: JobCategory[] = [
   "Học nghề có lương",
@@ -56,18 +57,26 @@ const PRESET_EXPERIENCE_TAGS = [
 
 interface AdminDetailToolbarProps {
   initialJob: JobItem;
+  onJobUpdated?: (updatedJob: JobItem) => void;
 }
 
-export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarProps) {
+export default function AdminDetailToolbar({ initialJob, onJobUpdated }: AdminDetailToolbarProps) {
   const router = useRouter();
   const [job, setJob] = useState<JobItem>(initialJob);
   const [copiedLink, setCopiedLink] = useState(false);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
+  // Cập nhật state nếu initialJob từ component cha thay đổi
+  useEffect(() => {
+    setJob(initialJob);
+  }, [initialJob]);
+
   // Edit Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<JobItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState("");
   const [quickMediaUrl, setQuickMediaUrl] = useState("");
 
   // Khóa cuộn trang nền khi mở modal
@@ -111,7 +120,9 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
       });
       const data = await res.json();
       if (data.success) {
-        setJob({ ...job, isActive: newStatus });
+        const updated = { ...job, isActive: newStatus };
+        setJob(updated);
+        if (onJobUpdated) onJobUpdated(updated);
         notifyJobsUpdated();
         showToast(`Đã ${newStatus ? "bật hiển thị" : "ẩn"} vị trí "${job.title}"!`, "success");
         router.refresh();
@@ -125,7 +136,7 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
 
   // Copy shareable link
   const handleCopyLink = () => {
-    const url = `${window.location.origin}/viec-lam/${job.slug}`;
+    const url = `${window.location.origin}${getJobUrl(job)}`;
     navigator.clipboard.writeText(url);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2500);
@@ -214,6 +225,11 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
     e.preventDefault();
     if (!editingJob || !editingJob.title) return;
 
+    if (isUploadingMedia) {
+      showToast("Hình ảnh hoặc video đang được tải lên, vui lòng đợi trong giây lát!", "error");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const finalSlug = slugify(editingJob.slug || editingJob.title || "");
@@ -230,8 +246,8 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
             : undefined,
         slug: finalSlug,
         images: cleanImages,
-        videoUrl: editingJob.videoUrl?.trim() || undefined,
-        videoPoster: editingJob.videoPoster?.trim() || undefined,
+        videoUrl: editingJob.videoUrl?.trim() ?? "",
+        videoPoster: editingJob.videoPoster?.trim() ?? "",
         badges: derivedBadges.length > 0 ? derivedBadges : (editingJob.badges || []),
         badge: derivedBadges.join(", "),
         contactZalo: editingJob.contactZalo || editingJob.concisePost?.zalo || "0981256712",
@@ -245,18 +261,18 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
 
       const data = await res.json();
       if (data.success) {
-        showToast(`Đã lưu thay đổi cho "${jobPayload.title}"!`, "success");
+        const savedJob = data.job || jobPayload;
+        showToast(`Đã lưu thay đổi cho "${savedJob.title}"!`, "success");
         setIsModalOpen(false);
         const prevSlug = job.slug;
-        setJob(jobPayload);
+        setJob(savedJob);
+        if (onJobUpdated) onJobUpdated(savedJob);
         notifyJobsUpdated();
 
         // Chuyển hướng nếu đổi slug hoặc refresh dữ liệu trang
         if (prevSlug !== finalSlug) {
           const isAdminRoute = typeof window !== "undefined" && window.location.pathname.startsWith("/admin");
-          window.location.href = isAdminRoute
-            ? `/admin/viec-lam/${finalSlug}`
-            : `/viec-lam/${finalSlug}`;
+          window.location.href = getJobUrl(savedJob, isAdminRoute);
         } else {
           router.refresh();
         }
@@ -272,9 +288,24 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
 
   // Upload video handler
   const handleUploadVideo = async (file: File) => {
-    showToast("Đang tải video lên máy chủ...", "success");
+    if (file.size > 50 * 1024 * 1024) {
+      showToast("Video vượt quá giới hạn 50MB. Vui lòng nén dung lượng hoặc dán link video trực tiếp.", "error");
+      return;
+    }
+
+    if (file.size > 15 * 1024 * 1024) {
+      showToast("Video dung lượng khá lớn, quá trình tải lên có thể mất 1-2 phút...", "success");
+    } else {
+      showToast("Đang tải video lên CDN máy chủ...", "success");
+    }
+
+    setIsUploadingMedia(true);
+    setUploadProgress("Đang tải video lên máy chủ lưu trữ...");
     try {
-      const data = await uploadMediaFile(file);
+      const data = await uploadMediaFile(file, {
+        onProgress: (text) => setUploadProgress(text),
+      });
+
       if (data.success && data.url) {
         let thumb = "";
         try {
@@ -293,46 +324,72 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
         );
         showToast("Đã tải video thành công!", "success");
       } else {
-        showToast(data.error || "Tải video thất bại", "error");
+        showToast(data.error || "Tải video thất bại, vui lòng thử lại", "error");
       }
     } catch {
       showToast("Lỗi khi tải video", "error");
+    } finally {
+      setIsUploadingMedia(false);
+      setUploadProgress("");
     }
   };
 
-  // Upload multiple images handler
+  // Upload multiple images handler với nén tự động và tải song song siêu tốc
   const handleUploadMultipleImages = async (files: FileList | File[]) => {
     const fileList = Array.from(files);
     if (fileList.length === 0) return;
 
-    showToast(`Đang tải ${fileList.length} ảnh lên...`, "success");
-    try {
-      const uploadedUrls: string[] = [];
-      for (const file of fileList) {
-        const data = await uploadMediaFile(file);
-        if (data.success && data.url) {
-          uploadedUrls.push(data.url);
-        }
-      }
+    setIsUploadingMedia(true);
+    setUploadProgress(`Đang tối ưu & nén ${fileList.length} ảnh...`);
+    showToast(`Đang tối ưu và tải ${fileList.length} ảnh lên...`, "success");
 
-      if (uploadedUrls.length > 0) {
+    try {
+      // Tải song song tối ưu tốc độ
+      const results = await Promise.all(
+        fileList.map(async (file, idx) => {
+          setUploadProgress(`Đang tải ảnh ${idx + 1}/${fileList.length}...`);
+          return await uploadMediaFile(file, {
+            onProgress: (text) => setUploadProgress(`[${idx + 1}/${fileList.length}] ${text}`),
+          });
+        })
+      );
+
+      const successfulUrls = results.filter((r) => r.success && r.url).map((r) => r.url as string);
+      const failedCount = results.filter((r) => !r.success).length;
+
+      if (successfulUrls.length > 0) {
         setEditingJob((prev) => {
           if (!prev) return prev;
           const current = (prev.images || []).filter(Boolean);
-          return { ...prev, images: [...current, ...uploadedUrls] };
+          return { ...prev, images: [...current, ...successfulUrls] };
         });
-        showToast(`Đã thêm thành công ${uploadedUrls.length} ảnh!`, "success");
+        showToast(
+          failedCount > 0
+            ? `Đã thêm ${successfulUrls.length} ảnh (${failedCount} ảnh lỗi)`
+            : `Đã thêm thành công ${successfulUrls.length} ảnh!`,
+          "success"
+        );
+      } else {
+        const firstError = results.find((r) => !r.success)?.error;
+        showToast(firstError || "Tải ảnh thất bại, vui lòng thử lại", "error");
       }
-    } catch {
-      showToast("Lỗi khi tải ảnh lên", "error");
+    } catch (err: any) {
+      showToast(err.message || "Lỗi khi tải ảnh lên", "error");
+    } finally {
+      setIsUploadingMedia(false);
+      setUploadProgress("");
     }
   };
 
   // Replace image at index
   const handleReplaceImage = async (file: File, index: number) => {
-    showToast(`Đang thay đổi ảnh #${index + 1}...`, "success");
+    setIsUploadingMedia(true);
+    setUploadProgress(`Đang nén & thay thế ảnh #${index + 1}...`);
+    showToast(`Đang thay thế ảnh #${index + 1}...`, "success");
     try {
-      const data = await uploadMediaFile(file);
+      const data = await uploadMediaFile(file, {
+        onProgress: (text) => setUploadProgress(text),
+      });
       if (data.success && data.url) {
         const newImageUrl = data.url;
         setEditingJob((prev) => {
@@ -347,6 +404,9 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
       }
     } catch {
       showToast("Lỗi khi tải ảnh", "error");
+    } finally {
+      setIsUploadingMedia(false);
+      setUploadProgress("");
     }
   };
 
@@ -446,7 +506,7 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
                 </div>
                 <div>
                   <h3 className="text-base font-black tracking-tight text-white">Chỉnh Sửa Vị Trí: {editingJob.title}</h3>
-                  <p className="text-xs text-white/70">ID: {editingJob.id} • Slug: /viec-lam/{editingJob.slug || "(Tự động)"}</p>
+                  <p className="text-xs text-white/70">ID: {editingJob.id} • Đường dẫn: {getJobUrl(editingJob)}</p>
                 </div>
               </div>
               <button
@@ -952,7 +1012,7 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
                       <span>📸 5. Quản Lý Media: Video & Hình Ảnh Tự Do</span>
                     </h4>
                     <p className="text-[11px] text-amber-800 mt-0.5">
-                      Thêm video và hình ảnh tùy thích (không giới hạn số lượng). Bấm icon để tải từ máy hoặc dán link.
+                      Thêm video và hình ảnh tùy thích (tự động nén ảnh siêu nhanh). Bấm icon để tải từ máy hoặc dán link.
                     </p>
                   </div>
 
@@ -960,37 +1020,41 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Icon Thêm Video */}
                     <label
-                      className="cursor-pointer inline-flex items-center justify-center w-8 h-8 rounded-xl bg-red-600 hover:bg-red-700 text-white shadow-sm transition active:scale-95 shrink-0"
+                      className={`cursor-pointer inline-flex items-center justify-center w-8 h-8 rounded-xl ${isUploadingMedia ? "bg-gray-400 cursor-not-allowed opacity-60" : "bg-red-600 hover:bg-red-700"} text-white shadow-sm transition active:scale-95 shrink-0`}
                       title={editingJob.videoUrl ? "Đổi video" : "Thêm video"}
                     >
                       <Video className="w-4 h-4" />
                       <input
                         type="file"
                         accept="video/*"
+                        disabled={isUploadingMedia}
                         className="hidden"
                         onChange={(e) => {
                           if (e.target.files && e.target.files[0]) {
                             handleUploadVideo(e.target.files[0]);
                           }
+                          e.target.value = "";
                         }}
                       />
                     </label>
 
                     {/* Icon Thêm Hình Ảnh */}
                     <label
-                      className="cursor-pointer inline-flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm transition active:scale-95 shrink-0"
-                      title="Thêm ảnh (Chọn nhiều ảnh)"
+                      className={`cursor-pointer inline-flex items-center justify-center w-8 h-8 rounded-xl ${isUploadingMedia ? "bg-gray-400 cursor-not-allowed opacity-60" : "bg-emerald-700 hover:bg-emerald-800"} text-white shadow-sm transition active:scale-95 shrink-0`}
+                      title="Thêm ảnh (Tự động nén tối ưu dung lượng)"
                     >
                       <ImageIcon className="w-4 h-4" />
                       <input
                         type="file"
                         accept="image/*"
                         multiple
+                        disabled={isUploadingMedia}
                         className="hidden"
                         onChange={(e) => {
                           if (e.target.files && e.target.files.length > 0) {
                             handleUploadMultipleImages(e.target.files);
                           }
+                          e.target.value = "";
                         }}
                       />
                     </label>
@@ -1013,7 +1077,8 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
                       <button
                         type="button"
                         onClick={handleAddQuickUrl}
-                        className="px-2.5 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-900 text-white font-bold text-xs transition"
+                        disabled={isUploadingMedia}
+                        className="px-2.5 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-900 text-white font-bold text-xs transition disabled:opacity-50"
                         title="Thêm link này"
                       >
                         Thêm
@@ -1021,6 +1086,14 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
                     </div>
                   </div>
                 </div>
+
+                {/* Banner trạng thái đang tải media lên */}
+                {isUploadingMedia && (
+                  <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center gap-2.5 text-xs font-bold text-amber-900 animate-pulse">
+                    <div className="w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin shrink-0" />
+                    <span>{uploadProgress || "Đang xử lý và tải tệp lên máy chủ..."}</span>
+                  </div>
+                )}
 
                 {/* HÀNG MEDIA NẰM TRÊN 1 HÀNG CUỘN NGANG */}
                 {Boolean(editingJob.videoUrl || (editingJob.images && editingJob.images.filter(Boolean).length > 0)) ? (
@@ -1171,15 +1244,15 @@ export default function AdminDetailToolbar({ initialJob }: AdminDetailToolbarPro
 
                   <button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-800 to-brand-900 hover:from-brand-900 hover:to-red-950 text-white font-black text-xs shadow-md transition active:scale-95 flex items-center gap-2 disabled:opacity-70"
+                    disabled={isSubmitting || isUploadingMedia}
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-800 to-brand-900 hover:from-brand-900 hover:to-red-950 text-white font-black text-xs shadow-md transition active:scale-95 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {isSubmitting ? (
+                    {isSubmitting || isUploadingMedia ? (
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : (
                       <CheckCircle2 className="w-4 h-4" />
                     )}
-                    <span>Lưu Thay Đổi</span>
+                    <span>{isUploadingMedia ? (uploadProgress || "Đang tải tệp...") : isSubmitting ? "Đang Lưu..." : "Lưu Thay Đổi"}</span>
                   </button>
                 </div>
               </div>

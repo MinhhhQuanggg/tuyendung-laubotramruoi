@@ -3,18 +3,38 @@
 import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { ALL_BRANCHES } from "@/data/branches";
+import { Branch } from "@/types/branch";
 import {
   ExternalLink,
   Plus,
   Minus,
 } from "lucide-react";
 
-export default function BranchMapClient() {
+interface BranchMapClientProps {
+  branches?: Branch[];
+}
+
+export default function BranchMapClient({ branches: propBranches }: BranchMapClientProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
   const markersRef = useRef<{ [id: string]: L.Marker }>({});
+  const [branches, setBranches] = useState<Branch[]>(propBranches || []);
+
+  useEffect(() => {
+    if (propBranches && propBranches.length > 0) {
+      setBranches(propBranches);
+    } else {
+      fetch(`/api/branches?t=${Date.now()}`, { cache: "no-store" })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.branches) {
+            setBranches(data.branches);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [propBranches]);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -41,11 +61,21 @@ export default function BranchMapClient() {
     ).addTo(map);
 
     tileLayerRef.current = googleRoadmap;
+  }, []);
+
+  // Update markers whenever branches data changes
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    // Clear old markers
+    Object.values(markersRef.current).forEach((m) => m.remove());
+    markersRef.current = {};
 
     const markersGroup: L.Marker[] = [];
 
-    // Add authentic Google Maps red teardrop markers for all 13 branches
-    ALL_BRANCHES.forEach((b) => {
+    // Add authentic Google Maps red teardrop markers for all branches
+    branches.forEach((b) => {
       if (!b.lat || !b.lng) return;
 
       const labelText = String(b.cnNumber);
@@ -136,74 +166,66 @@ export default function BranchMapClient() {
       markersGroup.push(marker);
     });
 
-    // Auto-fit all 13 branches cleanly
+    // Auto-fit all branches cleanly
     if (markersGroup.length > 0) {
-      const bounds = L.featureGroup(markersGroup).getBounds();
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
+      const featureGroup = L.featureGroup(markersGroup);
+      map.fitBounds(featureGroup.getBounds(), {
+        padding: [30, 30],
+        maxZoom: 13,
+      });
     }
+  }, [branches]);
 
-    return () => {
-      map.remove();
-      mapInstanceRef.current = null;
-    };
-  }, []);
+  const handleZoomIn = () => {
+    mapInstanceRef.current?.zoomIn();
+  };
 
-  const handleZoom = (delta: number) => {
-    const map = mapInstanceRef.current;
-    if (map) {
-      map.setZoom(map.getZoom() + delta);
-    }
+  const handleZoomOut = () => {
+    mapInstanceRef.current?.zoomOut();
+  };
+
+  const handleResetView = () => {
+    mapInstanceRef.current?.setView([10.82, 106.69], 12);
   };
 
   return (
-    <div className="w-full">
-      {/* Khung bản đồ Google Maps tương tác */}
-      <div className="relative w-full h-[400px] sm:h-[480px] md:h-[540px] rounded-2xl overflow-hidden border-2 border-brand-800/80 shadow-2xl">
-        <div ref={mapContainerRef} className="w-full h-full z-0" />
+    <div className="relative w-full h-[320px] sm:h-[380px] md:h-[420px] rounded-2xl overflow-hidden border border-brand-800/80 shadow-2xl bg-neutral-900 group">
+      {/* Map Container */}
+      <div ref={mapContainerRef} className="w-full h-full z-0" />
 
-        {/* Google Maps Style Floating Badge on top-left */}
-        <div className="absolute top-3 left-3 z-10 hidden sm:flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl shadow-lg border border-gray-200">
-          <div className="w-3 h-3 rounded-full bg-[#EA4335] animate-pulse" />
-          <span className="text-xs font-bold text-gray-800">
-            Lẩu Bò Trăm Rưỡi trên Google Maps
-          </span>
-          <span className="text-[11px] px-2 py-0.5 rounded-full bg-red-50 text-red-700 font-bold border border-red-200">
-            13 chi nhánh
-          </span>
-        </div>
+      {/* Google Maps Style Custom Controls (Top Right) */}
+      <div className="absolute top-3 right-3 z-[1000] flex flex-col gap-1.5 bg-white/95 backdrop-blur-sm rounded-lg shadow-md border border-gray-200 p-1">
+        <button
+          type="button"
+          onClick={handleZoomIn}
+          title="Phóng to bản đồ"
+          className="w-7 h-7 flex items-center justify-center text-gray-700 hover:text-black hover:bg-gray-100 rounded transition"
+        >
+          <Plus className="w-4 h-4" />
+        </button>
+        <div className="w-full h-[1px] bg-gray-200" />
+        <button
+          type="button"
+          onClick={handleZoomOut}
+          title="Thu nhỏ bản đồ"
+          className="w-7 h-7 flex items-center justify-center text-gray-700 hover:text-black hover:bg-gray-100 rounded transition"
+        >
+          <Minus className="w-4 h-4" />
+        </button>
+      </div>
 
-        {/* Google Maps Custom Zoom Buttons on bottom-right */}
-        <div className="absolute bottom-6 right-3 z-10 flex flex-col bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-          <button
-            onClick={() => handleZoom(1)}
-            aria-label="Phóng to"
-            className="w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 border-b border-gray-200 transition"
-          >
-            <Plus className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleZoom(-1)}
-            aria-label="Thu nhỏ"
-            className="w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition"
-          >
-            <Minus className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Google Maps Bottom Bar with Direct Google Maps Link */}
-        <div className="absolute bottom-2 left-2 z-10 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-gray-300 shadow flex items-center gap-2 text-xs">
-          <span className="font-bold text-gray-800">Google</span>
-          <span className="text-gray-400">|</span>
-          <a
-            href="https://www.google.com/maps/search/L%E1%BA%A9u+B%C3%B2+Tr%C4%83m+R%C6%B0%E1%BB%A1i"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#1a73e8] hover:underline font-semibold flex items-center gap-1"
-          >
-            <span>Mở trong Google Maps</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
-        </div>
+      {/* Floating Bottom Left Card: Open full Google Maps */}
+      <div className="absolute bottom-3 left-3 z-[1000] pointer-events-auto">
+        <a
+          href="https://www.google.com/maps/search/L%E1%BA%A3u+B%C3%B2+Tr%C4%83m+R%C6%B0%E1%BB%A1i"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/95 hover:bg-white text-gray-800 text-xs font-bold shadow-lg border border-gray-200 transition-all hover:scale-105"
+        >
+          <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+          <span>Mở Google Maps tìm quán</span>
+          <ExternalLink className="w-3.5 h-3.5 text-gray-500" />
+        </a>
       </div>
     </div>
   );

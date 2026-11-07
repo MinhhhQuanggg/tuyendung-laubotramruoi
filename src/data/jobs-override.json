@@ -118,7 +118,10 @@
     "isUrgent": true,
     "isActive": true,
     "contactZalo": "0981256712",
-    "images": []
+    "images": [
+      "https://fnojlgrgmqajnipxpolu.supabase.co/storage/v1/object/public/media/images/1793909819728-nghx8s.jpg",
+      "https://fnojlgrgmqajnipxpolu.supabase.co/storage/v1/object/public/media/images/1793909822273-tradwz.jpg"
+    ]
   },
   "QL-PHO-01": {
     "id": "QL-PHO-01",

@@ -2,8 +2,6 @@
 
 import { useState, useRef, useEffect, useMemo } from "react";
 import Image from "next/image";
-import { JOBS_DATA, APPLICATION_POSITIONS } from "@/data/jobs";
-import { ALL_BRANCHES } from "@/data/branches";
 import {
   X,
   Send,
@@ -52,8 +50,8 @@ export default function QuickApplyModal({
     allowCvUpload: true,
   });
 
-  const [branchesList, setBranchesList] = useState<Branch[]>(ALL_BRANCHES);
-  const [jobsList, setJobsList] = useState<JobItem[]>(JOBS_DATA);
+  const [branchesList, setBranchesList] = useState<Branch[]>([]);
+  const [jobsList, setJobsList] = useState<JobItem[]>([]);
 
   const [formData, setFormData] = useState({
     fullName: "",

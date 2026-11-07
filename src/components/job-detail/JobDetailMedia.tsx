@@ -22,7 +22,7 @@ export function JobDetailImages({ images }: JobDetailImagesProps) {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
   const validImages = (images || []).filter((src) => Boolean(src && src.trim() !== ""));
-  const displayImages = validImages.length > 0 ? validImages : DEFAULT_IMAGES;
+  const displayImages = validImages.length > 0 ? validImages : (images === undefined ? DEFAULT_IMAGES : []);
 
   // Xử lý phím tắt (Escape, ArrowLeft, ArrowRight) và khóa cuộn trang khi mở modal
   useEffect(() => {

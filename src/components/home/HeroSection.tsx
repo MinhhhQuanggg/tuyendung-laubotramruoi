@@ -30,9 +30,9 @@ export default function HeroSection() {
           </div>
 
           {/* Tiêu đề H1 - đúng 2 dòng chuẩn chỉ */}
-          <h1 className="text-[17px] xs:text-[19px] sm:text-2xl md:text-3xl lg:text-[36px] xl:text-[40px] font-black tracking-tight uppercase text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] leading-[1.25]">
+          <h1 className="text-[17px] xs:text-[19px] sm:text-2xl md:text-3xl lg:text-[36px] xl:text-[40px] font-black tracking-tight uppercase text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] leading-[1.25] lg:leading-[1.265]">
             <span className="block whitespace-nowrap">HỌC VIỆC, HỌC NGHỀ MIỄN PHÍ,</span>
-            <span className="block whitespace-nowrap mt-1 sm:mt-1.5 text-amber-300 drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
+            <span className="block whitespace-nowrap mt-1 sm:mt-1.5 md:mt-2 lg:mt-[1.5%] text-amber-300 drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
               VẪN CÓ LƯƠNG ĐỦ
             </span>
           </h1>
