@@ -46,7 +46,7 @@ const CATEGORIES: JobCategory[] = [
   "Trưởng, Quản lý",
 ];
 
-const PRESET_AGE_TAGS = [
+const DEFAULT_AGE_TAGS = [
   "18 – 30 tuổi",
   "18 – 25 tuổi",
   "20 – 30 tuổi",
@@ -55,7 +55,7 @@ const PRESET_AGE_TAGS = [
   "Không giới hạn độ tuổi",
 ];
 
-const PRESET_EXPERIENCE_TAGS = [
+const DEFAULT_EXPERIENCE_TAGS = [
   "Chưa có kinh nghiệm (Đào tạo từ số 0)",
   "Không yêu cầu kinh nghiệm",
   "Ưu tiên kinh nghiệm F&B",
@@ -64,6 +64,19 @@ const PRESET_EXPERIENCE_TAGS = [
   "Kinh nghiệm từ 2 năm trở lên",
   "Có tay nghề làm bếp / thớt",
   "Có kinh nghiệm phục vụ / order",
+];
+
+const DEFAULT_WORK_HOURS_TAGS = [
+  "14h00 – 24h00 mỗi ngày",
+  "Ca xoay linh hoạt",
+  "Ca xoay hoặc ca cố định",
+  "Ca làm việc 8h/ngày",
+  "Ca sáng (6h00 – 14h00)",
+  "Ca chiều (14h00 – 22h00)",
+  "Ca tối (16h00 – 24h00)",
+  "Đăng ký linh hoạt theo lịch học",
+  "Xoay ca theo lịch quản lý",
+  "Giờ hành chính & theo lịch quản lý",
 ];
 
 const PRESET_GALLERY = [
@@ -96,6 +109,11 @@ export default function AdminDashboardPage() {
   const [uploadProgress, setUploadProgress] = useState("");
   const [toastMessage, setToastMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
   const [quickMediaUrl, setQuickMediaUrl] = useState("");
+
+  // Quản lý danh sách thẻ gợi ý (Độ tuổi, Kinh nghiệm, Ca làm)
+  const [ageTags, setAgeTags] = useState<string[]>(DEFAULT_AGE_TAGS);
+  const [experienceTags, setExperienceTags] = useState<string[]>(DEFAULT_EXPERIENCE_TAGS);
+  const [workHoursTags, setWorkHoursTags] = useState<string[]>(DEFAULT_WORK_HOURS_TAGS);
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<"jobs" | "applications" | "life_videos" | "branches" | "quick_apply">("jobs");
@@ -175,6 +193,122 @@ export default function AdminDashboardPage() {
           ch.close();
         }
       } catch {}
+    }
+  };
+
+  // Đồng bộ danh sách thẻ gợi ý (Độ tuổi, Kinh nghiệm, Ca làm)
+  const fetchPresets = async () => {
+    try {
+      const cached = localStorage.getItem("job_presets_cache");
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed.ageTags) && parsed.ageTags.length > 0) setAgeTags(parsed.ageTags);
+          if (Array.isArray(parsed.experienceTags) && parsed.experienceTags.length > 0) setExperienceTags(parsed.experienceTags);
+          if (Array.isArray(parsed.workHoursTags) && parsed.workHoursTags.length > 0) setWorkHoursTags(parsed.workHoursTags);
+        } catch {}
+      }
+
+      const res = await fetch(`/api/admin/job-presets?t=${Date.now()}`, { cache: "no-store" });
+      const data = await res.json();
+      if (data.success && data.presets) {
+        if (Array.isArray(data.presets.ageTags)) setAgeTags(data.presets.ageTags);
+        if (Array.isArray(data.presets.experienceTags)) setExperienceTags(data.presets.experienceTags);
+        if (Array.isArray(data.presets.workHoursTags)) setWorkHoursTags(data.presets.workHoursTags);
+        try {
+          localStorage.setItem("job_presets_cache", JSON.stringify(data.presets));
+        } catch {}
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    fetchPresets();
+
+    const handlePresetsSync = () => fetchPresets();
+    window.addEventListener("presets-updated", handlePresetsSync);
+    let channel: BroadcastChannel | null = null;
+    if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+      try {
+        channel = new BroadcastChannel("presets-sync");
+        channel.onmessage = () => fetchPresets();
+      } catch {}
+    }
+
+    return () => {
+      window.removeEventListener("presets-updated", handlePresetsSync);
+      if (channel) channel.close();
+    };
+  }, []);
+
+  // Xóa 1 thẻ khỏi danh sách gợi ý
+  const handleDeletePresetTag = async (type: "age" | "experience" | "workHours", item: string) => {
+    const label = type === "age" ? "độ tuổi" : type === "experience" ? "kinh nghiệm" : "ca làm việc";
+    if (!confirm(`Bạn có chắc muốn xóa thẻ ${label} "${item}" khỏi danh sách gợi ý?`)) return;
+
+    // Cập nhật UI tức thì
+    if (type === "age") setAgeTags((prev) => prev.filter((t) => t !== item));
+    if (type === "experience") setExperienceTags((prev) => prev.filter((t) => t !== item));
+    if (type === "workHours") setWorkHoursTags((prev) => prev.filter((t) => t !== item));
+
+    try {
+      const res = await fetch("/api/admin/job-presets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, action: "delete", item }),
+      });
+      const data = await res.json();
+      if (data.success && data.presets) {
+        setAgeTags(data.presets.ageTags);
+        setExperienceTags(data.presets.experienceTags);
+        setWorkHoursTags(data.presets.workHoursTags);
+        try {
+          localStorage.setItem("job_presets_cache", JSON.stringify(data.presets));
+          if ("BroadcastChannel" in window) {
+            const ch = new BroadcastChannel("presets-sync");
+            ch.postMessage({ type: "presets-updated" });
+            ch.close();
+          }
+        } catch {}
+        showToast(`Đã xóa thẻ "${item}" khỏi danh sách gợi ý!`, "success");
+      }
+    } catch {
+      showToast("Lỗi khi xóa thẻ gợi ý", "error");
+    }
+  };
+
+  // Thêm 1 thẻ mới vào danh sách gợi ý
+  const handleAddPresetTag = async (type: "age" | "experience" | "workHours", item: string) => {
+    const trimmed = item.trim();
+    if (!trimmed) return;
+
+    if (type === "age" && !ageTags.includes(trimmed)) setAgeTags((prev) => [...prev, trimmed]);
+    if (type === "experience" && !experienceTags.includes(trimmed)) setExperienceTags((prev) => [...prev, trimmed]);
+    if (type === "workHours" && !workHoursTags.includes(trimmed)) setWorkHoursTags((prev) => [...prev, trimmed]);
+
+    try {
+      const res = await fetch("/api/admin/job-presets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, action: "add", item: trimmed }),
+      });
+      const data = await res.json();
+      if (data.success && data.presets) {
+        setAgeTags(data.presets.ageTags);
+        setExperienceTags(data.presets.experienceTags);
+        setWorkHoursTags(data.presets.workHoursTags);
+        try {
+          localStorage.setItem("job_presets_cache", JSON.stringify(data.presets));
+          if ("BroadcastChannel" in window) {
+            const ch = new BroadcastChannel("presets-sync");
+            ch.postMessage({ type: "presets-updated" });
+            ch.close();
+          }
+        } catch {}
+        showToast(`Đã thêm "${trimmed}" vào danh sách gợi ý!`, "success");
+      }
+    } catch {
+      showToast("Lỗi khi thêm thẻ gợi ý", "error");
     }
   };
 
@@ -305,6 +439,8 @@ export default function AdminDashboardPage() {
       const cleanImages = (editingJob.images || []).filter((img) => Boolean(img && img.trim() !== ""));
       const jobPayload = {
         ...editingJob,
+        workHours: editingJob.workHours || "",
+        workTypeDisplay: editingJob.workHours || editingJob.workTypeDisplay || "",
         showInMenu: editingJob.showInMenu !== false,
         menuPlacement: editingJob.menuPlacement || "PARENT",
         parentMenu:
@@ -1509,53 +1645,65 @@ export default function AdminDashboardPage() {
 
                 {/* Danh sách thẻ độ tuổi dạng Pill Buttons với icon Checkbox / + / X */}
                 <div className="flex flex-wrap items-center gap-2 pt-1">
-                  {PRESET_AGE_TAGS.map((tag) => {
+                  {ageTags.map((tag) => {
                     const isSelected = editingJob.ageRequirement === tag;
                     return (
-                      <button
+                      <div
                         key={tag}
-                        type="button"
-                        onClick={() => {
-                          const nextAge = isSelected ? "" : tag;
-                          // Also sync badges
-                          const currentBadges = editingJob.badges ? [...editingJob.badges] : [];
-                          const filteredBadges = currentBadges.filter((b) => !PRESET_AGE_TAGS.includes(b));
-                          if (nextAge) filteredBadges.unshift(nextAge);
-                          setEditingJob({
-                            ...editingJob,
-                            ageRequirement: nextAge,
-                            badges: filteredBadges,
-                            badge: filteredBadges.join(", "),
-                          });
-                        }}
-                        className={`group inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold border transition-all cursor-pointer select-none active:scale-95 shadow-sm ${
+                        className={`group inline-flex items-center gap-1 pl-3 pr-1.5 py-1.5 rounded-full text-xs font-semibold border transition-all select-none shadow-sm ${
                           isSelected
                             ? "border-emerald-500 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-500/30"
                             : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                         }`}
                       >
-                        <span
-                          className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
-                            isSelected
-                              ? "bg-emerald-600 border-emerald-600 text-white"
-                              : "border-gray-300 bg-white group-hover:border-gray-400"
-                          }`}
+                        {/* Bấm để chọn / bỏ chọn */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const nextAge = isSelected ? "" : tag;
+                            const currentBadges = editingJob.badges ? [...editingJob.badges] : [];
+                            const filteredBadges = currentBadges.filter((b) => !ageTags.includes(b));
+                            if (nextAge) filteredBadges.unshift(nextAge);
+                            setEditingJob({
+                              ...editingJob,
+                              ageRequirement: nextAge,
+                              badges: filteredBadges,
+                              badge: filteredBadges.join(", "),
+                            });
+                          }}
+                          className="inline-flex items-center gap-2 cursor-pointer focus:outline-none"
+                          title={isSelected ? "Bỏ chọn thẻ này" : "Chọn thẻ này"}
                         >
-                          {isSelected ? (
-                            <Check className="w-3 h-3 stroke-[3]" />
-                          ) : (
-                            <span className="w-1.5 h-1.5 rounded-full bg-transparent" />
-                          )}
-                        </span>
+                          <span
+                            className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
+                              isSelected
+                                ? "bg-emerald-600 border-emerald-600 text-white"
+                                : "border-gray-300 bg-white group-hover:border-gray-400"
+                            }`}
+                          >
+                            {isSelected ? (
+                              <Check className="w-3 h-3 stroke-[3]" />
+                            ) : (
+                              <span className="w-1.5 h-1.5 rounded-full bg-transparent" />
+                            )}
+                          </span>
 
-                        <span>{tag}</span>
+                          <span>{tag}</span>
+                        </button>
 
-                        {isSelected ? (
-                          <X className="w-3.5 h-3.5 text-emerald-700 hover:text-red-600 transition" />
-                        ) : (
-                          <Plus className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition" />
-                        )}
-                      </button>
+                        {/* Nút xóa thẻ khỏi danh sách gợi ý */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeletePresetTag("age", tag);
+                          }}
+                          className="w-5 h-5 rounded-full hover:bg-red-100 hover:text-red-600 text-gray-400 hover:scale-110 flex items-center justify-center transition shrink-0 ml-1"
+                          title={`Xóa thẻ "${tag}" khỏi danh sách gợi ý`}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
                     );
                   })}
                 </div>
@@ -1566,19 +1714,32 @@ export default function AdminDashboardPage() {
                     <span className="w-2 h-2 rounded-full bg-amber-400" />
                     <span>Hoặc tự điền độ tuổi thủ công:</span>
                   </div>
-                  <input
-                    type="text"
-                    value={editingJob.ageRequirement || ""}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setEditingJob({
-                        ...editingJob,
-                        ageRequirement: val,
-                      });
-                    }}
-                    placeholder="Nhập độ tuổi tùy chỉnh nếu không có thẻ tag phù hợp ở trên (VD: 19 – 27 tuổi, Đủ 20 tuổi trở lên)..."
-                    className="flex-1 px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-medium focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
-                  />
+                  <div className="flex-1 flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={editingJob.ageRequirement || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setEditingJob({
+                          ...editingJob,
+                          ageRequirement: val,
+                        });
+                      }}
+                      placeholder="Nhập độ tuổi tùy chỉnh nếu không có thẻ tag phù hợp ở trên (VD: 19 – 27 tuổi, Đủ 20 tuổi trở lên)..."
+                      className="flex-1 px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-medium focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
+                    />
+                    {editingJob.ageRequirement && !ageTags.includes(editingJob.ageRequirement) && (
+                      <button
+                        type="button"
+                        onClick={() => handleAddPresetTag("age", editingJob.ageRequirement!)}
+                        className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition shrink-0 flex items-center gap-1 border border-emerald-300 shadow-sm"
+                        title="Lưu độ tuổi này thành thẻ gợi ý cho các bài đăng sau"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Lưu thẻ mới</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -1603,53 +1764,65 @@ export default function AdminDashboardPage() {
 
                 {/* Danh sách thẻ kinh nghiệm dạng Pill Buttons với icon Checkbox / + / X */}
                 <div className="flex flex-wrap items-center gap-2 pt-1">
-                  {PRESET_EXPERIENCE_TAGS.map((tag) => {
+                  {experienceTags.map((tag) => {
                     const isSelected = editingJob.experienceDisplay === tag;
                     return (
-                      <button
+                      <div
                         key={tag}
-                        type="button"
-                        onClick={() => {
-                          const nextExp = isSelected ? "" : tag;
-                          // Also sync badges
-                          const currentBadges = editingJob.badges ? [...editingJob.badges] : [];
-                          const filteredBadges = currentBadges.filter((b) => !PRESET_EXPERIENCE_TAGS.includes(b));
-                          if (nextExp) filteredBadges.push(nextExp);
-                          setEditingJob({
-                            ...editingJob,
-                            experienceDisplay: nextExp,
-                            badges: filteredBadges,
-                            badge: filteredBadges.join(", "),
-                          });
-                        }}
-                        className={`group inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold border transition-all cursor-pointer select-none active:scale-95 shadow-sm ${
+                        className={`group inline-flex items-center gap-1 pl-3 pr-1.5 py-1.5 rounded-full text-xs font-semibold border transition-all select-none shadow-sm ${
                           isSelected
                             ? "border-emerald-500 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-500/30"
                             : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                         }`}
                       >
-                        <span
-                          className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
-                            isSelected
-                              ? "bg-emerald-600 border-emerald-600 text-white"
-                              : "border-gray-300 bg-white group-hover:border-gray-400"
-                          }`}
+                        {/* Bấm để chọn / bỏ chọn */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const nextExp = isSelected ? "" : tag;
+                            const currentBadges = editingJob.badges ? [...editingJob.badges] : [];
+                            const filteredBadges = currentBadges.filter((b) => !experienceTags.includes(b));
+                            if (nextExp) filteredBadges.push(nextExp);
+                            setEditingJob({
+                              ...editingJob,
+                              experienceDisplay: nextExp,
+                              badges: filteredBadges,
+                              badge: filteredBadges.join(", "),
+                            });
+                          }}
+                          className="inline-flex items-center gap-2 cursor-pointer focus:outline-none"
+                          title={isSelected ? "Bỏ chọn thẻ này" : "Chọn thẻ này"}
                         >
-                          {isSelected ? (
-                            <Check className="w-3 h-3 stroke-[3]" />
-                          ) : (
-                            <span className="w-1.5 h-1.5 rounded-full bg-transparent" />
-                          )}
-                        </span>
+                          <span
+                            className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
+                              isSelected
+                                ? "bg-emerald-600 border-emerald-600 text-white"
+                                : "border-gray-300 bg-white group-hover:border-gray-400"
+                            }`}
+                          >
+                            {isSelected ? (
+                              <Check className="w-3 h-3 stroke-[3]" />
+                            ) : (
+                              <span className="w-1.5 h-1.5 rounded-full bg-transparent" />
+                            )}
+                          </span>
 
-                        <span>{tag}</span>
+                          <span>{tag}</span>
+                        </button>
 
-                        {isSelected ? (
-                          <X className="w-3.5 h-3.5 text-emerald-700 hover:text-red-600 transition" />
-                        ) : (
-                          <Plus className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition" />
-                        )}
-                      </button>
+                        {/* Nút xóa thẻ khỏi danh sách gợi ý */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeletePresetTag("experience", tag);
+                          }}
+                          className="w-5 h-5 rounded-full hover:bg-red-100 hover:text-red-600 text-gray-400 hover:scale-110 flex items-center justify-center transition shrink-0 ml-1"
+                          title={`Xóa thẻ "${tag}" khỏi danh sách gợi ý`}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
                     );
                   })}
                 </div>
@@ -1660,26 +1833,155 @@ export default function AdminDashboardPage() {
                     <span className="w-2 h-2 rounded-full bg-amber-400" />
                     <span>Hoặc tự điền kinh nghiệm thủ công:</span>
                   </div>
-                  <input
-                    type="text"
-                    value={editingJob.experienceDisplay || ""}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setEditingJob({
-                        ...editingJob,
-                        experienceDisplay: val,
-                      });
-                    }}
-                    placeholder="Nhập yêu cầu kinh nghiệm khác nếu có (VD: Ưu tiên có kinh nghiệm làm đồ nướng, phục vụ bàn...)..."
-                    className="flex-1 px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-medium focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
-                  />
+                  <div className="flex-1 flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={editingJob.experienceDisplay || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setEditingJob({
+                          ...editingJob,
+                          experienceDisplay: val,
+                        });
+                      }}
+                      placeholder="Nhập yêu cầu kinh nghiệm khác nếu có (VD: Ưu tiên có kinh nghiệm làm đồ nướng, phục vụ bàn...)..."
+                      className="flex-1 px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-medium focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
+                    />
+                    {editingJob.experienceDisplay && !experienceTags.includes(editingJob.experienceDisplay) && (
+                      <button
+                        type="button"
+                        onClick={() => handleAddPresetTag("experience", editingJob.experienceDisplay!)}
+                        className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition shrink-0 flex items-center gap-1 border border-emerald-300 shadow-sm"
+                        title="Lưu kinh nghiệm này thành thẻ gợi ý cho các bài đăng sau"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Lưu thẻ mới</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* SECTION 4: NỘI DUNG CÔNG VIỆC */}
+              {/* SECTION 4: THẺ CA LÀM VIỆC (TAGS CHECKBOX + INPUT THỦ CÔNG) */}
+              <div className="space-y-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-2.5">
+                  <div>
+                    <h4 className="text-xs font-black uppercase tracking-wider text-gray-900 flex items-center gap-2">
+                      <span>⏰ 4. Ca Làm Việc / Thời Gian (Thẻ Bật/Tắt & Điền Thủ Công)</span>
+                    </h4>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      Bấm vào thẻ để chọn/bỏ chọn ca làm việc, hoặc tự điền ca làm thủ công bên dưới nếu không có thẻ phù hợp.
+                    </p>
+                  </div>
+                  {editingJob.workHours && (
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1.5 shadow-sm">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Đang chọn: <strong>{editingJob.workHours}</strong></span>
+                    </span>
+                  )}
+                </div>
+
+                {/* Danh sách thẻ ca làm việc dạng Pill Buttons với icon Checkbox / + / X */}
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  {workHoursTags.map((tag) => {
+                    const isSelected = editingJob.workHours === tag;
+                    return (
+                      <div
+                        key={tag}
+                        className={`group inline-flex items-center gap-1 pl-3 pr-1.5 py-1.5 rounded-full text-xs font-semibold border transition-all select-none shadow-sm ${
+                          isSelected
+                            ? "border-emerald-500 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-500/30"
+                            : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        {/* Bấm để chọn / bỏ chọn */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const nextHours = isSelected ? "" : tag;
+                            setEditingJob({
+                              ...editingJob,
+                              workHours: nextHours,
+                              workTypeDisplay: nextHours || editingJob.workTypeDisplay,
+                            });
+                          }}
+                          className="inline-flex items-center gap-2 cursor-pointer focus:outline-none"
+                          title={isSelected ? "Bỏ chọn thẻ này" : "Chọn thẻ này"}
+                        >
+                          <span
+                            className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
+                              isSelected
+                                ? "bg-emerald-600 border-emerald-600 text-white"
+                                : "border-gray-300 bg-white group-hover:border-gray-400"
+                            }`}
+                          >
+                            {isSelected ? (
+                              <Check className="w-3 h-3 stroke-[3]" />
+                            ) : (
+                              <span className="w-1.5 h-1.5 rounded-full bg-transparent" />
+                            )}
+                          </span>
+
+                          <span>{tag}</span>
+                        </button>
+
+                        {/* Nút xóa thẻ khỏi danh sách gợi ý */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeletePresetTag("workHours", tag);
+                          }}
+                          className="w-5 h-5 rounded-full hover:bg-red-100 hover:text-red-600 text-gray-400 hover:scale-110 flex items-center justify-center transition shrink-0 ml-1"
+                          title={`Xóa thẻ "${tag}" khỏi danh sách gợi ý`}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Input thủ công ca làm việc */}
+                <div className="pt-2.5 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center gap-2.5">
+                  <div className="text-xs font-bold text-gray-700 shrink-0 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-400" />
+                    <span>Hoặc tự điền ca làm thủ công:</span>
+                  </div>
+                  <div className="flex-1 flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={editingJob.workHours || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setEditingJob({
+                          ...editingJob,
+                          workHours: val,
+                          workTypeDisplay: val || editingJob.workTypeDisplay,
+                        });
+                      }}
+                      placeholder="Nhập ca làm việc tùy chỉnh nếu không có thẻ tag phù hợp ở trên (VD: Ca gãy, 7h00 - 15h00)..."
+                      className="flex-1 px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-medium focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
+                    />
+                    {editingJob.workHours && !workHoursTags.includes(editingJob.workHours) && (
+                      <button
+                        type="button"
+                        onClick={() => handleAddPresetTag("workHours", editingJob.workHours!)}
+                        className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition shrink-0 flex items-center gap-1 border border-emerald-300 shadow-sm"
+                        title="Lưu ca làm này thành thẻ gợi ý cho các bài đăng sau"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Lưu thẻ mới</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 5: NỘI DUNG CÔNG VIỆC */}
               <div className="space-y-4 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
                 <h4 className="text-xs font-black uppercase tracking-wider text-brand-900 border-b border-gray-100 pb-2.5 flex items-center gap-2">
-                  <span>📝 4. Nội Dung Công Việc</span>
+                  <span>📝 5. Nội Dung Công Việc</span>
                 </h4>
 
                 {/* Long Text Input */}
@@ -1710,13 +2012,13 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* SECTION 5: QUẢN LÝ MEDIA TỰ DO (VIDEO & ẢNH KHÔNG GIỚI HẠN) */}
+              {/* SECTION 6: QUẢN LÝ MEDIA TỰ DO (VIDEO & ẢNH KHÔNG GIỚI HẠN) */}
               <div className="space-y-4 bg-amber-50/50 p-4 sm:p-5 rounded-2xl border border-amber-200/90 shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-200 pb-3">
                   <div>
                     <h4 className="text-xs font-black uppercase tracking-wider text-amber-950 flex items-center gap-2">
                       <ImageIcon className="w-4 h-4 text-amber-800" />
-                      <span>📸 5. Quản Lý Media: Video & Hình Ảnh Tự Do</span>
+                      <span>📸 6. Quản Lý Media: Video & Hình Ảnh Tự Do</span>
                     </h4>
                     <p className="text-[11px] text-amber-800 mt-0.5">
                       Thêm video và hình ảnh tùy thích (tự động nén ảnh siêu nhanh). Bấm icon để tải từ máy hoặc dán link.

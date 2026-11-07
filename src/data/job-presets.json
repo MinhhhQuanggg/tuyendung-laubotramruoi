@@ -1,0 +1,29 @@
+{
+  "ageTags": [
+    "18 – 30 tuổi",
+    "18 – 25 tuổi",
+    "20 – 30 tuổi",
+    "22 – 35 tuổi",
+    "Đủ 18 tuổi trở lên",
+    "Không giới hạn độ tuổi"
+  ],
+  "experienceTags": [
+    "Chưa có kinh nghiệm (Đào tạo từ số 0)",
+    "Không yêu cầu kinh nghiệm",
+    "Ưu tiên kinh nghiệm F&B",
+    "Kinh nghiệm 6 tháng – 1 năm",
+    "Kinh nghiệm 1 – 2 năm",
+    "Kinh nghiệm từ 2 năm trở lên",
+    "Có tay nghề làm bếp / thớt"
+  ],
+  "workHoursTags": [
+    "14h00 – 24h00 mỗi ngày",
+    "Ca xoay linh hoạt",
+    "Ca xoay hoặc ca cố định",
+    "Ca làm việc 8h/ngày",
+    "Ca sáng (6h00 – 14h00)",
+    "Ca chiều (14h00 – 22h00)",
+    "Ca tối (16h00 – 24h00)",
+    "Đăng ký linh hoạt theo lịch học"
+  ]
+}
