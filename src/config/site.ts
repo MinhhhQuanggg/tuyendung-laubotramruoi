@@ -14,6 +14,7 @@ export const siteConfig = {
     phone: "0981256712",
     zalo: "0981256712",
     zaloUrl: "https://zalo.me/0981256712",
+    email: "qminh0733@gmail.com",
   },
   interviewers: [
     { name: "Nguyễn Trung Kiên", contact: "Zalo: 0981256712" },

@@ -189,6 +189,7 @@ export interface Database {
           full_name: string;
           age: string;
           phone_zalo: string;
+          email?: string | null;
           applied_region: string | null;
           address: string | null;
           position_id: string | null;
@@ -210,6 +211,7 @@ export interface Database {
           full_name: string;
           age: string;
           phone_zalo: string;
+          email?: string | null;
           applied_region?: string | null;
           address?: string | null;
           position_id?: string | null;
@@ -231,6 +233,7 @@ export interface Database {
           full_name?: string;
           age?: string;
           phone_zalo?: string;
+          email?: string | null;
           applied_region?: string | null;
           address?: string | null;
           position_id?: string | null;

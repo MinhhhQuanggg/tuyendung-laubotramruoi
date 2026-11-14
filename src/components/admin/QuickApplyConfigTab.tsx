@@ -401,7 +401,7 @@ export default function QuickApplyConfigTab() {
               <div className="bg-white text-gray-900 rounded-2xl overflow-hidden shadow-md border border-gray-200 text-xs">
                 {/* Header đỏ Trăm Rưỡi */}
                 <div className="bg-gradient-to-r from-brand-900 to-brand-800 text-white p-3.5 flex items-center gap-3">
-                  <Image src="/logo.png" alt="" width={32} height={32} className="object-contain shrink-0" />
+                  <Image src="/logo.webp" alt="" width={32} height={32} className="object-contain shrink-0" />
                   <div>
                     <h5 className="font-bold text-sm leading-snug">{config.formTitle}</h5>
                     <p className="text-[10px] text-amber-200 line-clamp-1">{config.formSubtitle}</p>

@@ -10,6 +10,7 @@ export interface ApplicationItem {
   fullName: string;
   age: string;
   phoneZalo: string;
+  email?: string;
   appliedRegion?: string;
   address?: string;
   positionId?: string;

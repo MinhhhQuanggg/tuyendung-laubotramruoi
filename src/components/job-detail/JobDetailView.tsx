@@ -1,12 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { JobItem } from "@/types/job";
-import AdminDetailToolbar from "@/components/admin/AdminDetailToolbar";
 import StickyJobSidebar from "@/components/job-detail/StickyJobSidebar";
 import { JobDetailImages, JobDetailVideo } from "@/components/job-detail/JobDetailMedia";
-import JobDetailApplyButton from "@/components/job-detail/JobDetailApplyButton";
 import { ChevronRight } from "lucide-react";
 
 interface JobDetailViewProps {
@@ -14,47 +11,10 @@ interface JobDetailViewProps {
   isAdmin?: boolean;
 }
 
-export default function JobDetailView({ job: initialJob, isAdmin = false }: JobDetailViewProps) {
-  const [job, setJob] = useState<JobItem>(initialJob);
-
-  // Đồng bộ lại state khi initialJob thay đổi từ server
-  useEffect(() => {
-    setJob(initialJob);
-  }, [initialJob]);
-
-  // Lắng nghe cập nhật realtime từ Admin hoặc tab khác để hiển thị tức thì
-  useEffect(() => {
-    const handleSync = () => {
-      fetch(`/api/admin/jobs/${job.id}?t=${Date.now()}`, { cache: "no-store" })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success && data.job) {
-            setJob(data.job);
-          }
-        })
-        .catch(() => {});
-    };
-
-    window.addEventListener("jobs-updated", handleSync);
-    let channel: BroadcastChannel | null = null;
-    if (typeof window !== "undefined" && "BroadcastChannel" in window) {
-      try {
-        channel = new BroadcastChannel("jobs-sync");
-        channel.onmessage = () => {
-          handleSync();
-        };
-      } catch {}
-    }
-
-    return () => {
-      window.removeEventListener("jobs-updated", handleSync);
-      if (channel) channel.close();
-    };
-  }, [job.id]);
-
+export default function JobDetailView({ job, isAdmin = false }: JobDetailViewProps) {
   return (
     <>
-      {/* Header Banner với Breadcrumb & Các nút thao tác Admin */}
+      {/* Header Banner với Breadcrumb */}
       <section className="relative bg-gradient-to-r from-[#a82323] via-[#6B1414] to-[#2a0505] text-white py-3.5 sm:py-4 overflow-hidden border-b border-white/10 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-wrap items-center justify-between gap-3">
           {/* Breadcrumb */}
@@ -69,14 +29,6 @@ export default function JobDetailView({ job: initialJob, isAdmin = false }: JobD
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-white font-medium">{job.title}</span>
           </nav>
-
-          {/* Thanh công cụ thao tác quản trị gộp trực tiếp vào Banner */}
-          {isAdmin && (
-            <AdminDetailToolbar
-              initialJob={job}
-              onJobUpdated={(updated) => setJob(updated)}
-            />
-          )}
         </div>
       </section>
 
@@ -96,7 +48,7 @@ export default function JobDetailView({ job: initialJob, isAdmin = false }: JobD
             />
           </div>
 
-          {/* CỘT 2 (Ở GIỮA): Bảng mô tả công việc */}
+          {/* CỘT 2 (Ở GIỮA): Bảng mô tả công việc & FAQ */}
           <div className="order-1 lg:order-2 lg:col-span-5 lg:col-start-4 lg:row-start-1 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
             {/* Badge & Tên vị trí */}
             <div className="border-b border-gray-100 pb-5 mb-6">
@@ -124,15 +76,7 @@ export default function JobDetailView({ job: initialJob, isAdmin = false }: JobD
                   </div>
                 );
               })()}
-              <h1
-                className={`text-[24px] sm:text-[28px] lg:text-[26px] xl:text-[30px] font-black leading-tight ${
-                  isAdmin
-                    ? job.isActive
-                      ? "text-emerald-600"
-                      : "text-gray-400"
-                    : "text-gray-900"
-                }`}
-              >
+              <h1 className="text-[24px] sm:text-[28px] lg:text-[26px] xl:text-[30px] font-black leading-tight text-gray-900">
                 {job.title}
               </h1>
               <div className="mt-2.5 flex items-center text-[17px] sm:text-[19px] text-gray-600">
@@ -171,25 +115,6 @@ export default function JobDetailView({ job: initialJob, isAdmin = false }: JobD
                           </div>
                         </div>
                       ))}
-
-                  {/* Thanh nút hành động: Nộp hồ sơ nhanh & Nhắn Zalo */}
-                  <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                    <JobDetailApplyButton job={job} />
-
-                    {job.concisePost.zalo && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-gray-700">Hoặc</span>
-                        <a
-                          href={`https://zalo.me/${job.concisePost.zalo.replace(/[^0-9]/g, "")}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-bold text-xs px-3.5 py-2.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition inline-flex items-center justify-center gap-1.5 shadow-sm"
-                        >
-                          <span>💬 Chat Zalo Tuyển Dụng</span>
-                        </a>
-                      </div>
-                    )}
-                  </div>
                 </div>
               </div>
             ) : (
@@ -204,9 +129,6 @@ export default function JobDetailView({ job: initialJob, isAdmin = false }: JobD
                       <li>Đang cập nhật nội dung công việc.</li>
                     )}
                   </ul>
-                  <div className="pt-4">
-                    <JobDetailApplyButton job={job} />
-                  </div>
                 </div>
               </div>
             )}

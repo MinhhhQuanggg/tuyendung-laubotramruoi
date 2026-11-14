@@ -110,8 +110,8 @@ export const ALL_BRANCHES: Branch[] = [
     lng: 106.6828,
   },
   {
-    id: "cn-13",
-    cnNumber: 13,
+    id: "cn-12",
+    cnNumber: 12,
     name: "33 Nguyễn Thị Tú (Vĩnh Lộc)",
     address: "33 Nguyễn Thị Tú, Phường Bình Hưng Hòa B (Vĩnh Lộc)",
     district: "Bình Tân",
@@ -144,18 +144,6 @@ export const ALL_BRANCHES: Branch[] = [
     region: "trung-tam",
     lat: 10.7761,
     lng: 106.6678,
-  },
-  {
-    id: "cn-12",
-    cnNumber: 12,
-    name: "245 Võ Thị Sáu (Biên Hòa)",
-    address: "245 Võ Thị Sáu, Trấn Biên, Biên Hòa",
-    district: "Đồng Nai",
-    city: "Đồng Nai",
-    phone: "0981256712",
-    region: "trung-tam",
-    lat: 10.9525,
-    lng: 106.8282,
   },
 ];
 

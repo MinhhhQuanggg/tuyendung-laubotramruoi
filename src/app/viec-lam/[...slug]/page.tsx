@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { getJobsList, getJobByPath } from "@/lib/jobs-store";
 import { getCategorySlug, getCleanJobSlug, getJobUrl } from "@/lib/job-url";
 import { siteConfig } from "@/config/site";
-import { generateJobPostingSchema } from "@/lib/schema";
+import { generateJobPostingSchema, generateJobFaqSchema } from "@/lib/schema";
 import JobDetailView from "@/components/job-detail/JobDetailView";
+import FloatingBannerApply from "@/components/home/FloatingBannerApply";
 
 interface JobDetailPageProps {
   params: {
@@ -70,7 +71,23 @@ export async function generateMetadata({ params }: JobDetailPageProps): Promise<
       description,
       url: `${siteConfig.url}${jobUrl}`,
       siteName: siteConfig.name,
+      locale: "vi_VN",
       type: "article",
+      images: [
+        {
+          url: `${siteConfig.url}/images/og-image.jpg`,
+          width: 1200,
+          height: 630,
+          alt: `${title} - Tuyển Dụng Lẩu Bò Trăm Rưỡi`,
+          type: "image/jpeg",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${siteConfig.url}/images/og-image.jpg`],
     },
   };
 }
@@ -90,18 +107,28 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
     notFound();
   }
 
-  const jsonLd = generateJobPostingSchema(job);
+  const jobPostingSchema = generateJobPostingSchema(job);
+  const faqSchema = generateJobFaqSchema(job);
 
   return (
     <>
       {/* Schema JobPosting phục vụ Google Jobs chuẩn 100% */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingSchema) }}
       />
 
-      {/* Trang chi tiết phía Client độc lập hoàn toàn với Admin: luôn hiển thị giao diện Client (có Menu, Footer từ AppLayout, không thanh công cụ Admin) */}
-      <JobDetailView job={job} isAdmin={false} />
+      {/* Schema FAQPage tối ưu cho Google Rich Results & AI Search (Gemini, ChatGPT) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+
+      {/* Trang chi tiết phía Client */}
+      <JobDetailView job={job} />
+
+      {/* Khối hộp trắng nổi tích hợp Liên Hệ Zalo & Hotline trước đường cong Footer */}
+      <FloatingBannerApply />
     </>
   );
 }

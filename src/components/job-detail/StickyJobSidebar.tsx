@@ -9,7 +9,7 @@ export default function StickyJobSidebar({ job }: StickyJobSidebarProps) {
   return (
     <div className="w-full flex items-center justify-center">
       <Image
-        src="/logo.png"
+        src="/logo.webp"
         alt="Tiệm Lẩu Bò Trăm Rưỡi"
         width={409}
         height={400}

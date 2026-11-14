@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { sendTelegramLeadNotification } from "@/lib/telegram";
-import { sendSlackApplicationNotification } from "@/lib/slack";
+// Google Sheets API & Slack Webhook đang được ẩn (tắt)
 import { appendCandidateToGoogleSheet } from "@/lib/google-sheets";
+import { sendSlackApplicationNotification } from "@/lib/slack";
+import { sendApplicationConfirmationEmail } from "@/lib/email";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase";
 import { saveApplication } from "@/lib/applications-store";
+
+// =========================================================================
+// CẤU HÌNH KÊNH THÔNG BÁO BÊN NGOÀI
+// =========================================================================
+// Telegram Bot API: Đã gỡ bỏ hoàn toàn
+// Google Sheets API & Slack Webhook: Đang ẩn (tắt), chuyển thành true nếu muốn mở lại
+const ENABLE_GOOGLE_SHEETS = false;
+const ENABLE_SLACK = false;
 
 const ApplySchema = z.object({
   fullName: z.string().min(2, "Họ và tên tối thiểu 2 ký tự"),
@@ -12,6 +21,11 @@ const ApplySchema = z.object({
   phoneZalo: z
     .string()
     .regex(/^(0|\+84)[0-9]{9,10}$/, "Số điện thoại không hợp lệ"),
+  email: z
+    .string()
+    .trim()
+    .min(1, "Vui lòng nhập địa chỉ email")
+    .email("Địa chỉ email không hợp lệ (ví dụ: tenban@gmail.com)"),
   appliedRegion: z.string().optional(),
   address: z.string().optional(),
   positionId: z.string().min(1, "Vui lòng chọn vị trí ứng tuyển"),
@@ -19,6 +33,7 @@ const ApplySchema = z.object({
   preferredBranch: z.string().optional(),
   cvFileName: z.string().optional(),
   cvBase64: z.string().optional(),
+  cvFileUrl: z.string().optional(),
   cvFileSize: z.number().optional(),
   cvFileType: z.string().optional(),
   note: z.string().optional(),
@@ -34,10 +49,52 @@ export async function POST(request: Request) {
       validatedData.address ||
       "Gần nhà nhất (HR tự xếp)";
 
+    let uploadedCvUrl = validatedData.cvFileUrl;
+
+    // Tự động upload CV lên Supabase Storage CDN để có liên kết trực tiếp mở xem ngay trên trình duyệt
+    if (
+      !uploadedCvUrl &&
+      validatedData.cvBase64 &&
+      validatedData.cvFileName &&
+      isSupabaseConfigured()
+    ) {
+      try {
+        const supabaseAdmin = getSupabaseAdmin();
+        if (supabaseAdmin) {
+          const base64Data = validatedData.cvBase64.includes(",")
+            ? validatedData.cvBase64.split(",")[1]
+            : validatedData.cvBase64;
+          const buffer = Buffer.from(base64Data, "base64");
+          const ext =
+            validatedData.cvFileName.split(".").pop()?.toLowerCase() || "pdf";
+          const storagePath = `cv/${Date.now()}-${Math.random()
+            .toString(36)
+            .substring(2, 8)}.${ext}`;
+          const contentType =
+            validatedData.cvFileType ||
+            (ext === "pdf" ? "application/pdf" : "image/jpeg");
+
+          const { error: uploadError } = await supabaseAdmin.storage
+            .from("media")
+            .upload(storagePath, buffer, { contentType, upsert: true });
+
+          if (!uploadError) {
+            const { data: pubData } = supabaseAdmin.storage
+              .from("media")
+              .getPublicUrl(storagePath);
+            uploadedCvUrl = pubData.publicUrl;
+          }
+        }
+      } catch (uploadErr) {
+        console.error("Lỗi khi tải CV lên Supabase Storage CDN:", uploadErr);
+      }
+    }
+
     const candidatePayload = {
       ...validatedData,
       appliedRegion: region,
       address: region,
+      cvFileUrl: uploadedCvUrl,
     };
 
     let dbApplicationId: string | undefined = undefined;
@@ -49,6 +106,7 @@ export async function POST(request: Request) {
         fullName: validatedData.fullName,
         age: validatedData.age,
         phoneZalo: validatedData.phoneZalo,
+        email: validatedData.email,
         appliedRegion: region,
         address: validatedData.address || region,
         positionId: validatedData.positionId,
@@ -56,11 +114,11 @@ export async function POST(request: Request) {
         preferredBranch: validatedData.preferredBranch,
         cvFileName: validatedData.cvFileName,
         cvBase64: validatedData.cvBase64,
+        cvFileUrl: uploadedCvUrl,
         cvFileSize: validatedData.cvFileSize,
         cvFileType: validatedData.cvFileType,
         note: validatedData.note,
         status: "pending",
-        telegramNotified: false,
       });
       if (savedApp) {
         dbApplicationId = savedApp.id;
@@ -70,67 +128,55 @@ export async function POST(request: Request) {
       console.error("Save application error:", saveErr);
     }
 
-    // 2. Chạy song song các kênh lưu trữ & thông báo tức thì (Non-blocking để tối ưu thời gian phản hồi)
-    const [sheetResult, slackResult, telegramResult] = await Promise.allSettled([
-      // A. Ghi vào Google Sheet Quản lý Ứng viên (Storage / Lưu trữ)
-      appendCandidateToGoogleSheet(candidatePayload),
-
-      // B. Bắn thông báo tức thì qua Incoming Slack Webhook cho HR gọi phỏng vấn (Realtime)
-      sendSlackApplicationNotification(candidatePayload),
-
-      // C. Bắn thông báo qua Telegram Bot cho HR (Dự phòng realtime)
-      sendTelegramLeadNotification(candidatePayload),
-    ]);
-
-    const isSheetSaved =
-      sheetResult.status === "fulfilled" && sheetResult.value.success;
-    const isSlackNotified =
-      slackResult.status === "fulfilled" && slackResult.value.success;
-    const isTelegramNotified =
-      telegramResult.status === "fulfilled" && telegramResult.value.success;
-
-    // Ghi log chi tiết trạng thái từng kênh
-    console.log("📊 Kết quả xử lý đơn ứng tuyển:", {
-      candidate: `${validatedData.fullName} (${validatedData.phoneZalo})`,
-      position: validatedData.positionTitle,
-      supabaseDb: dbSaved ? "✅ Thành công" : "⚠️ Chưa cấu hình hoặc lỗi",
-      googleSheet: isSheetSaved
-        ? `✅ Đã lưu (${(sheetResult as PromiseFulfilledResult<any>).value.method})`
-        : `⚠️ ${sheetResult.status === "fulfilled" ? (sheetResult as PromiseFulfilledResult<any>).value.error : (sheetResult as PromiseRejectedResult).reason}`,
-      slack: isSlackNotified
-        ? "✅ Đã gửi Slack"
-        : `⚠️ ${slackResult.status === "fulfilled" ? (slackResult as PromiseFulfilledResult<any>).value.error : (slackResult as PromiseRejectedResult).reason}`,
-      telegram: isTelegramNotified
-        ? "✅ Đã gửi Telegram"
-        : `⚠️ ${telegramResult.status === "fulfilled" ? (telegramResult as PromiseFulfilledResult<any>).value.error : (telegramResult as PromiseRejectedResult).reason}`,
-    });
-
-    // 3. Đánh dấu đã bắn telegram thành công trong Supabase nếu có
-    if (dbSaved && dbApplicationId && isTelegramNotified) {
+    // 2. Chạy ngầm gửi Email thông báo & xác nhận (Background Task)
+    // KHÔNG dùng await để trả kết quả thành công ngay lập tức cho ứng viên (< 200ms)
+    (async () => {
       try {
-        const supabase = getSupabaseAdmin();
-        if (supabase) {
-          await supabase
-            .from("applications")
-            .update({ telegram_notified: true })
-            .eq("id", dbApplicationId);
-        }
-      } catch {
-        // Non-blocking
-      }
-    }
+        const backgroundTasks: Promise<any>[] = [
+          // Kênh thông báo chính thức: Gửi Email xác nhận tự động tới ứng viên (kèm file CV & BCC tới HR)
+          sendApplicationConfirmationEmail(candidatePayload),
+        ];
 
+        // Google Sheets API (Đang ẩn / tắt theo cấu hình)
+        if (ENABLE_GOOGLE_SHEETS) {
+          backgroundTasks.push(appendCandidateToGoogleSheet(candidatePayload));
+        }
+
+        // Slack Webhook (Đang ẩn / tắt theo cấu hình)
+        if (ENABLE_SLACK) {
+          backgroundTasks.push(sendSlackApplicationNotification(candidatePayload));
+        }
+
+        const [emailResult] = await Promise.allSettled(backgroundTasks);
+
+        const isEmailSent =
+          emailResult &&
+          emailResult.status === "fulfilled" &&
+          emailResult.value?.success;
+
+        // Ghi log chi tiết trạng thái xử lý
+        console.log("📊 Kết quả xử lý đơn ứng tuyển (Background):", {
+          candidate: `${validatedData.fullName} (${validatedData.phoneZalo} - ${validatedData.email})`,
+          position: validatedData.positionTitle,
+          supabaseDb: dbSaved ? "✅ Thành công" : "⚠️ Chưa cấu hình hoặc lỗi",
+          emailConfirmation: isEmailSent
+            ? `✅ Đã gửi Email (${(emailResult as PromiseFulfilledResult<any>).value.simulated ? "Mô phỏng" : "Thực tế"})`
+            : `⚠️ ${emailResult?.status === "fulfilled" ? (emailResult as PromiseFulfilledResult<any>).value?.error : (emailResult as PromiseRejectedResult)?.reason}`,
+          googleSheets: ENABLE_GOOGLE_SHEETS ? "Đã bật" : "🔒 Đang ẩn (Tắt)",
+          slackWebhook: ENABLE_SLACK ? "Đã bật" : "🔒 Đang ẩn (Tắt)",
+          telegramBot: "🚫 Đã gỡ bỏ",
+        });
+      } catch (bgError) {
+        console.error("❌ Lỗi khi thực hiện thông báo nền:", bgError);
+      }
+    })();
+
+    // 3. Phản hồi thành công siêu tốc cho ứng viên (không bị delay)
     return NextResponse.json({
       success: true,
       message:
         "Nộp hồ sơ thành công! Bộ phận Tuyển Dụng Lẩu Bò Trăm Rưỡi sẽ liên hệ bạn sớm nhất.",
       applicationId: dbApplicationId,
-      details: {
-        dbSaved,
-        sheetSaved: isSheetSaved,
-        slackNotified: isSlackNotified,
-        telegramNotified: isTelegramNotified,
-      },
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

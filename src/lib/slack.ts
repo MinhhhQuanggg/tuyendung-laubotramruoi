@@ -93,6 +93,10 @@ export async function sendSlackApplicationNotification(
           },
           {
             type: "mrkdwn",
+            text: `*✉️ Email:*\n${candidate.email || "Chưa cung cấp"}`,
+          },
+          {
+            type: "mrkdwn",
             text: `*📍 Khu vực / Chi nhánh:*\n${region}`,
           },
           {
@@ -153,6 +157,7 @@ export async function sendSlackApplicationNotification(
         "Content-Type": "application/json",
       },
       body: JSON.stringify(slackPayload),
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!response.ok) {

@@ -1,5 +1,6 @@
 export type JobCategory =
   | "Học nghề có lương"
+  | "Part-time"
   | "Part-time, Thời vụ"
   | "Full-time"
   | "Trưởng, Quản lý";
@@ -62,6 +63,7 @@ export interface CandidateApplication {
   fullName: string;
   age: string;
   phoneZalo: string;
+  email: string;
   appliedRegion?: string;
   address?: string;
   positionId: string;
@@ -69,6 +71,7 @@ export interface CandidateApplication {
   preferredBranch?: string;
   cvFileName?: string;
   cvBase64?: string;
+  cvFileUrl?: string;
   cvFileSize?: number;
   cvFileType?: string;
   note?: string;

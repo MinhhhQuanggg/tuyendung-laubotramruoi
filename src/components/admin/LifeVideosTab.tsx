@@ -26,15 +26,15 @@ import { LifeVideo } from "@/types/life-video";
 import { uploadMediaFile } from "@/lib/upload-client";
 
 const PRESET_VIDEO_THUMBNAILS = [
-  "/images/tiktok/tiktok-1.jpg",
-  "/images/tiktok/tiktok-2.jpg",
-  "/images/tiktok/tiktok-3.jpg",
-  "/images/jobs/all_img_1.jpg",
-  "/images/jobs/all_img_2.jpg",
-  "/images/jobs/all_img_3.jpg",
-  "/images/jobs/all_img_4.jpg",
-  "/images/jobs/all_img_6.jpg",
-  "/images/jobs/all_img_7.jpg",
+  "/images/tiktok/tiktok-1.webp",
+  "/images/tiktok/tiktok-2.webp",
+  "/images/tiktok/tiktok-3.webp",
+  "/images/jobs/hoc-viec-bep-1.webp",
+  "/images/jobs/hoc-viec-bep-2.webp",
+  "/images/jobs/hoc-viec-bep-3.webp",
+  "/images/jobs/hoc-viec-bep-4.webp",
+  "/images/jobs/all_img_6.webp",
+  "/images/jobs/all_img_7.webp",
 ];
 
 const SUGGESTED_TAGS = [
@@ -95,7 +95,7 @@ export default function LifeVideosTab() {
       title: "",
       author: "@tiemlaubotramruoi",
       platform: "TikTok",
-      thumbnail: "/images/tiktok/tiktok-1.jpg",
+      thumbnail: "/images/tiktok/tiktok-1.webp",
       tag: "Đời sống Trăm Rưỡi",
       url: "",
       displayOrder: nextOrder,
@@ -902,7 +902,7 @@ export default function LifeVideosTab() {
                       type="text"
                       value={editingVideo.thumbnail || ""}
                       onChange={(e) => setEditingVideo({ ...editingVideo, thumbnail: e.target.value })}
-                      placeholder="Dán link ảnh (/images/tiktok/tiktok-1.jpg hoặc https://...)"
+                      placeholder="Dán link ảnh (/images/tiktok/tiktok-1.webp hoặc https://...)"
                       className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-medium focus:ring-2 focus:ring-brand-700 outline-none bg-white"
                     />
 

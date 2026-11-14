@@ -6,9 +6,11 @@
     "category": "Học nghề có lương",
     "badges": [
       "18–30 tuổi",
-      "Chưa có tay nghề"
+      "Chưa có tay nghề",
+      "Đào tạo từ số 0",
+      "Bao ăn ca"
     ],
-    "salaryDisplay": "7,5 - 10 triệu/tháng",
+    "salaryDisplay": "8 - 10 triệu/tháng",
     "locations": [
       "Gò Vấp",
       "Thủ Đức",
@@ -17,33 +19,35 @@
       "Phú Nhuận"
     ],
     "ageRequirement": "18 – 30 tuổi",
-    "workHours": "14h00 – 24h00 mỗi ngày",
+    "workHours": "14h00 – 24h00 hoặc 15h00 – 00h00",
     "experienceDisplay": "Không yêu cầu (Đào tạo từ số 0)",
     "isActive": true,
     "contactZalo": "0981256712",
     "images": [
-      "/images/jobs/hoc-viec-bep-1.jpg",
-      "/images/jobs/hoc-viec-bep-2.jpg",
-      "/images/jobs/hoc-viec-bep-3.jpg",
-      "/images/jobs/hoc-viec-bep-4.jpg"
+      "/images/posters/bep1.webp",
+      "/images/posters/bep2.webp",
+      "/images/culture/bep-operation.webp",
+      "/images/culture/bep-govap.webp"
     ],
     "videoUrl": "/videos/jobs/phubep.mp4",
     "videoPoster": "",
     "concisePost": {
       "intro": "Bạn muốn học nghề bếp bài bản nhưng ngại đóng học phí? Đừng lo, Tiệm Lẩu Bò Trăm Rưỡi chỉ dạy thực chiến từ A-Z, không cần kinh nghiệm, vừa học vừa có thu nhập cực ổn áp mỗi tháng!",
-      "zalo": "09812.56712"
+      "zalo": "0981256712"
     }
   },
   "PB-FT-01": {
     "id": "PB-FT-01",
     "slug": "phu-bep-full-time",
-    "title": "Phụ bếp",
+    "title": "Phụ bếp Full-time",
     "category": "Full-time",
     "badges": [
       "18 – 35 tuổi",
-      "Ưu tiên có kinh nghiệm phụ bếp từ 3 tháng"
+      "Ưu tiên có kinh nghiệm phụ bếp từ 3 tháng",
+      "Bao ăn ca",
+      "Thưởng doanh số"
     ],
-    "salaryDisplay": "7 - 11 triệu/tháng",
+    "salaryDisplay": "8 - 11 triệu/tháng",
     "locations": [
       "Gò Vấp",
       "Thủ Đức",
@@ -51,15 +55,15 @@
       "Quận 3"
     ],
     "ageRequirement": "18 – 35 tuổi",
-    "workHours": "Ca xoay hoặc ca cố định",
+    "workHours": "15h00 – 00h00 hoặc 16h00 – 01h00",
     "experienceDisplay": "Ưu tiên có kinh nghiệm phụ bếp từ 3 tháng",
     "isActive": true,
     "contactZalo": "0981256712",
     "images": [
-      "/images/jobs/all_img_1.jpg",
-      "/images/jobs/all_img_2.jpg",
-      "/images/jobs/all_img_3.jpg",
-      "/images/jobs/all_img_4.jpg"
+      "/images/posters/bep1.webp",
+      "/images/posters/bep3.webp",
+      "/images/culture/bep-operation.webp",
+      "/images/culture/bep-trungtam.webp"
     ],
     "videoUrl": "/videos/jobs/phubep.mp4",
     "videoPoster": "",
@@ -71,16 +75,18 @@
   "JOB-MW21SNDW": {
     "id": "JOB-MW21SNDW",
     "slug": "giam-sat-bep",
-    "title": "Giám sát Bếp",
+    "title": "Giám sát Bếp Chi Nhánh",
     "category": "Học nghề có lương",
     "badge": "25 – 35 tuổi, Kinh nghiệm từ 2 năm trở lên",
     "badges": [
       "25 – 35 tuổi",
-      "Kinh nghiệm từ 2 năm trở lên"
+      "Kinh nghiệm từ 2 năm trở lên",
+      "Quản trị bếp chuỗi",
+      "Thưởng doanh số"
     ],
-    "salaryDisplay": "11 - 14 triệu/tháng",
-    "minSalary": 7500000,
-    "maxSalary": 10000000,
+    "salaryDisplay": "11 - 14 triệu/tháng + Thưởng",
+    "minSalary": 11000000,
+    "maxSalary": 14000000,
     "salaryUnit": "MONTH",
     "locations": [
       "Gò Vấp",
@@ -90,28 +96,29 @@
     ],
     "ageRequirement": "25 – 35 tuổi",
     "workType": "FULL_TIME",
-    "workTypeDisplay": "Toàn thời gian (Ca 14h00 – 24h00)",
-    "workHours": "14h00 – 24h00 mỗi ngày",
+    "workTypeDisplay": "Toàn thời gian (Ca 14h00 – 01h00)",
+    "workHours": "14h00 – 01h00 mỗi ngày",
     "experienceDisplay": "Kinh nghiệm từ 2 năm trở lên",
-    "experienceRequirements": "no requirements",
+    "experienceRequirements": "Có ít nhất 2 năm làm việc trong bếp nhà hàng",
     "concisePost": {
-      "headline": "",
-      "intro": "🔥 [CƠ HỘI VÀNG CHO BẠN ĐẦU BẾP ĐAM MÊ THĂNG TIẾN TRONG NGÀNH] 🔥\n🍲 Tiệm Lẩu Bò Trăm Rưỡi đang tìm kiếm và đào tạo những \"thủ领\" tương lai cho vị trí: GIÁM SÁT BẾP CHI NHÁNH!\n💰 Thu nhập hấp dẫn: 11.000.000đ - 14.000.000đ + Thưởng xứng đáng! \n🚀 ⏰ Thời gian làm việc: 14:00 – 01:00.\n👉 Yêu cầu ứng viên:\n🎂 Độ tuổi: Từ 25 - 35 tuổi.\n🔪 Có kinh nghiệm ít nhất 3 năm trong công việc bếp.\n👥 Có kinh nghiệm đào tạo, dẫn dắt các nhân sự bếp mới.\n🎯 Có tinh thần trách nhiệm cao, kỷ luật thép và ham học hỏi.\n❤️ Đam mê cháy bỏng và muốn gắn bó, phát triển lâu dài với nghề bếp.\n👉 Bạn sẽ được học và làm chủ những gì tại Lẩu Bò Trăm Rưỡi?\n📊 Quản trị bếp chuỗi chuyên nghiệp: Kiểm soát COGs (giá vốn), chất lượng & định lượng món ăn, tối ưu tốc độ ra món, kỹ năng đào tạo và tiêu chuẩn Vệ sinh An toàn Thực phẩm (HACCP).\n🤖 AI & Data: Trải nghiệm ứng dụng trí tuệ nhân tạo và dữ liệu thực chiến trong quản lý vận hành bếp hiện đại.\n🤝 Huấn luyện đội ngũ & Năng lực lãnh đạo: Thấu hiểu tâm lý con người – Hợp tác cùng thắng – Phát huy tối đa tài năng – Làm việc hiệu quả.\n👉 Lộ trình thăng tiến rõ ràng, rộng mở: ⭐ Giám Sát Bếp ➡️ Trưởng Bếp Chi Nhánh ➡️ Quản Lý Bếp Vùng ➡️ Trưởng Bộ Phận Bếp Chuỗi.",
+      "headline": "GIÁM SÁT BẾP CHI NHÁNH - TIỆM LẨU BÒ TRĂM RƯỠI",
+      "intro": "🔥 [CƠ HỘI VÀNG CHO BẠN ĐẦU BẾP ĐAM MÊ THĂNG TIẾN TRONG NGÀNH] 🔥\n🍲 Tiệm Lẩu Bò Trăm Rưỡi đang tìm kiếm và đào tạo những 'thủ lĩnh' tương lai cho vị trí: GIÁM SÁT BẾP CHI NHÁNH!\n💰 Thu nhập hấp dẫn: 11.000.000đ - 14.000.000đ + Thưởng xứng đáng! \n🚀 ⏰ Thời gian làm việc: 14:00 – 01:00.\n👉 Yêu cầu ứng viên:\n🎂 Độ tuổi: Từ 25 - 35 tuổi.\n🔪 Có kinh nghiệm ít nhất 2 năm trong công việc bếp.\n👥 Có kỹ năng đào tạo, dẫn dắt các nhân sự bếp mới.\n🎯 Có tinh thần trách nhiệm cao, kỷ luật thép và ham học hỏi.\n👉 Lộ trình thăng tiến rõ ràng, rộng mở: ⭐ Giám Sát Bếp ➡️ Bếp Trưởng Chi Nhánh ➡️ Quản Lý Bếp Vùng ➡️ Trưởng Bộ Phận Bếp Chuỗi.",
       "points": [],
       "zalo": "0981256712"
     },
     "responsibilities": [
-      "Sơ chế rau nấm, thịt bò tươi và chuẩn bị quầy nguyên liệu.",
-      "Xếp đĩa và hỗ trợ ra món theo quy chuẩn định lượng của chuỗi.",
-      "Giữ gìn vệ sinh sạch sẽ khu vực gian bếp theo tiêu chuẩn an toàn thực phẩm."
+      "Quản lý chất lượng món ăn, kiểm tra vệ sinh an toàn thực phẩm toàn bộ khu vực bếp.",
+      "Kiểm soát hao hụt và chi phí nguyên vật liệu đầu vào của chi nhánh.",
+      "Đào tạo kỹ năng chế biến và tác phong cho nhân sự phụ bếp mới."
     ],
     "requirements": [
-      "Độ tuổi từ 18 – 30 tuổi, chăm chỉ, thật thà, có tinh thần cầu tiến.",
-      "Không yêu cầu tay nghề trước đó, sẽ được đào tạo bài bản từ số 0."
+      "Từ 25 – 35 tuổi, có kinh nghiệm tối thiểu 2 năm làm bếp F&B.",
+      "Kỹ năng quản lý nhân sự và giao việc tốt."
     ],
     "benefits": [
-      "Lương 7,5 - 10 triệu/tháng, đánh giá tăng lương nhanh sau tuần đầu.",
-      "Bao ăn ca, cấp đồng phục miễn phí, môi trường trẻ trung thân thiện."
+      "Lương 11 – 14 triệu/tháng + Thưởng doanh thu.",
+      "Bao ăn ở hoặc hỗ trợ chi phí, chế độ phúc lợi đầy đủ.",
+      "Lộ trình thăng tiến rõ ràng lên Bếp trưởng vùng."
     ],
     "datePosted": "2026-11-04",
     "validThrough": "2027-11-04T11:56:15.319Z",
@@ -119,23 +126,28 @@
     "isActive": true,
     "contactZalo": "0981256712",
     "images": [
-      "https://fnojlgrgmqajnipxpolu.supabase.co/storage/v1/object/public/media/images/1793909819728-nghx8s.jpg",
-      "https://fnojlgrgmqajnipxpolu.supabase.co/storage/v1/object/public/media/images/1793909822273-tradwz.jpg"
-    ]
+      "/images/posters/giamsat1.webp",
+      "/images/posters/giamsat2.webp",
+      "/images/posters/giamsat-detail-1.webp",
+      "/images/culture/bep-tanphu.webp"
+    ],
+    "videoUrl": "/videos/culture/beef-slicing.mp4"
   },
   "QL-PHO-01": {
     "id": "QL-PHO-01",
     "slug": "pho-quan-ly-tiem",
-    "title": "Phó quản lý tiệm",
+    "title": "Học việc Phó Quản Lý F&B",
     "category": "Trưởng, Quản lý",
-    "badge": "22 – 35 tuổi, Tối thiểu 6 tháng làm Tổ trưởng / Trợ lý quản lý F&B",
+    "badge": "22 – 35 tuổi, Lộ trình lên Quản lý 2 tháng",
     "badges": [
       "22 – 35 tuổi",
-      "Tối thiểu 6 tháng làm Tổ trưởng / Trợ lý quản lý F&B"
+      "Lộ trình lên Quản lý 2 tháng",
+      "Kiểm soát COGs & COL",
+      "Bao ăn ca"
     ],
-    "salaryDisplay": "Thỏa thuận",
+    "salaryDisplay": "10 - 14 triệu/tháng",
     "minSalary": 10000000,
-    "maxSalary": 15000000,
+    "maxSalary": 14000000,
     "salaryUnit": "MONTH",
     "locations": [
       "Gò Vấp",
@@ -145,15 +157,15 @@
     ],
     "ageRequirement": "22 – 35 tuổi",
     "workType": "FULL_TIME",
-    "workTypeDisplay": "Toàn thời gian",
-    "workHours": "Xoay ca theo lịch quản lý",
+    "workTypeDisplay": "Toàn thời gian (16h00 – 01h00)",
+    "workHours": "16h00 – 01h00 mỗi ngày",
     "experienceDisplay": "Tối thiểu 6 tháng làm Tổ trưởng / Trợ lý quản lý F&B",
-    "experienceRequirements": "6 months minimum",
+    "experienceRequirements": "Từng làm tổ trưởng hoặc giám sát sảnh chuỗi F&B từ 6 tháng",
     "concisePost": {
       "zalo": "0981256712",
-      "intro": "Đồng hành cùng Quản lý tiệm điều phối ca làm việc, hỗ trợ khách hàng và xây dựng đội ngũ vững mạnh!\n\n🔹 Vị trí: Phó Quản lý tiệm (Assistant Restaurant Manager)\n\n✨ Thu nhập: 10 – 15 triệu/tháng + KPI\n\n🚀 Thăng tiến: Lên Quản lý tiệm sau 3 – 6 tháng",
+      "intro": "Đồng hành cùng Quản lý tiệm điều phối ca làm việc, hỗ trợ khách hàng và xây dựng đội ngũ vững mạnh!\n\n🔹 Vị trí: Học việc Phó Quản Lý F&B (Assistant Restaurant Manager)\n\n✨ Thu nhập: 10 – 14 triệu/tháng + KPI\n\n🚀 Thăng tiến: Lên Quản lý tiệm sau 2 tháng",
       "points": [],
-      "headline": "🌟 TUYỂN DỤNG PHÓ QUẢN LÝ TIỆM LẨU BÒ TRĂM RƯỠI 🌟"
+      "headline": "🌟 TUYỂN DỤNG HỌC VIỆC PHÓ QUẢN LÝ F&B - LẨU BÒ TRĂM RƯỠI 🌟"
     },
     "responsibilities": [
       "Hỗ trợ Quản lý tiệm điều phối nhân sự, phân công ca làm việc sảnh và bếp",
@@ -165,8 +177,8 @@
       "Giao tiếp khéo léo, nhanh nhẹn, tinh thần trách nhiệm cao"
     ],
     "benefits": [
-      "Thu nhập 10 – 15 triệu/tháng + Thưởng KPI tiệm",
-      "Lộ trình thăng tiến rõ ràng lên Quản lý tiệm",
+      "Thu nhập 10 – 14 triệu/tháng + Thưởng KPI tiệm",
+      "Lộ trình thăng tiến rõ ràng lên Quản lý tiệm sau 2 tháng",
       "Đầy đủ chế độ BHXH, bao ăn ca"
     ],
     "datePosted": "2026-10-28T00:00:00+00:00",
@@ -175,12 +187,12 @@
     "isActive": true,
     "contactZalo": "0981256712",
     "images": [
-      "/images/jobs/all_img_1.jpg",
-      "/images/jobs/all_img_2.jpg",
-      "/images/jobs/all_img_3.jpg",
-      "/images/jobs/all_img_4.jpg"
+      "/images/posters/pho-quan-ly.webp",
+      "/images/culture/quanly-birthday.webp",
+      "/images/culture/phucvu-store-opening.webp",
+      "/images/culture/phucvu-team.webp"
     ],
-    "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
-    "videoPoster": "/images/jobs/all_img_1.jpg"
+    "videoUrl": "/videos/jobs/quanly.mp4",
+    "videoPoster": ""
   }
 }

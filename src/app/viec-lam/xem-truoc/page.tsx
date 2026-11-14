@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Eye, XCircle } from "lucide-react";
 import { JobItem } from "@/types/job";
 import JobDetailView from "@/components/job-detail/JobDetailView";
+import FloatingBannerApply from "@/components/home/FloatingBannerApply";
 import { PREVIEW_STORAGE_KEY, PREVIEW_CHANNEL_NAME } from "@/lib/job-preview";
 
 export default function JobPreviewPage() {
@@ -131,6 +132,9 @@ export default function JobPreviewPage() {
 
       {/* Hiển thị giao diện Client chuẩn xác 100% */}
       <JobDetailView job={job} isAdmin={false} />
+
+      {/* Khối hộp trắng nổi tích hợp Liên Hệ Zalo & Hotline trước đường cong Footer */}
+      <FloatingBannerApply />
     </>
   );
 }
