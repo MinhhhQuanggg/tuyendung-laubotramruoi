@@ -1,14 +1,33 @@
+import fs from "fs";
+import path from "path";
 import { LifeVideo } from "@/types/life-video";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase";
 
+const LOCAL_VIDEOS_PATH = path.join(process.cwd(), "src", "data", "life-videos.json");
+
+function readLocalVideos(): LifeVideo[] {
+  try {
+    if (fs.existsSync(LOCAL_VIDEOS_PATH)) {
+      const data = fs.readFileSync(LOCAL_VIDEOS_PATH, "utf8");
+      return JSON.parse(data) as LifeVideo[];
+    }
+  } catch (err) {
+    console.error("Error reading life-videos.json:", err);
+  }
+  return [];
+}
+
 export async function getLifeVideosList(onlyActive = false): Promise<LifeVideo[]> {
+  const localList = readLocalVideos();
+  const fallbackList = onlyActive ? localList.filter((v) => v.isActive) : localList;
+
   if (!isSupabaseConfigured()) {
-    return [];
+    return fallbackList;
   }
 
   try {
     const supabase = getSupabaseAdmin();
-    if (!supabase) return [];
+    if (!supabase) return fallbackList;
 
     let query = supabase
       .from("life_videos")
@@ -39,7 +58,7 @@ export async function getLifeVideosList(onlyActive = false): Promise<LifeVideo[]
     console.error("Supabase load in getLifeVideosList failed:", err);
   }
 
-  return [];
+  return fallbackList;
 }
 
 export async function getLifeVideoById(id: string): Promise<LifeVideo | null> {

@@ -41,7 +41,7 @@ import ApplicationsTab from "@/components/admin/ApplicationsTab";
 
 const CATEGORIES: JobCategory[] = [
   "Học nghề có lương",
-  "Part-time, Thời vụ",
+  "Part-time",
   "Full-time",
   "Trưởng, Quản lý",
 ];
@@ -80,13 +80,13 @@ const DEFAULT_WORK_HOURS_TAGS = [
 ];
 
 const PRESET_GALLERY = [
-  "/images/jobs/all_img_1.jpg",
-  "/images/jobs/all_img_2.jpg",
-  "/images/jobs/all_img_3.jpg",
-  "/images/jobs/all_img_4.jpg",
-  "/images/jobs/all_img_6.jpg",
-  "/images/jobs/all_img_7.jpg",
-  "/images/jobs/1.jpg",
+  "/images/jobs/all_img_1.webp",
+  "/images/jobs/all_img_2.webp",
+  "/images/jobs/all_img_3.webp",
+  "/images/jobs/all_img_4.webp",
+  "/images/jobs/all_img_6.webp",
+  "/images/jobs/all_img_7.webp",
+  "/images/jobs/1.webp",
 ];
 
 export default function AdminDashboardPage() {
@@ -723,7 +723,7 @@ export default function AdminDashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-brand-200 bg-brand-50 flex items-center justify-center">
-              <Image src="/logo.png" alt="Logo" width={40} height={40} className="object-cover" />
+              <Image src="/logo.webp" alt="Logo" width={40} height={40} className="object-cover" />
             </div>
             <div>
               <div className="flex items-center gap-2">

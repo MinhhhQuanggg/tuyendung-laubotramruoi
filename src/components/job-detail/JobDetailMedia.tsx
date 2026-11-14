@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { extractFirstFrameFromVideo } from "@/lib/video-thumbnail";
 
 const DEFAULT_IMAGES = [
-  "/images/jobs/all_img_1.jpg",
-  "/images/jobs/all_img_2.jpg",
-  "/images/jobs/all_img_3.jpg",
-  "/images/jobs/all_img_4.jpg",
+  "/images/jobs/hoc-viec-bep-1.webp",
+  "/images/jobs/hoc-viec-bep-2.webp",
+  "/images/jobs/hoc-viec-bep-3.webp",
+  "/images/jobs/hoc-viec-bep-4.webp",
 ];
 
 const DEFAULT_VIDEO = "https://www.w3schools.com/html/mov_bbb.mp4";
@@ -20,6 +21,11 @@ interface JobDetailImagesProps {
 
 export function JobDetailImages({ images }: JobDetailImagesProps) {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const validImages = (images || []).filter((src) => Boolean(src && src.trim() !== ""));
   const displayImages = validImages.length > 0 ? validImages : (images === undefined ? DEFAULT_IMAGES : []);
@@ -79,6 +85,26 @@ export function JobDetailImages({ images }: JobDetailImagesProps) {
               unoptimized={src.startsWith("data:")}
               className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
             />
+
+            {/* Logo web gắn ở góc trên bên trái của ảnh đầu tiên */}
+            {idx === 0 && (
+              <div
+                className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 z-10 pointer-events-none select-none transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
+                title="Lẩu Bò Trăm Rưỡi"
+              >
+                <div className="relative w-9 h-9 sm:w-11 sm:h-11">
+                  <Image
+                    src="/logo.webp"
+                    alt="Logo Lẩu Bò Trăm Rưỡi"
+                    fill
+                    sizes="44px"
+                    priority
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Hiệu ứng overlay khi hover để người dùng biết có thể click mở full */}
             <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
               <div className="w-8 h-8 rounded-full bg-white/95 text-gray-900 flex items-center justify-center shadow-lg transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
@@ -89,24 +115,37 @@ export function JobDetailImages({ images }: JobDetailImagesProps) {
         ))}
       </div>
 
-      {/* MODAL XEM ẢNH FULL (HIỂN THỊ ẢNH GỐC ĐỘ PHÂN GIẢI CAO NHẤT) */}
-      {selectedPhotoIndex !== null && displayImages[selectedPhotoIndex] && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-6 animate-in fade-in duration-200 select-none"
-          onClick={() => setSelectedPhotoIndex(null)}
-        >
+      {/* MODAL XEM ẢNH FULL BẰNG REACT PORTAL - HOÀN TOÀN TÁCH RỜI KHỎI STACKING CONTEXT CỦA CỘT STICKY & HEADER */}
+      {selectedPhotoIndex !== null && displayImages[selectedPhotoIndex] && mounted &&
+        createPortal(
           <div
-            className="relative max-w-4xl w-full max-h-[92vh] bg-black/90 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center border border-white/10"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/92 backdrop-blur-md p-2 sm:p-4 select-none animate-in fade-in duration-200"
+            onClick={() => setSelectedPhotoIndex(null)}
           >
-            {/* Nút đóng modal */}
+            {/* Nút đóng modal góc trên bên phải màn hình - hoàn toàn không bị khuất bởi menu */}
             <button
               onClick={() => setSelectedPhotoIndex(null)}
-              className="absolute top-3 right-3 z-20 w-10 h-10 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-black/95 hover:scale-105 active:scale-95 transition border border-white/20 shadow-lg cursor-pointer"
+              className="fixed top-3 right-3 sm:top-5 sm:right-5 z-[100000] w-11 h-11 rounded-full bg-black/80 hover:bg-black text-white flex items-center justify-center border border-white/30 shadow-2xl transition hover:scale-110 active:scale-95 cursor-pointer"
               aria-label="Đóng"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
+
+            {/* Logo web gắn ở góc trên bên trái khi xem ảnh đầu tiên trong modal */}
+            {selectedPhotoIndex === 0 && (
+              <div className="fixed top-3 left-3 sm:top-5 sm:left-5 z-[100000] pointer-events-none select-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]">
+                <div className="relative w-11 h-11 sm:w-14 sm:h-14">
+                  <Image
+                    src="/logo.webp"
+                    alt="Logo Lẩu Bò Trăm Rưỡi"
+                    fill
+                    sizes="56px"
+                    priority
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Nút lùi về ảnh trước */}
             {displayImages.length > 1 && (
@@ -117,10 +156,10 @@ export function JobDetailImages({ images }: JobDetailImagesProps) {
                     prev !== null ? (prev - 1 + displayImages.length) % displayImages.length : null
                   );
                 }}
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-black/95 hover:scale-105 active:scale-95 transition border border-white/20 shadow-lg cursor-pointer"
+                className="fixed left-2 sm:left-6 top-1/2 -translate-y-1/2 z-[100000] w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/75 hover:bg-black text-white flex items-center justify-center border border-white/25 shadow-2xl transition hover:scale-110 active:scale-95 cursor-pointer"
                 aria-label="Ảnh trước"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7" />
               </button>
             )}
 
@@ -133,36 +172,39 @@ export function JobDetailImages({ images }: JobDetailImagesProps) {
                     prev !== null ? (prev + 1) % displayImages.length : null
                   );
                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-black/95 hover:scale-105 active:scale-95 transition border border-white/20 shadow-lg cursor-pointer"
+                className="fixed right-2 sm:right-6 top-1/2 -translate-y-1/2 z-[100000] w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/75 hover:bg-black text-white flex items-center justify-center border border-white/25 shadow-2xl transition hover:scale-110 active:scale-95 cursor-pointer"
                 aria-label="Ảnh tiếp"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7" />
               </button>
             )}
 
-            {/* Khung hiển thị ảnh gốc: unoptimized=true đảm bảo load đúng file gốc chất lượng cao */}
-            <div className="relative w-full h-[75vh] sm:h-[85vh] flex items-center justify-center p-2">
+            {/* Khung hiển thị ảnh gốc: Vừa vặn hoàn hảo trong màn hình, không bị thừa hoặc khuất */}
+            <div
+              className="relative w-full max-w-5xl h-[80vh] sm:h-[86vh] max-h-[88vh] flex items-center justify-center p-2"
+              onClick={(e) => e.stopPropagation()}
+            >
               <Image
                 src={displayImages[selectedPhotoIndex]}
                 alt={`Hình ảnh việc làm thực tế ${selectedPhotoIndex + 1}`}
                 fill
-                sizes="(max-width: 1024px) 100vw, 1200px"
+                sizes="(max-width: 1024px) 100vw, 1400px"
                 quality={95}
                 priority
                 unoptimized={true}
-                className="object-contain"
+                className="object-contain drop-shadow-2xl"
               />
             </div>
 
             {/* Bộ đếm vị trí ảnh */}
             {displayImages.length > 1 && (
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 px-3.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-semibold tracking-wide border border-white/10 shadow">
+              <div className="fixed bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-[100000] px-4 py-1.5 rounded-full bg-black/75 backdrop-blur-md text-white text-xs sm:text-sm font-semibold tracking-wide border border-white/20 shadow-xl">
                 {selectedPhotoIndex + 1} / {displayImages.length}
               </div>
             )}
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </>
   );
 }

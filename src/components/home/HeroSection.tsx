@@ -4,11 +4,11 @@ import { Sparkles } from "lucide-react";
 
 export default function HeroSection() {
   return (
-    <section className="relative text-white min-h-[420px] sm:min-h-[460px] md:min-h-[480px] flex flex-col justify-between overflow-hidden bg-surface">
+    <section className="relative text-white min-h-[440px] sm:min-h-[480px] md:min-h-[500px] flex flex-col justify-between overflow-hidden bg-surface">
       {/* Background Image: Full banner chiều dài & chiều rộng */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/hero-banner-clean.jpg"
+          src="/images/hero-banner-clean.webp"
           alt="Tiệm Lẩu Bò Trăm Rưỡi Tuyển Dụng"
           fill
           priority
@@ -42,7 +42,7 @@ export default function HeroSection() {
       {/* Logo tuyển dụng hoà nhập tự nhiên vào vị trí tán cây xanh bên phải (ngay dưới chữ TRĂM RƯỠI) */}
       <div className="absolute right-4 sm:right-6 md:right-8 lg:right-12 xl:right-16 top-[28%] sm:top-[26%] md:top-[24%] lg:top-[22%] z-20 w-20 sm:w-28 md:w-36 lg:w-44 select-none pointer-events-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
         <Image
-          src="/images/logo-tuyendung.png"
+          src="/images/logo-tuyendung.webp"
           alt="Logo Tuyển Dụng Tiệm Lẩu Bò Trăm Rưỡi"
           width={190}
           height={198}

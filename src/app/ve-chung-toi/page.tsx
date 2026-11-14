@@ -45,7 +45,7 @@ export default function AboutPage() {
                   Hệ Thống Tiệm Lẩu Bò Trăm Rưỡi – Lẩu Bò Triều Châu
                 </h2>
                 <p className="mt-4 text-base sm:text-lg text-gray-700 leading-relaxed">
-                  <strong>Lẩu Bò Trăm Rưỡi</strong> là chuỗi nhà hàng ẩm thực chuyên về lẩu bò chuẩn vị Triều Châu với hệ thống 13 chi nhánh trải rộng khắp TP. Hồ Chí Minh (Gò Vấp, Thủ Đức, Quận 3, Quận 10, Phú Nhuận, Bình Thạnh, Tân Phú, Bình Tân) và tỉnh Đồng Nai (Biên Hòa).
+                  <strong>Lẩu Bò Trăm Rưỡi</strong> là chuỗi nhà hàng ẩm thực chuyên về lẩu bò chuẩn vị Triều Châu với hệ thống 12 chi nhánh trải rộng khắp TP. Hồ Chí Minh (Gò Vấp, Thủ Đức, Quận 3, Quận 10, Phú Nhuận, Bình Thạnh, Tân Phú, Bình Tân).
                 </p>
               </div>
 
@@ -145,7 +145,7 @@ export default function AboutPage() {
           <div className="lg:col-span-4">
             <div className="w-full sticky top-24">
               <Image
-                src="/logo.png"
+                src="/logo.webp"
                 alt="Tiệm Lẩu Bò Trăm Rưỡi"
                 width={409}
                 height={400}

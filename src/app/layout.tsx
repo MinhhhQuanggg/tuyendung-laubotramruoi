@@ -25,9 +25,9 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/logo.webp",
+    shortcut: "/logo.webp",
+    apple: "/logo.webp",
   },
   description: siteConfig.description,
   keywords: [
@@ -52,6 +52,21 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     locale: "vi_VN",
     type: "website",
+    images: [
+      {
+        url: `${siteConfig.url}/images/og-image.jpg`,
+        width: 1200,
+        height: 630,
+        alt: `${siteConfig.heroHeading} - ${siteConfig.name}`,
+        type: "image/jpeg",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${siteConfig.heroHeading} | ${siteConfig.name}`,
+    description: siteConfig.description,
+    images: [`${siteConfig.url}/images/og-image.jpg`],
   },
   robots: {
     index: true,

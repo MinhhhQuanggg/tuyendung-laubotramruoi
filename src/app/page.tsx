@@ -20,10 +20,10 @@ export default async function HomePage() {
       {/* Hero Section vòm cong */}
       <HeroSection />
 
-      {/* Lưới Job Cards 2 cột */}
+      {/* Lưới Job Cards 2 cột với bộ lọc nghề nghiệp */}
       <JobGridSection />
 
-      {/* Kênh truyền thông & Đời sống Trăm Rưỡi */}
+      {/* Kênh truyền thông & Đời sống Trăm Rưỡi (Video thực tế + Ảnh hoạt động + TikTok) */}
       <LifeAtTramRuoi initialVideos={lifeVideos} />
 
       {/* Khối hộp trắng nổi tích hợp Form Ứng Tuyển Nhanh trước đường cong Footer */}

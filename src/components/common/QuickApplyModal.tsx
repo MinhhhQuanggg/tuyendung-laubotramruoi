@@ -18,6 +18,7 @@ import {
   ExternalLink,
   Building2,
   Check,
+  Mail,
 } from "lucide-react";
 import { QuickApplyConfig } from "@/types/quick-apply";
 import { Branch } from "@/types/branch";
@@ -57,6 +58,7 @@ export default function QuickApplyModal({
     fullName: "",
     age: "",
     phoneZalo: "",
+    email: "",
     appliedRegion: "",
     positionId: "",
     positionTitle: "",
@@ -218,10 +220,25 @@ export default function QuickApplyModal({
       return;
     }
 
+    const emailTrimmed = formData.email.trim();
+    if (!emailTrimmed) {
+      setErrorMsg("Vui lòng nhập địa chỉ email của bạn để nhận xác nhận hồ sơ");
+      setLoading(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailTrimmed)) {
+      setErrorMsg("Địa chỉ email không hợp lệ (ví dụ: tenban@gmail.com)");
+      setLoading(false);
+      return;
+    }
+
     const payload = {
       fullName: formData.fullName.trim(),
       age: formData.age.trim(),
       phoneZalo: formData.phoneZalo.trim(),
+      email: emailTrimmed,
       appliedRegion: regionToSend,
       positionId: selectedJob ? selectedJob.id : formData.positionId,
       positionTitle: selectedJob ? selectedJob.title : formData.positionTitle,
@@ -262,6 +279,7 @@ export default function QuickApplyModal({
       fullName: "",
       age: "",
       phoneZalo: "",
+      email: "",
       appliedRegion: "",
       positionId: "",
       positionTitle: "",
@@ -278,7 +296,7 @@ export default function QuickApplyModal({
         {/* Header Modal */}
         <div className="bg-gradient-to-r from-[#8B1818] via-[#6B1414] to-[#4A0D0D] text-white p-5 sm:p-6 relative shrink-0 flex items-center gap-3.5 pr-14">
           <Image
-            src="/logo.png"
+            src="/logo.webp"
             alt="Lẩu Bò Trăm Rưỡi"
             width={48}
             height={48}
@@ -310,8 +328,13 @@ export default function QuickApplyModal({
               <p className="text-sm text-gray-600 mb-6">
                 {config.successMessage}
               </p>
-              <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-emerald-800 text-xs text-left mb-6">
-                💡 <b>Lưu ý:</b> {config.successNote}
+              <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-emerald-800 text-xs text-left mb-6 space-y-2">
+                <div>💡 <b>Lưu ý:</b> {config.successNote}</div>
+                {formData.email && (
+                  <div className="pt-2 border-t border-emerald-200/60 text-emerald-950 font-medium leading-relaxed">
+                    ✉️ Email xác nhận và hướng dẫn chi tiết đã được gửi tự động tới <b>{formData.email}</b>. Bạn vui lòng kiểm tra hộp thư (cả mục Quảng cáo/Spam) nhé!
+                  </div>
+                )}
               </div>
               <button
                 onClick={handleResetAndClose}
@@ -548,7 +571,32 @@ export default function QuickApplyModal({
               </div>
 
               {/* ========================================================================= */}
-              {/* 5. ĐÍNH KÈM FILE CV (NẾU ĐƯỢC BẬT TRONG CẤU HÌNH) */}
+              {/* 5. EMAIL ỨNG VIÊN (BẮT BUỘC ĐỂ GỬI XÁC NHẬN TỰ ĐỘNG) */}
+              {/* ========================================================================= */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                  <span>Email của bạn <span className="text-red-500">*</span></span>
+                  <span className="text-[10px] text-brand-800 font-semibold normal-case">
+                    Nhận xác nhận & lịch phone check
+                  </span>
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="VD: nguyenvanan@gmail.com"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    className="w-full pl-10 pr-3.5 py-2.5 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none font-medium text-gray-900"
+                  />
+                </div>
+              </div>
+
+              {/* ========================================================================= */}
+              {/* 6. ĐÍNH KÈM FILE CV (NẾU ĐƯỢC BẬT TRONG CẤU HÌNH) */}
               {/* ========================================================================= */}
               {config.allowCvUpload && (
                 <div>

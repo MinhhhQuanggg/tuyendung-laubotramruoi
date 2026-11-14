@@ -78,6 +78,7 @@ async function getGoogleAccessToken(
       grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
       assertion: assertionJwt,
     }),
+    signal: AbortSignal.timeout(8000),
   });
 
   if (!tokenRes.ok) {
@@ -133,14 +134,15 @@ export async function appendCandidateToGoogleSheet(
     candidate.fullName, // Cột B: Họ và tên
     candidate.age, // Cột C: Tuổi
     candidate.phoneZalo, // Cột D: Số điện thoại / Zalo
-    candidate.positionTitle, // Cột E: Vị trí ứng tuyển
-    region, // Cột F: Khu vực ứng tuyển
-    candidate.preferredBranch || "", // Cột G: Chi nhánh mong muốn
-    candidate.cvFileName ? "Có CV" : "Nộp nhanh (Không CV)", // Cột H: Trạng thái CV
-    candidate.cvFileName || "", // Cột I: Tên file CV
-    candidate.note || "", // Cột J: Ghi chú của ứng viên
-    "Chờ liên hệ", // Cột K: Trạng thái xử lý HR
-    "", // Cột L: Ghi chú phỏng vấn (HR điền)
+    candidate.email || "", // Cột E: Email
+    candidate.positionTitle, // Cột F: Vị trí ứng tuyển
+    region, // Cột G: Khu vực ứng tuyển
+    candidate.preferredBranch || "", // Cột H: Chi nhánh mong muốn
+    candidate.cvFileName ? "Có CV" : "Nộp nhanh (Không CV)", // Cột I: Trạng thái CV
+    candidate.cvFileName || "", // Cột J: Tên file CV
+    candidate.note || "", // Cột K: Ghi chú của ứng viên
+    "Chờ liên hệ", // Cột L: Trạng thái xử lý HR
+    "", // Cột M: Ghi chú phỏng vấn (HR điền)
   ];
 
   // 1. Ưu tiên: Google Sheets API v4 bằng Service Account
@@ -155,7 +157,7 @@ export async function appendCandidateToGoogleSheet(
       // Endpoint append của Google Sheets API v4
       const appendUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(
         tabName
-      )}!A:L:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+      )}!A:M:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
 
       const appendRes = await fetch(appendUrl, {
         method: "POST",
@@ -166,6 +168,7 @@ export async function appendCandidateToGoogleSheet(
         body: JSON.stringify({
           values: [rowValues],
         }),
+        signal: AbortSignal.timeout(10000),
       });
 
       if (!appendRes.ok) {
@@ -208,6 +211,7 @@ export async function appendCandidateToGoogleSheet(
           fullName: candidate.fullName,
           age: candidate.age,
           phoneZalo: candidate.phoneZalo,
+          email: candidate.email || "",
           positionTitle: candidate.positionTitle,
           appliedRegion: region,
           preferredBranch: candidate.preferredBranch || "",
@@ -217,6 +221,7 @@ export async function appendCandidateToGoogleSheet(
           status: "Chờ liên hệ",
           rowValues,
         }),
+        signal: AbortSignal.timeout(10000),
       });
 
       if (!webhookRes.ok) {

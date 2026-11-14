@@ -42,7 +42,7 @@ export default function BranchMapClient({ branches: propBranches }: BranchMapCli
 
     // Initialize Leaflet map with Google Maps default view on TP.HCM
     const map = L.map(mapContainerRef.current, {
-      center: [10.82, 106.69],
+      center: [10.815, 106.685],
       zoom: 12,
       zoomControl: false, // Custom Google Maps zoom buttons
       scrollWheelZoom: false,
@@ -95,11 +95,6 @@ export default function BranchMapClient({ branches: propBranches }: BranchMapCli
           <!-- Badge Text inside the white circle: CN number -->
           <div style="position: absolute; top: 7px; left: 0; width: 32px; text-align: center; font-size: 10px; font-weight: 900; color: #B31412; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; pointer-events: none;">
             ${labelText}
-          </div>
-
-          <!-- Tooltip label on hover -->
-          <div style="position: absolute; bottom: 44px; left: 50%; transform: translateX(-50%); background: #202124; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 6px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.3); pointer-events: none; opacity: 0; transition: opacity 0.15s ease;" class="group-hover:!opacity-100">
-            CN ${b.cnNumber} - ${b.district}: ${b.name}
           </div>
         </div>
       `;
@@ -185,11 +180,11 @@ export default function BranchMapClient({ branches: propBranches }: BranchMapCli
   };
 
   const handleResetView = () => {
-    mapInstanceRef.current?.setView([10.82, 106.69], 12);
+    mapInstanceRef.current?.setView([10.815, 106.685], 12);
   };
 
   return (
-    <div className="relative w-full h-[320px] sm:h-[380px] md:h-[420px] rounded-2xl overflow-hidden border border-brand-800/80 shadow-2xl bg-neutral-900 group">
+    <div className="relative w-full h-[320px] sm:h-[380px] md:h-[420px] rounded-2xl overflow-hidden border border-brand-800/80 shadow-2xl bg-neutral-900">
       {/* Map Container */}
       <div ref={mapContainerRef} className="w-full h-full z-0" />
 

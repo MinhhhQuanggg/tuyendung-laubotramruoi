@@ -29,7 +29,7 @@ import { getJobUrl } from "@/lib/job-url";
 
 const CATEGORIES: JobCategory[] = [
   "Học nghề có lương",
-  "Part-time, Thời vụ",
+  "Part-time",
   "Full-time",
   "Trưởng, Quản lý",
 ];
