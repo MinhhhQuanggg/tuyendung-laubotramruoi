@@ -7,7 +7,7 @@ interface StickyJobSidebarProps {
 
 export default function StickyJobSidebar({ job }: StickyJobSidebarProps) {
   return (
-    <div className="w-full flex items-center justify-center">
+    <div className="hidden lg:flex w-full items-center justify-center">
       <Image
         src="/logo.webp"
         alt="Tiệm Lẩu Bò Trăm Rưỡi"

@@ -14,8 +14,8 @@ interface JobDetailViewProps {
 export default function JobDetailView({ job, isAdmin = false }: JobDetailViewProps) {
   return (
     <>
-      {/* Header Banner với Breadcrumb */}
-      <section className="relative bg-gradient-to-r from-[#a82323] via-[#6B1414] to-[#2a0505] text-white py-3.5 sm:py-4 overflow-hidden border-b border-white/10 shadow-sm">
+      {/* Header Banner với Breadcrumb - Gradient Option A */}
+      <section className="relative bg-gradient-to-r from-[#8E1B24] via-[#5c1015] to-[#3A0910] text-white py-3.5 sm:py-4 overflow-hidden border-b border-[#C9963F]/30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-wrap items-center justify-between gap-3">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-xs text-amber-200/80">

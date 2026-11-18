@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { CandidateApplication } from "@/types/job";
 import { siteConfig } from "@/config/site";
+import { MOCK_JOBS_DATA } from "@/data/mock-jobs";
 
 export interface EmailSendResult {
   success: boolean;
@@ -54,8 +55,28 @@ function createTransporter() {
 }
 
 /**
+ * Xác định mức lương hiển thị theo vị trí ứng tuyển
+ */
+function resolveSalaryDisplay(candidate: CandidateApplication): string {
+  if (candidate.salaryDisplay && candidate.salaryDisplay.trim()) {
+    return candidate.salaryDisplay.trim();
+  }
+  const posId = (candidate.positionId || "").toLowerCase().trim();
+  const posTitle = (candidate.positionTitle || "").toLowerCase().trim();
+  const matchedJob = MOCK_JOBS_DATA.find(
+    (j) =>
+      (posId && (j.id.toLowerCase() === posId || j.slug.toLowerCase() === posId)) ||
+      (posTitle && j.title.toLowerCase() === posTitle)
+  );
+  if (matchedJob?.salaryDisplay) {
+    return matchedJob.salaryDisplay;
+  }
+  return "Theo quy định hệ thống";
+}
+
+/**
  * Xây dựng giao diện HTML email xác nhận tiếp nhận hồ sơ ứng tuyển
- * Phong cách nhận diện thương hiệu Lẩu Bò Trăm Rưỡi (Đỏ đô F&B #8B1E1E + Vàng kim)
+ * Phong cách nhận diện thương hiệu Lẩu Bò Trăm Rưỡi với Highlight Gradient rực rỡ
  */
 function buildConfirmationEmailHtml(candidate: CandidateApplication): string {
   const hrPhone = siteConfig.hrContact?.phone || "0981256712";
@@ -63,6 +84,7 @@ function buildConfirmationEmailHtml(candidate: CandidateApplication): string {
   const hrEmail = process.env.SMTP_USER || DEFAULT_HR_EMAIL;
   const region = candidate.appliedRegion || candidate.address || "Gần nhà nhất (HR tự xếp)";
   const branch = candidate.preferredBranch || "Gần nhà nhất (HR tự xếp)";
+  const salaryDisplay = resolveSalaryDisplay(candidate);
 
   return `
 <!DOCTYPE html>
@@ -79,21 +101,21 @@ function buildConfirmationEmailHtml(candidate: CandidateApplication): string {
         <!-- Main Card Container -->
         <table role="presentation" width="100%" style="max-width: 620px; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 18px rgba(0,0,0,0.06); border: 1px solid #E5E7EB;">
           
-          <!-- Header Banner -->
+          <!-- Header Banner (Highlight Gradient - Sáng rực rỡ, highlight khác với tông trầm đen ở trang chủ) -->
           <tr>
-            <td style="background: linear-gradient(135deg, #8B1E1E 0%, #6B1414 50%, #2A0505 100%); padding: 32px 24px; text-align: center;">
+            <td style="background: linear-gradient(135deg, #B91C1C 0%, #DC2626 35%, #EA580C 70%, #F59E0B 100%); padding: 36px 24px; text-align: center; border-bottom: 4px solid #FDE68A;">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <div style="display: inline-block; padding: 8px 16px; border-radius: 20px; background-color: rgba(255,255,255,0.12); border: 1px solid rgba(254,240,138,0.4); margin-bottom: 12px;">
-                      <span style="color: #FEF08A; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <div style="display: inline-block; padding: 7px 18px; border-radius: 20px; background-color: rgba(255,255,255,0.22); border: 1.5px solid #FEF08A; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                      <span style="color: #FFFFFF; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; text-shadow: 0 1px 2px rgba(0,0,0,0.25);">
                         🍲 TIỆM LẨU BÒ TRĂM RƯỠI — TUYỂN DỤNG CHÍNH THỨC
                       </span>
                     </div>
-                    <h1 style="margin: 0; color: #FFFFFF; font-size: 24px; font-weight: 900; letter-spacing: -0.3px;">
+                    <h1 style="margin: 0; color: #FFFFFF; font-size: 25px; font-weight: 900; letter-spacing: -0.3px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
                       XÁC NHẬN TIẾP NHẬN HỒ SƠ
                     </h1>
-                    <p style="margin: 8px 0 0; color: #FECACA; font-size: 14px;">
+                    <p style="margin: 9px 0 0; color: #FFFBEB; font-size: 14.5px; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.25);">
                       Học việc, học nghề miễn phí • Vẫn có lương đủ • Bao ăn ca
                     </p>
                   </td>
@@ -112,18 +134,25 @@ function buildConfirmationEmailHtml(candidate: CandidateApplication): string {
                 Phòng Tuyển dụng (HR) <strong>Hệ Thống Tiệm Lẩu Bò Trăm Rưỡi</strong> xin thông báo: chúng tôi đã tiếp nhận thành công hồ sơ đăng ký ứng tuyển của bạn cho vị trí:
               </p>
 
-              <!-- Position Highlight Box -->
-              <div style="background-color: #FEF2F2; border-left: 4px solid #8B1E1E; padding: 14px 18px; border-radius: 8px; margin-bottom: 24px;">
+              <!-- Position & Salary Highlight Box (Đồng bộ thứ tự hiển thị như trang chi tiết công việc) -->
+              <div style="background-color: #FEF2F2; border: 1px solid #FEE2E2; border-left: 5px solid #DC2626; padding: 16px 20px; border-radius: 10px; margin-bottom: 24px;">
                 <div style="font-size: 12px; font-weight: 700; color: #991B1B; text-transform: uppercase; letter-spacing: 0.5px;">Vị trí bạn ứng tuyển</div>
-                <div style="font-size: 20px; font-weight: 900; color: #7F1D1D; margin-top: 4px;">${candidate.positionTitle}</div>
+                <div style="font-size: 22px; font-weight: 900; color: #7F1D1D; margin-top: 4px; line-height: 1.3;">${candidate.positionTitle}</div>
+                <div style="margin-top: 8px; font-size: 18px; font-weight: 800; color: #991B1B;">
+                  💰 ${salaryDisplay}
+                </div>
               </div>
 
               <!-- Information Summary Table -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border: 1px solid #E5E7EB; border-radius: 10px; margin-bottom: 24px; font-size: 14px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border: 1px solid #E5E7EB; border-radius: 10px; margin-bottom: 24px; font-size: 14px; overflow: hidden;">
                 <tr style="background-color: #F9FAFB;">
                   <td colspan="2" style="padding: 10px 16px; font-weight: 700; color: #1F2937; border-bottom: 1px solid #E5E7EB;">
                     📋 Tóm tắt thông tin đăng ký
                   </td>
+                </tr>
+                <tr style="background-color: #FEF2F2;">
+                  <td style="padding: 11px 16px; color: #991B1B; width: 40%; font-weight: 700; border-bottom: 1px solid #FEE2E2;">💰 Mức lương:</td>
+                  <td style="padding: 11px 16px; font-weight: 800; color: #8B1E1E; font-size: 15px; border-bottom: 1px solid #FEE2E2;">${salaryDisplay}</td>
                 </tr>
                 <tr>
                   <td style="padding: 10px 16px; color: #6B7280; width: 40%; border-bottom: 1px solid #F3F4F6;">👤 Họ và tên:</td>
@@ -166,80 +195,7 @@ function buildConfirmationEmailHtml(candidate: CandidateApplication): string {
                 </tr>
               </table>
 
-              ${
-                candidate.cvFileName
-                  ? `
-              <!-- CV Attachment Notice Box -->
-              <div style="background-color: #ECFDF5; border: 1.5px solid #10B981; border-radius: 12px; padding: 18px 20px; margin-bottom: 24px;">
-                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                  <span style="font-size: 20px; margin-right: 8px;">📎</span>
-                  <strong style="color: #065F46; font-size: 15px; text-transform: uppercase;">
-                    HỒ SƠ CV ĐÃ ĐÍNH KÈM
-                  </strong>
-                </div>
-                <p style="margin: 0 0 10px; font-size: 14px; color: #047857; line-height: 1.5;">
-                  Tệp hồ sơ: <strong style="color: #064E3B;">${candidate.cvFileName}</strong>
-                  ${candidate.cvFileSize ? `<span style="color: #059669; font-size: 13px;">(${formatFileSize(candidate.cvFileSize)})</span>` : ""}
-                </p>
-
-                ${
-                  candidate.cvFileUrl
-                    ? `
-                <!-- Button Xem CV Trực Tiếp Online -->
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 14px 0 12px;">
-                  <tr>
-                    <td align="center">
-                      <a href="${candidate.cvFileUrl}" target="_blank" style="display: inline-block; background-color: #059669; color: #FFFFFF; font-weight: 800; font-size: 15px; text-decoration: none; padding: 13px 26px; border-radius: 8px; box-shadow: 0 4px 12px rgba(5,150,105,0.35); text-align: center;">
-                        📄 BẤM ĐỂ MỞ XEM CV TRỰC TIẾP TRÊN TRÌNH DUYỆT ↗
-                      </a>
-                    </td>
-                  </tr>
-                </table>
-
-                ${
-                  candidate.cvFileType?.startsWith("image/") ||
-                  Boolean(candidate.cvFileName?.match(/\.(jpg|jpeg|png|webp)$/i))
-                    ? `
-                <div style="margin: 14px 0 10px; text-align: center;">
-                  <p style="font-size: 12.5px; font-weight: 600; color: #065F46; margin: 0 0 6px;">📷 Xem trước ảnh CV:</p>
-                  <a href="${candidate.cvFileUrl}" target="_blank" style="text-decoration: none;">
-                    <img src="${candidate.cvFileUrl}" alt="CV ứng viên" style="max-width: 100%; max-height: 400px; border-radius: 8px; border: 1px solid #A7F3D0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);" />
-                  </a>
-                </div>
-                `
-                    : ""
-                }
-                `
-                    : ""
-                }
-
-                <div style="background-color: #D1FAE5; padding: 10px 14px; border-radius: 6px; font-size: 13px; color: #065F46; line-height: 1.5; margin-top: 10px;">
-                  💡 <strong>Hướng dẫn xem CV:</strong>
-                  <br/>• <strong>Cách 1:</strong> Bấm trực tiếp vào nút màu xanh ở trên để mở xem CV trên tab mới của trình duyệt điện thoại / máy tính.
-                  <br/>• <strong>Cách 2:</strong> Cuộn xuống dưới cùng của email này để xem hoặc tải tệp đính kèm (Attachments).
-                </div>
-              </div>
-              `
-                  : ""
-              }
-
-              <!-- Next Steps: Phone Check Action Notice -->
-              <div style="background-color: #FFFBEB; border: 1.5px solid #FCD34D; border-radius: 12px; padding: 18px 20px; margin-bottom: 24px;">
-                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                  <span style="font-size: 18px; margin-right: 8px;">⚡</span>
-                  <strong style="color: #92400E; font-size: 15px; text-transform: uppercase;">
-                    TIẾN TRÌNH TIẾP THEO: PHONE CHECK TRONG ÍT PHÚT
-                  </strong>
-                </div>
-                <p style="margin: 0 0 10px; font-size: 14.5px; color: #78350F; line-height: 1.55;">
-                  Bộ phận Tuyển dụng (<strong>Anh Nguyễn Trung Kiên - Kiên HR</strong>) sẽ chủ động liên hệ với bạn qua <strong>cuộc gọi hoặc tin nhắn Zalo</strong> từ số <strong>0981 256 712</strong> để tiến hành Phone Check ngắn và xếp lịch phỏng vấn trực tiếp tại chi nhánh gần bạn.
-                </p>
-                <div style="background-color: #FEF3C7; padding: 8px 12px; border-radius: 6px; font-size: 13.5px; color: #B45309; font-weight: 600;">
-                  🔔 Bạn vui lòng chú ý chuông điện thoại từ số <strong>0981 256 712</strong> nhé!
-                </div>
-              </div>
-
-              <!-- Two-Way Communication (Yêu cầu 10) -->
+              <!-- Two-Way Communication -->
               <p style="font-size: 14.5px; color: #4B5563; margin: 0 0 20px; line-height: 1.6;">
                 💡 <strong>Trao đổi hai chiều:</strong> Bạn hoàn toàn có thể <strong>reply trực tiếp email này</strong> (được chuyển thẳng đến hòm thư <a href="mailto:${hrEmail}" style="color: #8B1E1E; font-weight: 600;">${hrEmail}</a>) hoặc bấm nhắn tin qua Zalo dưới đây nếu có bất kỳ thắc mắc nào về ca làm, địa chỉ hay quyền lợi.
               </p>
@@ -249,7 +205,7 @@ function buildConfirmationEmailHtml(candidate: CandidateApplication): string {
                 <tr>
                   <td align="center">
                     <a href="${hrZaloUrl}" target="_blank" style="display: inline-block; background-color: #0068FF; color: #FFFFFF; font-weight: 700; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 30px; box-shadow: 0 4px 12px rgba(0,104,255,0.35);">
-                      💬 Nhắn tin Zalo với HR (0981 256 712)
+                      💬 Nhắn tin Zalo với HR (${hrPhone})
                     </a>
                   </td>
                 </tr>
@@ -294,18 +250,18 @@ function buildConfirmationEmailHtml(candidate: CandidateApplication): string {
 export async function sendApplicationConfirmationEmail(
   candidate: CandidateApplication
 ): Promise<EmailSendResult> {
-  const candidateEmail = candidate.email?.trim();
-
-  if (!candidateEmail) {
-    return {
-      success: false,
-      error: "Candidate email is empty or missing",
-    };
-  }
-
+  const candidateEmail = candidate.email?.trim() || "";
   const senderEmail = process.env.SMTP_USER || DEFAULT_HR_EMAIL;
   const adminBccEmail = process.env.HR_NOTIFICATION_EMAIL || DEFAULT_HR_EMAIL;
   const fromName = process.env.SMTP_FROM || `"Tuyển Dụng Lẩu Bò Trăm Rưỡi" <${senderEmail}>`;
+
+  const targetEmail = candidateEmail || adminBccEmail;
+  if (!targetEmail) {
+    return {
+      success: false,
+      error: "No recipient email available",
+    };
+  }
 
   // Nhận biết hồ sơ có CV đính kèm hay không
   const hasCv = Boolean(
@@ -391,23 +347,28 @@ export async function sendApplicationConfirmationEmail(
   try {
     // Tránh BCC trùng nếu ứng viên test nhập chính địa chỉ email của admin
     const bccRecipient =
+      candidateEmail &&
       adminBccEmail &&
       adminBccEmail.toLowerCase() !== candidateEmail.toLowerCase()
         ? adminBccEmail
         : undefined;
 
+    const emailSubject = candidateEmail
+      ? subject
+      : `[HR THÔNG BÁO] Ứng viên mới: ${candidate.fullName || "Ứng viên"} (${candidate.phoneZalo}) - ${candidate.positionTitle}`;
+
     const info = await transporter.sendMail({
       from: fromName,
-      to: candidateEmail,
+      to: targetEmail,
       bcc: bccRecipient, // Gắn qminh0733@gmail.com nhận bản sao thông báo kèm file CV
-      replyTo: senderEmail, // Khi ứng viên reply email, thư sẽ về qminh0733@gmail.com
-      subject,
+      replyTo: candidateEmail || senderEmail,
+      subject: emailSubject,
       html: htmlContent,
       attachments,
     });
 
     console.log(
-      `✅ [EMAIL SUCCESS] Đã gửi email xác nhận thành công tới ${candidateEmail}${
+      `✅ [EMAIL SUCCESS] Đã gửi email thông báo thành công tới ${targetEmail}${
         bccRecipient ? ` (BCC: ${bccRecipient})` : ""
       }${attachments.length > 0 ? ` kèm file CV [${candidate.cvFileName}]` : ""}. MessageID: ${info.messageId}`
     );

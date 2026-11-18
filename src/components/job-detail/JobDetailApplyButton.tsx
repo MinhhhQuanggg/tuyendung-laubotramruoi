@@ -12,7 +12,7 @@ export default function JobDetailApplyButton({ job }: { job: JobItem }) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-brand-800 to-brand-900 hover:from-brand-900 hover:to-brand-950 active:scale-95 text-white font-extrabold text-sm shadow-md shadow-brand-900/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+        className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-[#8E1B24] via-[#6B1414] to-[#3A0910] hover:from-[#7a171f] hover:to-[#2e070c] border border-[#C9963F]/40 active:scale-95 text-white font-extrabold text-sm shadow-md shadow-[#8E1B24]/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
       >
         <Send className="w-4 h-4 text-amber-300" />
         <span>Nộp Hồ Sơ Ứng Tuyển Nhanh</span>

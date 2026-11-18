@@ -60,14 +60,15 @@ export interface JobItem {
 }
 
 export interface CandidateApplication {
-  fullName: string;
-  age: string;
+  fullName?: string;
+  age?: string;
   phoneZalo: string;
-  email: string;
+  email?: string;
   appliedRegion?: string;
   address?: string;
   positionId: string;
   positionTitle: string;
+  salaryDisplay?: string;
   preferredBranch?: string;
   cvFileName?: string;
   cvBase64?: string;
