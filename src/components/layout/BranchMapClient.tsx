@@ -8,6 +8,7 @@ import {
   ExternalLink,
   Plus,
   Minus,
+  LocateFixed,
 } from "lucide-react";
 
 interface BranchMapClientProps {
@@ -161,8 +162,19 @@ export default function BranchMapClient({ branches: propBranches }: BranchMapCli
       markersGroup.push(marker);
     });
 
-    // Auto-fit all branches cleanly
-    if (markersGroup.length > 0) {
+    // Tự động căn góc nhìn tập trung vào vị trí địa lý TP.HCM
+    const hcmBranches = branches.filter((b) => b.city === "Hồ Chí Minh" || (b.lat && b.lat < 10.9));
+    const hcmMarkers = hcmBranches
+      .map((b) => markersRef.current[b.id])
+      .filter(Boolean);
+
+    if (hcmMarkers.length > 0) {
+      const hcmGroup = L.featureGroup(hcmMarkers);
+      map.fitBounds(hcmGroup.getBounds(), {
+        padding: [32, 32],
+        maxZoom: 13,
+      });
+    } else if (markersGroup.length > 0) {
       const featureGroup = L.featureGroup(markersGroup);
       map.fitBounds(featureGroup.getBounds(), {
         padding: [30, 30],
@@ -180,11 +192,24 @@ export default function BranchMapClient({ branches: propBranches }: BranchMapCli
   };
 
   const handleResetView = () => {
-    mapInstanceRef.current?.setView([10.815, 106.685], 12);
+    const hcmMarkers = branches
+      .filter((b) => b.city === "Hồ Chí Minh" || (b.lat && b.lat < 10.9))
+      .map((b) => markersRef.current[b.id])
+      .filter(Boolean);
+
+    if (mapInstanceRef.current && hcmMarkers.length > 0) {
+      const hcmGroup = L.featureGroup(hcmMarkers);
+      mapInstanceRef.current.fitBounds(hcmGroup.getBounds(), {
+        padding: [32, 32],
+        maxZoom: 13,
+      });
+    } else {
+      mapInstanceRef.current?.setView([10.810, 106.690], 12);
+    }
   };
 
   return (
-    <div className="relative w-full h-[320px] sm:h-[380px] md:h-[420px] rounded-2xl overflow-hidden border border-brand-800/80 shadow-2xl bg-neutral-900">
+    <div className="relative w-full h-[360px] sm:h-[440px] md:h-[500px] rounded-2xl overflow-hidden border border-brand-800/80 shadow-2xl bg-neutral-900">
       {/* Map Container */}
       <div ref={mapContainerRef} className="w-full h-full z-0" />
 
@@ -206,6 +231,15 @@ export default function BranchMapClient({ branches: propBranches }: BranchMapCli
           className="w-7 h-7 flex items-center justify-center text-gray-700 hover:text-black hover:bg-gray-100 rounded transition"
         >
           <Minus className="w-4 h-4" />
+        </button>
+        <div className="w-full h-[1px] bg-gray-200" />
+        <button
+          type="button"
+          onClick={handleResetView}
+          title="Tập trung về khu vực TP.HCM"
+          className="w-7 h-7 flex items-center justify-center text-gray-700 hover:text-red-600 hover:bg-gray-100 rounded transition"
+        >
+          <LocateFixed className="w-4 h-4" />
         </button>
       </div>
 

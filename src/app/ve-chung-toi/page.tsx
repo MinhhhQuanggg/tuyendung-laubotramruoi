@@ -45,7 +45,7 @@ export default function AboutPage() {
                   Hệ Thống Tiệm Lẩu Bò Trăm Rưỡi – Lẩu Bò Triều Châu
                 </h2>
                 <p className="mt-4 text-base sm:text-lg text-gray-700 leading-relaxed">
-                  <strong>Lẩu Bò Trăm Rưỡi</strong> là chuỗi nhà hàng ẩm thực chuyên về lẩu bò chuẩn vị Triều Châu với hệ thống 12 chi nhánh trải rộng khắp TP. Hồ Chí Minh (Gò Vấp, Thủ Đức, Quận 3, Quận 10, Phú Nhuận, Bình Thạnh, Tân Phú, Bình Tân).
+                  <strong>Lẩu Bò Trăm Rưỡi</strong> là chuỗi nhà hàng ẩm thực chuyên về lẩu bò chuẩn vị Triều Châu với hệ thống 15 chi nhánh trải rộng khắp TP. Hồ Chí Minh (Quận 1, Quận 2, Quận 3, Quận 10, Gò Vấp, Thủ Đức, Phú Nhuận, Bình Thạnh, Tân Phú, Bình Tân) và tỉnh Đồng Nai (Biên Hòa).
                 </p>
               </div>
 
@@ -83,7 +83,7 @@ export default function AboutPage() {
                   <p className="flex items-start gap-2.5">
                     <MapPin className="w-5 h-5 text-brand-800 shrink-0 mt-0.5" />
                     <span>
-                      <strong>Hệ thống:</strong> 13 chi nhánh tại TP.HCM & Đồng Nai (Chi nhánh trung tâm: 516 CMT8, Quận 3; 828 Sư Vạn Hạnh, Quận 10; 228 Hoàng Diệu 2, Thủ Đức; 701 Phan Văn Trị, Gò Vấp...).
+                      <strong>Hệ thống:</strong> 15 chi nhánh tại TP.HCM & Đồng Nai (Chi nhánh tiêu biểu: 2 Đinh Tiên Hoàng, Quận 1; 516 CMT8, Quận 3; 828 Sư Vạn Hạnh, Quận 10; 210 Nguyễn Duy Trinh, Quận 2; 228 Hoàng Diệu 2, Thủ Đức; 701 Phan Văn Trị, Gò Vấp; 245 Võ Thị Sáu, Biên Hòa...).
                     </span>
                   </p>
                   <p className="flex items-center gap-2.5">

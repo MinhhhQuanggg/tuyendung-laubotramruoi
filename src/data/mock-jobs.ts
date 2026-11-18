@@ -302,7 +302,6 @@ export const MOCK_JOBS_DATA: JobItem[] = [
       "/images/posters/giamsat1.webp",
       "/images/posters/giamsat2.webp",
       "/images/posters/giamsat-detail-1.webp",
-      "/images/culture/bep-tanphu.webp",
     ],
     videoUrl: "/videos/culture/beef-slicing.mp4",
     videoPoster: "",

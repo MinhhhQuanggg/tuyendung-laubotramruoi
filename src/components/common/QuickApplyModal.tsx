@@ -23,6 +23,8 @@ import {
 import { QuickApplyConfig } from "@/types/quick-apply";
 import { Branch } from "@/types/branch";
 import { JobItem } from "@/types/job";
+import { ALL_BRANCHES } from "@/data/branches";
+import { MOCK_JOBS_DATA } from "@/data/mock-jobs";
 
 interface QuickApplyModalProps {
   isOpen: boolean;
@@ -51,17 +53,17 @@ export default function QuickApplyModal({
     allowCvUpload: true,
   });
 
-  const [branchesList, setBranchesList] = useState<Branch[]>([]);
-  const [jobsList, setJobsList] = useState<JobItem[]>([]);
+  const [branchesList, setBranchesList] = useState<Branch[]>(ALL_BRANCHES);
+  const [jobsList, setJobsList] = useState<JobItem[]>(MOCK_JOBS_DATA);
 
   const [formData, setFormData] = useState({
     fullName: "",
     age: "",
     phoneZalo: "",
     email: "",
-    appliedRegion: "",
-    positionId: "",
-    positionTitle: "",
+    appliedRegion: "CN 14 (Quận 2): 210 Nguyễn Duy Trinh, Quận 2",
+    positionId: "JOB-GS-BEP",
+    positionTitle: "Giám sát Bếp Chi Nhánh",
   });
 
   const [cvFile, setCvFile] = useState<{
@@ -110,29 +112,61 @@ export default function QuickApplyModal({
     }
   }, [isOpen]);
 
-  // Tự động liên kết và chọn sẵn công việc nếu được truyền defaultPositionSlug hoặc defaultPositionId
+  // Tự động liên kết và ưu tiên chọn sẵn vị trí Giám sát Bếp Chi Nhánh & Chi nhánh Nguyễn Duy Trinh Q2
   useEffect(() => {
     if (isOpen) {
+      // 1. Vị trí công việc: Ưu tiên defaultPosition được truyền vào, nếu không thì ưu tiên "Giám sát Bếp Chi Nhánh"
       const targetIdentifier = defaultPositionSlug || defaultPositionId;
+      let foundJob: JobItem | undefined;
+
       if (targetIdentifier) {
-        const foundJob = jobsList.find(
+        foundJob = jobsList.find(
           (j) =>
             j.slug === targetIdentifier ||
             j.id === targetIdentifier ||
             j.title.toLowerCase().includes(targetIdentifier.toLowerCase())
         );
-
-        if (foundJob) {
-          setFormData((prev) => ({
-            ...prev,
-            positionId: foundJob.id,
-            positionTitle: foundJob.title,
-          }));
-          return;
-        }
       }
+
+      if (!foundJob) {
+        // Mặc định ưu tiên vị trí "Giám sát Bếp Chi Nhánh"
+        foundJob = jobsList.find(
+          (j) =>
+            j.slug === "giam-sat-bep" ||
+            j.title.toLowerCase().includes("giám sát bếp")
+        );
+      }
+
+      // 2. Chi nhánh: Mặc định ưu tiên chi nhánh "210 Nguyễn Duy Trinh, Quận 2"
+      let defaultBranchText = "CN 14 (Quận 2): 210 Nguyễn Duy Trinh, Quận 2";
+      const ndtBranch = branchesList.find(
+        (b) =>
+          b.address.toLowerCase().includes("nguyễn duy trinh") ||
+          b.name.toLowerCase().includes("nguyễn duy trinh")
+      );
+      if (ndtBranch) {
+        defaultBranchText = `CN ${ndtBranch.cnNumber} (${ndtBranch.district}): ${ndtBranch.address}`;
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        positionId: foundJob ? foundJob.id : (prev.positionId || "JOB-GS-BEP"),
+        positionTitle: foundJob ? foundJob.title : (prev.positionTitle || "Giám sát Bếp Chi Nhánh"),
+        appliedRegion: prev.appliedRegion || defaultBranchText,
+      }));
     }
-  }, [isOpen, defaultPositionSlug, defaultPositionId, jobsList]);
+  }, [isOpen, defaultPositionSlug, defaultPositionId, jobsList, branchesList]);
+
+  // Danh sách vị trí ưu tiên: "Giám sát Bếp Chi Nhánh" được đưa lên hàng đầu tiên
+  const prioritizedJobsList = useMemo(() => {
+    const gsJob = jobsList.find(
+      (j) =>
+        j.slug === "giam-sat-bep" ||
+        j.title.toLowerCase().includes("giám sát bếp")
+    );
+    if (!gsJob) return jobsList;
+    return [gsJob, ...jobsList.filter((j) => j.id !== gsJob.id)];
+  }, [jobsList]);
 
   // Đối tượng Job đang được chọn hiện tại
   const selectedJob = useMemo(() => {
@@ -153,6 +187,57 @@ export default function QuickApplyModal({
         formData.appliedRegion.includes(b.name)
     );
   }, [branchesList, formData.appliedRegion]);
+
+  // Phân chia danh sách chi nhánh theo 3 vùng địa lý chuẩn như Footer (Phương án 1)
+  const regionGroups = useMemo(() => {
+    // 1. Phía Đông & Đồng Nai: Thủ Đức, Quận 2, Quận 9, Biên Hòa (Ưu tiên Nguyễn Duy Trinh Q2 lên đầu)
+    const col1Branches = branchesList
+      .filter(
+        (b) =>
+          ["Thủ Đức", "Quận 2", "Quận 9", "Biên Hòa", "Đồng Nai"].includes(b.district) ||
+          b.city === "Đồng Nai" ||
+          b.region === "thu-duc-khu-dong"
+      )
+      .sort((a, b) => {
+        const isANdt = a.address.toLowerCase().includes("nguyễn duy trinh");
+        const isBNdt = b.address.toLowerCase().includes("nguyễn duy trinh");
+        if (isANdt && !isBNdt) return -1;
+        if (!isANdt && isBNdt) return 1;
+        return a.cnNumber - b.cnNumber;
+      });
+
+    // 2. Phía Bắc: Gò Vấp, Bình Thạnh, Phú Nhuận
+    const col2Branches = branchesList
+      .filter((b) => ["Gò Vấp", "Bình Thạnh", "Phú Nhuận"].includes(b.district))
+      .sort((a, b) => a.cnNumber - b.cnNumber);
+
+    // 3. Trung Tâm & Phía Nam / Tây: Quận 1, Quận 3, Quận 10, Tân Phú, Bình Tân
+    const col3Branches = branchesList
+      .filter(
+        (b) =>
+          !col1Branches.some((item) => item.id === b.id) &&
+          !col2Branches.some((item) => item.id === b.id)
+      )
+      .sort((a, b) => a.cnNumber - b.cnNumber);
+
+    return [
+      {
+        title: "Khu Vực Phía Đông & Đồng Nai",
+        subtitle: "Thủ Đức • Quận 2 • Quận 9 • Biên Hòa",
+        branches: col1Branches,
+      },
+      {
+        title: "Khu Vực Phía Bắc",
+        subtitle: "Gò Vấp • Bình Thạnh • Phú Nhuận",
+        branches: col2Branches,
+      },
+      {
+        title: "Khu Vực Trung Tâm & Nam / Tây",
+        subtitle: "Quận 1 • Quận 3 • Quận 10 • Tân Phú • Bình Tân",
+        branches: col3Branches,
+      },
+    ];
+  }, [branchesList]);
 
   if (!isOpen) return null;
 
@@ -220,28 +305,32 @@ export default function QuickApplyModal({
       return;
     }
 
-    const emailTrimmed = formData.email.trim();
-    if (!emailTrimmed) {
-      setErrorMsg("Vui lòng nhập địa chỉ email của bạn để nhận xác nhận hồ sơ");
+    const phoneTrimmed = formData.phoneZalo.trim();
+    if (!phoneTrimmed) {
+      setErrorMsg("Vui lòng nhập số điện thoại hoặc Zalo để HR liên hệ phỏng vấn");
       setLoading(false);
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailTrimmed)) {
-      setErrorMsg("Địa chỉ email không hợp lệ (ví dụ: tenban@gmail.com)");
-      setLoading(false);
-      return;
+    const emailTrimmed = formData.email.trim();
+    if (emailTrimmed) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(emailTrimmed)) {
+        setErrorMsg("Địa chỉ email không hợp lệ (ví dụ: tenban@gmail.com)");
+        setLoading(false);
+        return;
+      }
     }
 
     const payload = {
-      fullName: formData.fullName.trim(),
+      fullName: formData.fullName.trim() || "Ứng viên",
       age: formData.age.trim(),
-      phoneZalo: formData.phoneZalo.trim(),
+      phoneZalo: phoneTrimmed,
       email: emailTrimmed,
       appliedRegion: regionToSend,
       positionId: selectedJob ? selectedJob.id : formData.positionId,
       positionTitle: selectedJob ? selectedJob.title : formData.positionTitle,
+      salaryDisplay: selectedJob ? selectedJob.salaryDisplay : undefined,
       preferredBranch: selectedBranch ? `${selectedBranch.name} (${selectedBranch.address})` : regionToSend,
       cvFileName: cvFile ? cvFile.name : undefined,
       cvBase64: cvFile ? cvFile.base64 : undefined,
@@ -280,9 +369,9 @@ export default function QuickApplyModal({
       age: "",
       phoneZalo: "",
       email: "",
-      appliedRegion: "",
-      positionId: "",
-      positionTitle: "",
+      appliedRegion: "CN 14 (Quận 2): 210 Nguyễn Duy Trinh, Quận 2",
+      positionId: "JOB-GS-BEP",
+      positionTitle: "Giám sát Bếp Chi Nhánh",
     });
     onClose();
   };
@@ -293,8 +382,8 @@ export default function QuickApplyModal({
         className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header Modal */}
-        <div className="bg-gradient-to-r from-[#8B1818] via-[#6B1414] to-[#4A0D0D] text-white p-5 sm:p-6 relative shrink-0 flex items-center gap-3.5 pr-14">
+        {/* Header Modal - Gradient Option A (Đỏ son + Vàng đồng) */}
+        <div className="bg-gradient-to-r from-[#8E1B24] via-[#5c1015] to-[#3A0910] text-white p-5 sm:p-6 relative shrink-0 flex items-center gap-3.5 pr-14 border-b border-[#C9963F]/30">
           <Image
             src="/logo.webp"
             alt="Lẩu Bò Trăm Rưỡi"
@@ -366,23 +455,33 @@ export default function QuickApplyModal({
                 </label>
 
                 <div className="relative">
-                  <Briefcase className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Briefcase className="w-4 h-4 text-brand-800 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+
+                  {/* Hiển thị tiêu đề vị trí kiểu Gradient sang trọng */}
+                  {selectedJob && (
+                    <div className="absolute left-10 right-9 top-1/2 -translate-y-1/2 pointer-events-none truncate z-10 flex items-center">
+                      <span className="font-black text-sm bg-gradient-to-r from-[#8E1B24] via-[#B83232] to-[#C9963F] bg-clip-text text-transparent truncate">
+                        {selectedJob.title}
+                      </span>
+                    </div>
+                  )}
+
                   <select
                     value={formData.positionId}
                     onChange={handlePositionChange}
-                    className={`w-full pl-10 pr-4 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none bg-white cursor-pointer ${
-                      !formData.positionId
-                        ? "text-gray-400 font-normal border-gray-300"
-                        : "text-gray-900 font-bold border-brand-300 bg-brand-50/20"
+                    className={`w-full pl-10 pr-9 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none bg-white cursor-pointer ${
+                      selectedJob
+                        ? "text-transparent border-amber-300/80 bg-gradient-to-r from-amber-50/40 via-red-50/20 to-white shadow-sm"
+                        : "text-gray-400 font-normal border-gray-300"
                     }`}
                     required
                   >
                     <option value="" disabled hidden className="text-gray-400">
                       Hãy chọn vị trí công việc phù hợp
                     </option>
-                    {jobsList.map((job) => (
-                      <option key={job.id} value={job.id}>
-                        {job.title} ({job.salaryDisplay || "Lương thỏa thuận"})
+                    {prioritizedJobsList.map((job) => (
+                      <option key={job.id} value={job.id} className="text-gray-900 font-medium bg-white">
+                        {job.title}
                       </option>
                     ))}
                   </select>
@@ -390,12 +489,12 @@ export default function QuickApplyModal({
 
                 {/* Card Liên Kết Thông Tin Công Việc Đang Chọn */}
                 {selectedJob && (
-                  <div className="mt-2 p-3 rounded-2xl bg-gradient-to-r from-amber-50/80 via-brand-50/40 to-white border border-amber-200/70 text-xs space-y-1.5 animate-in fade-in duration-150">
+                  <div className="mt-2 p-3 rounded-2xl bg-gradient-to-r from-amber-50/90 via-red-50/30 to-white border border-amber-200/80 text-xs space-y-1.5 animate-in fade-in duration-150 shadow-sm">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-extrabold text-brand-950 text-sm">
+                      <span className="font-black text-sm bg-gradient-to-r from-[#8E1B24] via-[#B83232] to-[#C9963F] bg-clip-text text-transparent">
                         {selectedJob.title}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-amber-950 uppercase tracking-wide">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 to-amber-400 text-amber-950 uppercase tracking-wide shadow-xs">
                         {selectedJob.category || "Tuyển gấp"}
                       </span>
                     </div>
@@ -429,7 +528,17 @@ export default function QuickApplyModal({
                 </label>
 
                 <div className="relative">
-                  <MapPin className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <MapPin className="w-4 h-4 text-brand-800 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+
+                  {/* Hiển thị địa chỉ chi nhánh kiểu Gradient sang trọng */}
+                  {selectedBranch && (
+                    <div className="absolute left-10 right-9 top-1/2 -translate-y-1/2 pointer-events-none truncate z-10 flex items-center">
+                      <span className="font-black text-sm bg-gradient-to-r from-[#8E1B24] via-[#B83232] to-[#C9963F] bg-clip-text text-transparent truncate">
+                        CN {selectedBranch.cnNumber} • {selectedBranch.address.includes(selectedBranch.district) ? selectedBranch.address : `${selectedBranch.address}, ${selectedBranch.district}`}
+                      </span>
+                    </div>
+                  )}
+
                   <select
                     value={formData.appliedRegion}
                     onChange={(e) =>
@@ -438,10 +547,10 @@ export default function QuickApplyModal({
                         appliedRegion: e.target.value,
                       }))
                     }
-                    className={`w-full pl-10 pr-4 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none bg-white cursor-pointer ${
-                      !formData.appliedRegion
-                        ? "text-gray-400 font-normal border-gray-300"
-                        : "text-gray-900 font-bold border-brand-300 bg-brand-50/20"
+                    className={`w-full pl-10 pr-9 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none bg-white cursor-pointer ${
+                      selectedBranch
+                        ? "text-transparent border-amber-300/80 bg-gradient-to-r from-amber-50/40 via-red-50/20 to-white shadow-sm"
+                        : "text-gray-400 font-normal border-gray-300"
                     }`}
                     required
                   >
@@ -454,25 +563,42 @@ export default function QuickApplyModal({
                       ⭐ Gần nhà nhất (HR sẽ liên hệ xếp chi nhánh gần bạn nhất)
                     </option>
 
-                    {/* Danh sách các chi nhánh thực tế từ database / admin */}
-                    {branchesList.map((b) => {
-                      const branchText = `CN ${b.cnNumber} (${b.district}): ${b.address}`;
-                      return (
-                        <option key={b.id} value={branchText}>
-                          CN {b.cnNumber} • {b.name} ({b.address}, {b.district})
-                        </option>
-                      );
-                    })}
+                    {/* Phân chia chi nhánh theo 3 vùng địa lý chuẩn như Footer */}
+                    {regionGroups.map((group) => (
+                      <optgroup
+                        key={group.title}
+                        label={`📍 ${group.title.toUpperCase()} (${group.subtitle})`}
+                        className="font-bold text-[#8E1B24] bg-amber-50/60"
+                      >
+                        {group.branches.map((b) => {
+                          const branchText = `CN ${b.cnNumber} (${b.district}): ${b.address}`;
+                          const displayAddr = b.address.includes(b.district)
+                            ? b.address
+                            : `${b.address}, ${b.district}`;
+                          return (
+                            <option
+                              key={b.id}
+                              value={branchText}
+                              className="font-normal text-gray-800 bg-white"
+                            >
+                              CN {b.cnNumber} • {displayAddr}
+                            </option>
+                          );
+                        })}
+                      </optgroup>
+                    ))}
                   </select>
                 </div>
 
                 {/* Card Liên Kết Hiển Thị Địa Chỉ Chi Tiết */}
                 {selectedBranch ? (
-                  <div className="mt-2 p-3 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-xs space-y-1.5 animate-in fade-in duration-150">
+                  <div className="mt-2 p-3 rounded-2xl bg-gradient-to-r from-amber-50/90 via-red-50/30 to-white border border-amber-200/80 text-xs space-y-1.5 animate-in fade-in duration-150 shadow-sm">
                     <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-1.5 font-black text-brand-950 text-sm">
+                      <div className="flex items-center gap-1.5 font-black text-sm">
                         <Building2 className="w-4 h-4 text-brand-800 shrink-0" />
-                        <span>CN {selectedBranch.cnNumber} - {selectedBranch.name}</span>
+                        <span className="font-black text-sm bg-gradient-to-r from-[#8E1B24] via-[#B83232] to-[#C9963F] bg-clip-text text-transparent">
+                          CN {selectedBranch.cnNumber} - {selectedBranch.name}
+                        </span>
                       </div>
                       {selectedBranch.mapUrl && (
                         <a
@@ -515,12 +641,12 @@ export default function QuickApplyModal({
               {/* ========================================================================= */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2">
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-                    Họ và tên của bạn <span className="text-red-500">*</span>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                    <span>Họ và tên</span>
+                    <span className="text-[11px] font-normal text-gray-400 normal-case">(Tùy chọn)</span>
                   </label>
                   <input
                     type="text"
-                    required
                     placeholder="VD: Nguyễn Văn An"
                     value={formData.fullName}
                     onChange={(e) =>
@@ -530,12 +656,12 @@ export default function QuickApplyModal({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-                    Tuổi <span className="text-red-500">*</span>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                    <span>Tuổi</span>
+                    <span className="text-[11px] font-normal text-gray-400 normal-case">(Tùy chọn)</span>
                   </label>
                   <input
                     type="number"
-                    required
                     min={16}
                     max={60}
                     placeholder="VD: 20"
@@ -571,26 +697,25 @@ export default function QuickApplyModal({
               </div>
 
               {/* ========================================================================= */}
-              {/* 5. EMAIL ỨNG VIÊN (BẮT BUỘC ĐỂ GỬI XÁC NHẬN TỰ ĐỘNG) */}
+              {/* 5. EMAIL ỨNG VIÊN */}
               {/* ========================================================================= */}
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                  <span>Email của bạn <span className="text-red-500">*</span></span>
-                  <span className="text-[10px] text-brand-800 font-semibold normal-case">
-                    Nhận xác nhận & lịch phone check
+                  <span>Email của bạn</span>
+                  <span className="text-[11px] font-normal text-gray-400 normal-case">
+                    (Không bắt buộc)
                   </span>
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="email"
-                    required
-                    placeholder="VD: nguyenvanan@gmail.com"
+                    placeholder="Khuyến khích điền email để xác nhận lịch phỏng vấn"
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    className="w-full pl-10 pr-3.5 py-2.5 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none font-medium text-gray-900"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none font-medium text-gray-900 placeholder:text-gray-400 placeholder:text-xs sm:placeholder:text-sm"
                   />
                 </div>
               </div>

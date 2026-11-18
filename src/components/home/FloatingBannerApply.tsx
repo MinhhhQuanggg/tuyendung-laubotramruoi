@@ -12,8 +12,8 @@ export default function FloatingBannerApply() {
   return (
     <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mb-10 relative z-20">
       <div className="bg-gradient-to-br from-white via-[#fffdf9] to-amber-50/40 rounded-3xl p-4 sm:p-7 lg:p-9 shadow-[0_22px_50px_-10px_rgba(28,5,5,0.28),0_12px_24px_-8px_rgba(0,0,0,0.16)] border border-amber-200/60 ring-1 ring-black/5 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-4 sm:gap-6 transition-all duration-300 hover:shadow-[0_28px_60px_-10px_rgba(28,5,5,0.36),0_16px_30px_-8px_rgba(0,0,0,0.2)]">
-        {/* Viền nhấn màu đỏ nâu & vàng đồng đồng bộ nhận diện thương hiệu */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-900 via-amber-500 to-brand-800" />
+        {/* Viền nhấn màu đỏ son & vàng đồng Option A (#3A0910 -> #C9963F -> #8E1B24) */}
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#3A0910] via-[#C9963F] to-[#8E1B24]" />
 
         {/* Khối bên trái: Icon Zalo chuẩn nhận diện & Tiêu đề đồng bộ màu thương hiệu */}
         <div className="flex items-center gap-3.5 sm:gap-6 w-full lg:w-auto">
@@ -84,7 +84,7 @@ export default function FloatingBannerApply() {
               href={zaloUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 sm:px-5 md:px-7 py-2 sm:py-2.5 md:py-3 rounded-full bg-gradient-to-r from-brand-900 via-brand-800 to-brand-900 hover:from-brand-950 hover:to-brand-850 text-white font-bold text-[12px] sm:text-sm md:text-base shadow-[0_6px_18px_rgba(139,30,30,0.4)] hover:shadow-[0_8px_24px_rgba(139,30,30,0.5)] hover:scale-105 active:scale-95 transition-all duration-200 shrink-0 cursor-pointer inline-flex items-center gap-1 sm:gap-1.5 whitespace-nowrap"
+              className="px-3 sm:px-5 md:px-7 py-2 sm:py-2.5 md:py-3 rounded-full bg-gradient-to-r from-[#3A0910] via-[#8E1B24] to-[#3A0910] hover:from-[#4a0d16] hover:to-[#4a0d16] text-white font-bold text-[12px] sm:text-sm md:text-base shadow-[0_6px_18px_rgba(142,27,36,0.4)] hover:shadow-[0_8px_24px_rgba(142,27,36,0.55)] border border-[#C9963F]/40 hover:scale-105 active:scale-95 transition-all duration-200 shrink-0 cursor-pointer inline-flex items-center gap-1 sm:gap-1.5 whitespace-nowrap"
             >
               <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300 shrink-0" />
               <span>Nhắn Zalo</span>

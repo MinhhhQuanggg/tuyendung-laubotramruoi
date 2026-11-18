@@ -661,7 +661,7 @@ export default function BranchesTab() {
                   required
                   value={editingBranch.address || ""}
                   onChange={(e) => setEditingBranch({ ...editingBranch, address: e.target.value })}
-                  placeholder="Ví dụ: 828 Sư Vạn Hạnh, Phường 12 (Hòa Hưng)"
+                  placeholder="Ví dụ: 828 Sư Vạn Hạnh, Quận 10"
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-medium focus:ring-2 focus:ring-brand-700 outline-none"
                 />
               </div>

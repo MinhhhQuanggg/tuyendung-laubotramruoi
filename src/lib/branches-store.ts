@@ -26,22 +26,20 @@ export async function getBranchesList(onlyActive = false): Promise<Branch[]> {
 
     const { data, error } = await query;
     if (!error && data && data.length > 0) {
-      return data
-        .filter((b: any) => !b.address?.includes("Biên Hòa") && b.city !== "Đồng Nai")
-        .map((b: any) => ({
-          id: b.id,
-          cnNumber: b.cn_number,
-          name: b.name,
-          address: b.address,
-          district: b.district,
-          city: b.city,
-          phone: b.phone || "0981256712",
-          region: b.region as RegionType,
-          mapUrl: b.map_url || undefined,
-          lat: b.lat ?? undefined,
-          lng: b.lng ?? undefined,
-          isActive: b.is_active ?? true,
-        }));
+      return data.map((b: any) => ({
+        id: b.id,
+        cnNumber: b.cn_number,
+        name: b.name,
+        address: b.address,
+        district: b.district,
+        city: b.city,
+        phone: b.phone || "0981256712",
+        region: b.region as RegionType,
+        mapUrl: b.map_url || undefined,
+        lat: b.lat ?? undefined,
+        lng: b.lng ?? undefined,
+        isActive: b.is_active ?? true,
+      }));
     }
   } catch (err) {
     console.error("Supabase load in getBranchesList failed:", err);

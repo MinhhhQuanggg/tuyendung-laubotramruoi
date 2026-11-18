@@ -16,20 +16,24 @@ const ENABLE_GOOGLE_SHEETS = false;
 const ENABLE_SLACK = false;
 
 const ApplySchema = z.object({
-  fullName: z.string().min(2, "Họ và tên tối thiểu 2 ký tự"),
-  age: z.string().min(1, "Vui lòng nhập tuổi"),
+  fullName: z.string().optional(),
+  age: z.string().optional(),
   phoneZalo: z
     .string()
     .regex(/^(0|\+84)[0-9]{9,10}$/, "Số điện thoại không hợp lệ"),
   email: z
     .string()
     .trim()
-    .min(1, "Vui lòng nhập địa chỉ email")
-    .email("Địa chỉ email không hợp lệ (ví dụ: tenban@gmail.com)"),
+    .optional()
+    .refine(
+      (val) => !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
+      "Địa chỉ email không hợp lệ (ví dụ: tenban@gmail.com)"
+    ),
   appliedRegion: z.string().optional(),
   address: z.string().optional(),
   positionId: z.string().min(1, "Vui lòng chọn vị trí ứng tuyển"),
   positionTitle: z.string().min(1, "Vị trí không hợp lệ"),
+  salaryDisplay: z.string().optional(),
   preferredBranch: z.string().optional(),
   cvFileName: z.string().optional(),
   cvBase64: z.string().optional(),
@@ -92,8 +96,12 @@ export async function POST(request: Request) {
 
     const candidatePayload = {
       ...validatedData,
+      fullName: validatedData.fullName?.trim() || "Ứng viên",
+      age: validatedData.age?.trim() || "",
+      email: validatedData.email?.trim() || "",
       appliedRegion: region,
       address: region,
+      salaryDisplay: validatedData.salaryDisplay,
       cvFileUrl: uploadedCvUrl,
     };
 
@@ -103,10 +111,10 @@ export async function POST(request: Request) {
     // 1. Lưu hồ sơ ứng viên vào Hệ thống Quản trị (Supabase + Local Store)
     try {
       const savedApp = await saveApplication({
-        fullName: validatedData.fullName,
-        age: validatedData.age,
+        fullName: candidatePayload.fullName,
+        age: candidatePayload.age,
         phoneZalo: validatedData.phoneZalo,
-        email: validatedData.email,
+        email: candidatePayload.email,
         appliedRegion: region,
         address: validatedData.address || region,
         positionId: validatedData.positionId,

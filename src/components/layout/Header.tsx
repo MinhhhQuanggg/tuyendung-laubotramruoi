@@ -321,9 +321,9 @@ export default function Header() {
 
   return (
     <>
-      {/* Header Container: Tự động ẩn khi cuộn xuống và hiện khi cuộn lên */}
+      {/* Header Container: Gradient Option A (Đỏ son + Vàng đồng) */}
       <header
-        className={`sticky top-0 z-50 bg-[#6B1414] shadow-lg transition-transform duration-300 ease-in-out ${
+        className={`sticky top-0 z-50 bg-gradient-to-r from-[#3A0910] via-[#6B1414] to-[#3A0910] border-b border-[#C9963F]/25 shadow-lg transition-transform duration-300 ease-in-out ${
           isVisible ? "translate-y-0" : "-translate-y-full"
         }`}
       >
