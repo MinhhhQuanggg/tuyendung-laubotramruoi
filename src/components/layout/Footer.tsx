@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { Branch } from "@/types/branch";
+import { REGION_METADATA, getBranchRegionKey } from "@/data/branches";
 import { MapPin, Navigation } from "lucide-react";
 import CurvedWaveDivider from "../common/CurvedWaveDivider";
 import BranchMap from "./BranchMap";
@@ -30,53 +31,94 @@ export default function Footer() {
     };
   }, []);
 
-  // Phân chia danh sách chi nhánh theo 3 vùng địa lý chuẩn (Phương án 1)
+  // Phân chia danh sách chi nhánh theo các cụm quận:
+  // Cột 1: Quận Đông (Ưu tiên Nguyễn Duy Trinh lên hàng đầu bên trái)
+  // Cột 2: Quận Trung Tâm 2 (Tân Bình, Tân Phú, Bình Thạnh, Phú Nhuận)
+  // Cột 3: Quận Bắc (Q12, Gò Vấp, Hóc Môn)
+  // Cột 4: Quận Trung Tâm (Q1, Q3, Q4, Q5, Q10) và Quận Tây (ở ngay dưới cột Quận Trung Tâm)
   const regionColumns = useMemo(() => {
-    // 1. Phía Đông & Đồng Nai: Thủ Đức, Quận 2, Quận 9, Biên Hòa
-    const col1Branches = branches
-      .filter(
-        (b) =>
-          ["Thủ Đức", "Quận 2", "Quận 9", "Biên Hòa", "Đồng Nai"].includes(b.district) ||
-          b.city === "Đồng Nai" ||
-          b.region === "thu-duc-khu-dong"
-      )
-      .sort((a, b) => a.cnNumber - b.cnNumber);
+    return REGION_METADATA.map((meta) => {
+      const colBranches = branches.filter((b) => getBranchRegionKey(b) === meta.key);
 
-    // 2. Phía Bắc: Gò Vấp, Bình Thạnh, Phú Nhuận
-    const col2Branches = branches
-      .filter((b) => ["Gò Vấp", "Bình Thạnh", "Phú Nhuận"].includes(b.district))
-      .sort((a, b) => a.cnNumber - b.cnNumber);
+      // Sắp xếp chi nhánh: với Quận Đông (hoặc bất kỳ nhóm nào có Nguyễn Duy Trinh), đưa Nguyễn Duy Trinh lên đầu tiên
+      colBranches.sort((a, b) => {
+        const isANdt = a.address.toLowerCase().includes("nguyễn duy trinh") || a.name.toLowerCase().includes("nguyễn duy trinh");
+        const isBNdt = b.address.toLowerCase().includes("nguyễn duy trinh") || b.name.toLowerCase().includes("nguyễn duy trinh");
+        if (isANdt && !isBNdt) return -1;
+        if (!isANdt && isBNdt) return 1;
+        return a.cnNumber - b.cnNumber;
+      });
 
-    // 3. Trung Tâm & Phía Nam / Tây: Quận 1, Quận 3, Quận 10, Tân Phú, Bình Tân
-    const col3Branches = branches
-      .filter(
-        (b) =>
-          !col1Branches.some((item) => item.id === b.id) &&
-          !col2Branches.some((item) => item.id === b.id)
-      )
-      .sort((a, b) => a.cnNumber - b.cnNumber);
-
-    return [
-      {
-        title: "Khu Vực Phía Đông & Đồng Nai",
-        subtitle: "TP. Thủ Đức • Quận 2 • Quận 9 • Biên Hòa",
-        count: col1Branches.length,
-        branches: col1Branches,
-      },
-      {
-        title: "Khu Vực Phía Bắc",
-        subtitle: "Gò Vấp • Bình Thạnh • Phú Nhuận",
-        count: col2Branches.length,
-        branches: col2Branches,
-      },
-      {
-        title: "Khu Vực Trung Tâm & Nam / Tây",
-        subtitle: "Quận 1 • Quận 3 • Quận 10 • Tân Phú • Bình Tân",
-        count: col3Branches.length,
-        branches: col3Branches,
-      },
-    ];
+      return {
+        key: meta.key,
+        code: meta.code,
+        title: meta.title,
+        subtitle: meta.subtitle,
+        count: colBranches.length,
+        branches: colBranches,
+      };
+    });
   }, [branches]);
+
+  const colDong = regionColumns.find((c) => c.key === "qdong");
+  const colTT2 = regionColumns.find((c) => c.key === "qtt2");
+  const colBac = regionColumns.find((c) => c.key === "qbac");
+  const colTT = regionColumns.find((c) => c.key === "qtt");
+  const colTay = regionColumns.find((c) => c.key === "qtay");
+
+  // Render card cụm chi nhánh
+  const renderRegionCard = (col: (typeof regionColumns)[0]) => (
+    <div key={col.key} className="space-y-3">
+      {/* Header Tiêu Đề Của Từng Cụm */}
+      <div className="pb-2 border-b border-brand-900/80 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          <h4 className="text-white font-bold text-sm sm:text-base tracking-wide truncate">
+            {col.title}
+          </h4>
+        </div>
+        <span className="shrink-0 ml-2 text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-amber-300">
+          {col.count} tiệm
+        </span>
+      </div>
+
+      {/* Danh Sách Chi Nhánh Trong Cụm */}
+      <div className="space-y-1">
+        {col.branches.map((b) => (
+          <a
+            key={b.id}
+            href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+              "Lẩu Bò Trăm Rưỡi " + b.address
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={`Mở chỉ đường Google Maps tới CN ${b.cnNumber} (${b.name})`}
+            className={`group flex items-start gap-2.5 py-1.5 px-2 rounded-lg hover:bg-white/[0.06] transition-all duration-150 text-left cursor-pointer ${
+              b.address.toLowerCase().includes("nguyễn duy trinh")
+                ? "bg-amber-400/[0.08] border border-amber-400/20"
+                : ""
+            }`}
+          >
+            {/* Badge CN + số thứ tự đồng bộ với ghim trên Google Maps */}
+            <span className="shrink-0 px-2 py-0.5 mt-0.5 rounded-md bg-amber-400 text-brand-950 font-black text-xs shadow-sm group-hover:scale-105 transition-transform">
+              CN {b.cnNumber}
+            </span>
+
+            {/* Tên & Địa chỉ chi nhánh */}
+            <div className="min-w-0 flex-1">
+              <div className="text-white text-xs sm:text-sm font-bold group-hover:text-amber-300 transition-colors flex items-center justify-between gap-1">
+                <span className="truncate">{b.name}</span>
+                <Navigation className="w-3 h-3 text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+              </div>
+              <p className="text-gray-400 text-xs sm:text-[13px] leading-snug line-clamp-1 group-hover:text-gray-200 transition-colors mt-0.5">
+                {b.address}
+              </p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <footer
@@ -95,73 +137,34 @@ export default function Footer() {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8 flex-1 flex flex-col justify-between w-full relative z-10 space-y-6">
-        {/* PHẦN TRÊN: DANH SÁCH ĐỊA CHỈ CHI NHÁNH CHIA 3 CỘT THEO 3 VÙNG ĐỊA LÝ */}
+        {/* PHẦN TRÊN: DANH SÁCH ĐỊA CHỈ CHI NHÁNH CHIA 4 CỘT: QUẬN ĐÔNG | QUẬN TRUNG TÂM 2 | QUẬN BẮC | QUẬN TRUNG TÂM (CỘT QUẬN TÂY Ở DƯỚI) */}
         <div className="pb-6 border-b border-brand-900/80">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-white font-extrabold text-sm sm:text-base md:text-lg uppercase tracking-wider flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
-              Hệ Thống {branches.length > 0 ? `${branches.length} ` : ""}Chi Nhánh Lẩu Bò Trăm Rưỡi
+              Danh Sách Tiệm Lẩu Bò Trăm Rưỡi ({branches.length > 0 ? `${branches.length} ` : ""}Chi Nhánh)
             </h3>
             <span className="text-xs text-amber-200/80 font-medium bg-white/5 border border-white/10 px-3 py-1 rounded-full">
-              📍 Phân bổ đồng đều theo 3 vùng địa lý
+              📍 Phân nhóm theo 4 cột (Quận Đông • Quận Trung Tâm 2 • Quận Bắc • Quận Trung Tâm & Tây)
             </span>
           </div>
 
-          {/* GRID 3 CỘT ĐỊA CHỈ THEO 3 VÙNG ĐỊA LÝ - THIẾT KẾ KHÔNG KHUNG THOÁNG ĐẸP */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
-            {regionColumns.map((col, colIdx) => (
-              <div key={colIdx} className="space-y-3">
-                {/* Header Tiêu Đề Của Từng Vùng */}
-                <div className="pb-2 border-b border-brand-900/80 flex items-center justify-between">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                      <h4 className="text-white font-bold text-sm sm:text-base tracking-wide truncate">
-                        {col.title}
-                      </h4>
-                    </div>
-                    <p className="text-[11px] sm:text-xs text-amber-200/70 font-medium truncate mt-0.5">
-                      {col.subtitle}
-                    </p>
-                  </div>
-                  <span className="shrink-0 ml-2 text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-amber-300">
-                    {col.count} tiệm
-                  </span>
-                </div>
+          {/* GRID 4 CỘT: QUẬN ĐÔNG | QUẬN TRUNG TÂM 2 | QUẬN BẮC | QUẬN TRUNG TÂM (CỘT QUẬN TÂY Ở DƯỚI) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 lg:gap-x-7 gap-y-7">
+            {/* Cột 1: Quận Đông (Nguyễn Duy Trinh lên hàng đầu bên trái) */}
+            {colDong && renderRegionCard(colDong)}
 
-                {/* Danh Sách Chi Nhánh Trong Vùng */}
-                <div className="space-y-1">
-                  {col.branches.map((b) => (
-                    <a
-                      key={b.id}
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-                        "Lẩu Bò Trăm Rưỡi " + b.address
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={`Mở chỉ đường Google Maps tới CN ${b.cnNumber} (${b.name})`}
-                      className="group flex items-start gap-2.5 py-1.5 px-2 rounded-lg hover:bg-white/[0.06] transition-all duration-150 text-left cursor-pointer"
-                    >
-                      {/* Badge CN + số thứ tự đồng bộ với ghim trên Google Maps */}
-                      <span className="shrink-0 px-2 py-0.5 mt-0.5 rounded-md bg-amber-400 text-brand-950 font-black text-xs shadow-sm group-hover:scale-105 transition-transform">
-                        CN {b.cnNumber}
-                      </span>
+            {/* Cột 2: Quận Trung Tâm 2 */}
+            {colTT2 && renderRegionCard(colTT2)}
 
-                      {/* Tên & Địa chỉ chi nhánh */}
-                      <div className="min-w-0 flex-1">
-                        <div className="text-white text-xs sm:text-sm font-bold group-hover:text-amber-300 transition-colors flex items-center justify-between gap-1">
-                          <span className="truncate">{b.name}</span>
-                          <Navigation className="w-3 h-3 text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                        </div>
-                        <p className="text-gray-400 text-xs sm:text-[13px] leading-snug line-clamp-1 group-hover:text-gray-200 transition-colors mt-0.5">
-                          {b.address}
-                        </p>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ))}
+            {/* Cột 3: Quận Bắc */}
+            {colBac && renderRegionCard(colBac)}
+
+            {/* Cột 4: Quận Trung Tâm (trên) & Quận Tây (ở dưới cột Quận Trung Tâm) */}
+            <div className="space-y-6">
+              {colTT && renderRegionCard(colTT)}
+              {colTay && renderRegionCard(colTay)}
+            </div>
           </div>
         </div>
 

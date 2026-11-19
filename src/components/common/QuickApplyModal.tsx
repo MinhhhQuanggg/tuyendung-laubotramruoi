@@ -7,7 +7,6 @@ import {
   Send,
   CheckCircle2,
   Phone,
-  Sparkles,
   MapPin,
   FileUp,
   FileText,
@@ -16,15 +15,64 @@ import {
   DollarSign,
   Clock,
   ExternalLink,
-  Building2,
-  Check,
   Mail,
 } from "lucide-react";
 import { QuickApplyConfig } from "@/types/quick-apply";
 import { Branch } from "@/types/branch";
 import { JobItem } from "@/types/job";
-import { ALL_BRANCHES } from "@/data/branches";
+import { ALL_BRANCHES, REGION_METADATA, getBranchRegionKey } from "@/data/branches";
 import { MOCK_JOBS_DATA } from "@/data/mock-jobs";
+
+/**
+ * Chỉ các công việc thực sự là học việc, học nghề mới hiển thị huy hiệu "Học nghề có lương"
+ */
+export function isHocViecJob(
+  job?: JobItem | { title?: string; category?: string; slug?: string } | null
+): boolean {
+  if (!job) return false;
+  const title = (job.title || "").toLowerCase();
+  const category = (job.category || "").toLowerCase();
+  const slug = (job.slug || "").toLowerCase();
+
+  // Chức danh giám sát, quản lý, trưởng bếp thực thụ tuyệt đối không phải học việc (trừ khi có từ học việc/học nghề)
+  if (
+    !title.includes("học việc") &&
+    !title.includes("học nghề") &&
+    !slug.includes("hoc-viec") &&
+    !slug.includes("hoc-nghe") &&
+    (title.includes("giám sát") ||
+      title.includes("quản lý") ||
+      title.includes("trưởng") ||
+      category.includes("quản lý") ||
+      category.includes("trưởng"))
+  ) {
+    return false;
+  }
+
+  return (
+    title.includes("học việc") ||
+    title.includes("học nghề") ||
+    slug.includes("hoc-viec") ||
+    slug.includes("hoc-nghe") ||
+    category.includes("học nghề")
+  );
+}
+
+/**
+ * Tạo đường dẫn mở bản đồ Google Maps cho chi nhánh
+ */
+function getBranchMapsUrl(branch?: Branch | null): string {
+  if (!branch) {
+    return "https://www.google.com/maps/search/?api=1&query=L%E1%BA%A3u+B%C3%B2+Tr%C4%83m+R%C6%B0%E1%BB%A1i";
+  }
+  if (branch.mapUrl) return branch.mapUrl;
+  if (branch.lat && branch.lng) {
+    return `https://www.google.com/maps/search/?api=1&query=${branch.lat},${branch.lng}`;
+  }
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `Lẩu Bò Trăm Rưỡi CN ${branch.cnNumber} ${branch.address}`
+  )}`;
+}
 
 interface QuickApplyModalProps {
   isOpen: boolean;
@@ -115,7 +163,6 @@ export default function QuickApplyModal({
   // Tự động liên kết và ưu tiên chọn sẵn vị trí Giám sát Bếp Chi Nhánh & Chi nhánh Nguyễn Duy Trinh Q2
   useEffect(() => {
     if (isOpen) {
-      // 1. Vị trí công việc: Ưu tiên defaultPosition được truyền vào, nếu không thì ưu tiên "Giám sát Bếp Chi Nhánh"
       const targetIdentifier = defaultPositionSlug || defaultPositionId;
       let foundJob: JobItem | undefined;
 
@@ -129,7 +176,6 @@ export default function QuickApplyModal({
       }
 
       if (!foundJob) {
-        // Mặc định ưu tiên vị trí "Giám sát Bếp Chi Nhánh"
         foundJob = jobsList.find(
           (j) =>
             j.slug === "giam-sat-bep" ||
@@ -137,7 +183,6 @@ export default function QuickApplyModal({
         );
       }
 
-      // 2. Chi nhánh: Mặc định ưu tiên chi nhánh "210 Nguyễn Duy Trinh, Quận 2"
       let defaultBranchText = "CN 14 (Quận 2): 210 Nguyễn Duy Trinh, Quận 2";
       const ndtBranch = branchesList.find(
         (b) =>
@@ -188,55 +233,33 @@ export default function QuickApplyModal({
     );
   }, [branchesList, formData.appliedRegion]);
 
-  // Phân chia danh sách chi nhánh theo 3 vùng địa lý chuẩn như Footer (Phương án 1)
+  // Phân chia danh sách chi nhánh theo 5 cụm quận (Quận Đông • Quận Trung Tâm 2 • Quận Bắc • Quận Trung Tâm • Quận Tây)
   const regionGroups = useMemo(() => {
-    // 1. Phía Đông & Đồng Nai: Thủ Đức, Quận 2, Quận 9, Biên Hòa (Ưu tiên Nguyễn Duy Trinh Q2 lên đầu)
-    const col1Branches = branchesList
-      .filter(
-        (b) =>
-          ["Thủ Đức", "Quận 2", "Quận 9", "Biên Hòa", "Đồng Nai"].includes(b.district) ||
-          b.city === "Đồng Nai" ||
-          b.region === "thu-duc-khu-dong"
-      )
-      .sort((a, b) => {
-        const isANdt = a.address.toLowerCase().includes("nguyễn duy trinh");
-        const isBNdt = b.address.toLowerCase().includes("nguyễn duy trinh");
+    return REGION_METADATA.map((meta) => {
+      const branches = branchesList.filter(
+        (b) => getBranchRegionKey(b) === meta.key
+      );
+
+      branches.sort((a, b) => {
+        const isANdt =
+          a.address.toLowerCase().includes("nguyễn duy trinh") ||
+          a.name.toLowerCase().includes("nguyễn duy trinh");
+        const isBNdt =
+          b.address.toLowerCase().includes("nguyễn duy trinh") ||
+          b.name.toLowerCase().includes("nguyễn duy trinh");
         if (isANdt && !isBNdt) return -1;
         if (!isANdt && isBNdt) return 1;
         return a.cnNumber - b.cnNumber;
       });
 
-    // 2. Phía Bắc: Gò Vấp, Bình Thạnh, Phú Nhuận
-    const col2Branches = branchesList
-      .filter((b) => ["Gò Vấp", "Bình Thạnh", "Phú Nhuận"].includes(b.district))
-      .sort((a, b) => a.cnNumber - b.cnNumber);
-
-    // 3. Trung Tâm & Phía Nam / Tây: Quận 1, Quận 3, Quận 10, Tân Phú, Bình Tân
-    const col3Branches = branchesList
-      .filter(
-        (b) =>
-          !col1Branches.some((item) => item.id === b.id) &&
-          !col2Branches.some((item) => item.id === b.id)
-      )
-      .sort((a, b) => a.cnNumber - b.cnNumber);
-
-    return [
-      {
-        title: "Khu Vực Phía Đông & Đồng Nai",
-        subtitle: "Thủ Đức • Quận 2 • Quận 9 • Biên Hòa",
-        branches: col1Branches,
-      },
-      {
-        title: "Khu Vực Phía Bắc",
-        subtitle: "Gò Vấp • Bình Thạnh • Phú Nhuận",
-        branches: col2Branches,
-      },
-      {
-        title: "Khu Vực Trung Tâm & Nam / Tây",
-        subtitle: "Quận 1 • Quận 3 • Quận 10 • Tân Phú • Bình Tân",
-        branches: col3Branches,
-      },
-    ];
+      return {
+        key: meta.key,
+        code: meta.code,
+        title: meta.title,
+        subtitle: meta.subtitle,
+        branches,
+      };
+    }).filter((group) => group.branches.length > 0);
   }, [branchesList]);
 
   if (!isOpen) return null;
@@ -286,8 +309,8 @@ export default function QuickApplyModal({
     return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setLoading(true);
     setErrorMsg("");
 
@@ -377,273 +400,245 @@ export default function QuickApplyModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/65 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 max-h-[92vh] flex flex-col"
+        className="relative w-full max-w-lg md:max-w-[615px] bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-gray-100 max-h-[96vh] sm:max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Modal - Gradient Option A (Đỏ son + Vàng đồng) */}
-        <div className="bg-gradient-to-r from-[#8E1B24] via-[#5c1015] to-[#3A0910] text-white p-5 sm:p-6 relative shrink-0 flex items-center gap-3.5 pr-14 border-b border-[#C9963F]/30">
-          <Image
-            src="/logo.webp"
-            alt="Lẩu Bò Trăm Rưỡi"
-            width={48}
-            height={48}
-            className="w-11 h-11 sm:w-12 sm:h-12 object-contain shrink-0 drop-shadow-sm"
-          />
-          <div>
-            <h3 className="text-xl sm:text-[22px] font-bold">{config.formTitle}</h3>
-            <p className="text-xs sm:text-sm text-red-100 mt-1">
-              {config.formSubtitle}
-            </p>
+        <div className="bg-gradient-to-r from-[#8E1B24] via-[#5c1015] to-[#3A0910] text-white p-3 sm:p-4 md:p-5 px-4 sm:px-5 md:px-6 relative shrink-0 flex items-center justify-between gap-3 border-b border-[#C9963F]/30">
+          <div className="flex items-center gap-2.5 sm:gap-3 md:gap-3.5 min-w-0">
+            <Image
+              src="/logo.webp"
+              alt="Lẩu Bò Trăm Rưỡi"
+              width={48}
+              height={48}
+              className="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 object-contain shrink-0 drop-shadow-sm"
+            />
+            <div className="min-w-0">
+              <h3 className="text-base sm:text-lg md:text-[21px] font-bold truncate leading-tight">{config.formTitle}</h3>
+              <p className="text-[11px] sm:text-xs md:text-sm text-red-100 truncate mt-0.5 leading-tight">
+                {config.formSubtitle}
+              </p>
+            </div>
           </div>
-          <button
-            onClick={handleResetAndClose}
-            className="absolute top-5 right-5 p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-            aria-label="Đóng"
-          >
-            <X className="w-5 h-5 text-white" />
-          </button>
+
+          <div className="flex items-center gap-2 md:gap-3 shrink-0">
+            {/* Nút Submit ở Header (tránh lỗi bàn phím điện thoại che nút bên dưới) */}
+            {!success && (
+              <button
+                type="submit"
+                form="quick-apply-form"
+                onClick={() => handleSubmit()}
+                disabled={loading}
+                className="px-3 sm:px-3.5 md:px-4 py-1.5 sm:py-2 md:py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:brightness-105 active:scale-95 text-[#3A0910] font-black text-xs sm:text-sm md:text-base shadow-md flex items-center gap-1.5 md:gap-2 cursor-pointer disabled:opacity-70 transition-all shrink-0"
+                title="Bấm để nộp đơn ứng tuyển ngay"
+              >
+                {loading ? (
+                  <div className="w-3.5 h-3.5 md:w-4 md:h-4 border-2 border-[#3A0910] border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#3A0910]" />
+                    <span>Nộp đơn</span>
+                  </>
+                )}
+              </button>
+            )}
+
+            <button
+              onClick={handleResetAndClose}
+              className="p-1.5 md:p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer text-white"
+              aria-label="Đóng"
+            >
+              <X className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+            </button>
+          </div>
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 sm:p-6 overflow-y-auto space-y-4">
+        <div className="p-3 sm:p-4 md:p-6 overflow-y-auto space-y-2.5 sm:space-y-3 md:space-y-4">
           {success ? (
-            <div className="text-center py-6">
-              <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4 animate-bounce" />
-              <h4 className="text-xl font-bold text-gray-900 mb-2">
+            <div className="text-center py-4 sm:py-6 md:py-8">
+              <CheckCircle2 className="w-14 h-14 md:w-16 md:h-16 text-emerald-500 mx-auto mb-3 md:mb-4 animate-bounce" />
+              <h4 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1.5 md:mb-2">
                 {config.successTitle}
               </h4>
-              <p className="text-sm text-gray-600 mb-6">
+              <p className="text-xs sm:text-sm md:text-base text-gray-600 mb-4 md:mb-5 max-w-sm md:max-w-md mx-auto">
                 {config.successMessage}
               </p>
-              <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-emerald-800 text-xs text-left mb-6 space-y-2">
+              <div className="p-3 md:p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-emerald-800 text-xs md:text-sm text-left mb-4 md:mb-5 space-y-1.5 md:space-y-2">
                 <div>💡 <b>Lưu ý:</b> {config.successNote}</div>
                 {formData.email && (
-                  <div className="pt-2 border-t border-emerald-200/60 text-emerald-950 font-medium leading-relaxed">
-                    ✉️ Email xác nhận và hướng dẫn chi tiết đã được gửi tự động tới <b>{formData.email}</b>. Bạn vui lòng kiểm tra hộp thư (cả mục Quảng cáo/Spam) nhé!
+                  <div className="pt-1.5 md:pt-2 border-t border-emerald-200/60 text-emerald-950 font-medium leading-relaxed">
+                    ✉️ Email xác nhận và hướng dẫn chi tiết đã được gửi tự động tới <b>{formData.email}</b>. Bạn vui lòng kiểm tra hộp thư nhé!
                   </div>
                 )}
               </div>
               <button
                 onClick={handleResetAndClose}
-                className="w-full py-3 bg-brand-800 hover:bg-brand-900 text-white font-semibold rounded-xl transition cursor-pointer"
+                className="w-full py-2.5 md:py-3.5 bg-brand-800 hover:bg-brand-900 text-white font-semibold rounded-xl transition cursor-pointer text-sm md:text-base"
               >
                 Đóng cửa sổ
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form id="quick-apply-form" onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3 md:space-y-4">
               {errorMsg && (
-                <div className="p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200">
+                <div className="p-2.5 md:p-3 bg-red-50 text-red-700 text-xs md:text-sm rounded-xl border border-red-200">
                   {errorMsg}
                 </div>
               )}
 
               {/* ========================================================================= */}
-              {/* 1. VỊ TRÍ CÔNG VIỆC (LIÊN KẾT ĐỘNG VỚI DANH MỤC VIỆC LÀM) */}
+              {/* 1. VỊ TRÍ ỨNG TUYỂN & LƯƠNG (KHÔNG DUPLICATE, LƯƠNG TO NỔI BẬT NGANG TIÊU ĐỀ) */}
               {/* ========================================================================= */}
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                  <span>Vị trí muốn ứng tuyển <span className="text-red-500">*</span></span>
-                  {selectedJob && (
-                    <span className="text-[11px] font-semibold text-brand-800 normal-case flex items-center gap-1">
-                      <Check className="w-3 h-3 text-emerald-600" />
-                      Đã liên kết việc làm
-                    </span>
-                  )}
+                <label className="block text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wider mb-1 md:mb-1.5">
+                  <span>Vị trí muốn ứng tuyển</span> <span className="text-red-500">*</span>
                 </label>
-
                 <div className="relative">
-                  <Briefcase className="w-4 h-4 text-brand-800 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
-
-                  {/* Hiển thị tiêu đề vị trí kiểu Gradient sang trọng */}
-                  {selectedJob && (
-                    <div className="absolute left-10 right-9 top-1/2 -translate-y-1/2 pointer-events-none truncate z-10 flex items-center">
-                      <span className="font-black text-sm bg-gradient-to-r from-[#8E1B24] via-[#B83232] to-[#C9963F] bg-clip-text text-transparent truncate">
-                        {selectedJob.title}
-                      </span>
-                    </div>
-                  )}
-
+                  <Briefcase className="w-3.5 h-3.5 md:w-4 md:h-4 text-brand-800 absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <select
                     value={formData.positionId}
                     onChange={handlePositionChange}
-                    className={`w-full pl-10 pr-9 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none bg-white cursor-pointer ${
-                      selectedJob
-                        ? "text-transparent border-amber-300/80 bg-gradient-to-r from-amber-50/40 via-red-50/20 to-white shadow-sm"
-                        : "text-gray-400 font-normal border-gray-300"
-                    }`}
+                    className="w-full pl-8 md:pl-9.5 pr-7 py-2 md:py-2.5 text-xs sm:text-sm md:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none bg-white font-bold text-gray-900 truncate"
                     required
                   >
-                    <option value="" disabled hidden className="text-gray-400">
-                      Hãy chọn vị trí công việc phù hợp
-                    </option>
                     {prioritizedJobsList.map((job) => (
-                      <option key={job.id} value={job.id} className="text-gray-900 font-medium bg-white">
+                      <option key={job.id} value={job.id}>
                         {job.title}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                {/* Card Liên Kết Thông Tin Công Việc Đang Chọn */}
-                {selectedJob && (
-                  <div className="mt-2 p-3 rounded-2xl bg-gradient-to-r from-amber-50/90 via-red-50/30 to-white border border-amber-200/80 text-xs space-y-1.5 animate-in fade-in duration-150 shadow-sm">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-black text-sm bg-gradient-to-r from-[#8E1B24] via-[#B83232] to-[#C9963F] bg-clip-text text-transparent">
-                        {selectedJob.title}
-                      </span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 to-amber-400 text-amber-950 uppercase tracking-wide shadow-xs">
-                        {selectedJob.category || "Tuyển gấp"}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 pt-1 text-gray-700 text-[11px]">
-                      <div className="flex items-center gap-1.5 font-bold text-brand-900">
-                        <DollarSign className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-                        <span>Lương: {selectedJob.salaryDisplay}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-gray-600 truncate">
-                        <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                        <span className="truncate">{selectedJob.workHours || selectedJob.workTypeDisplay || "Ca xoay / linh hoạt"}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* ========================================================================= */}
-              {/* 2. ĐỊA CHỈ CHI NHÁNH (LIÊN KẾT ĐỘNG VỚI HỆ THỐNG CHI NHÁNH) */}
-              {/* ========================================================================= */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                  <span>Địa chỉ chi nhánh làm việc <span className="text-red-500">*</span></span>
-                  {selectedBranch && (
-                    <span className="text-[11px] font-semibold text-brand-800 normal-case flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-red-600" />
-                      {selectedBranch.district}
+                {/* Khối LƯƠNG: Font size to ngang Tiêu đề title, nổi bật & không bị duplicate */}
+                <div className="mt-1.5 md:mt-2 px-3 md:px-3.5 py-1.5 sm:py-2 md:py-2.5 rounded-xl bg-gradient-to-r from-amber-50/90 via-red-50/30 to-white border border-amber-200/80 flex items-center justify-between gap-2 shadow-xs">
+                  <div className="flex items-center gap-1.5 md:gap-2 min-w-0">
+                    <DollarSign className="w-4 h-4 md:w-5 md:h-5 text-amber-700 shrink-0" />
+                    <span className="font-black text-sm sm:text-base md:text-lg bg-gradient-to-r from-[#8E1B24] via-[#B83232] to-[#C9963F] bg-clip-text text-transparent truncate">
+                      Lương: {selectedJob?.salaryDisplay || "Thoả thuận hấp dẫn"}
                     </span>
-                  )}
-                </label>
+                  </div>
 
-                <div className="relative">
-                  <MapPin className="w-4 h-4 text-brand-800 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
-
-                  {/* Hiển thị địa chỉ chi nhánh kiểu Gradient sang trọng */}
-                  {selectedBranch && (
-                    <div className="absolute left-10 right-9 top-1/2 -translate-y-1/2 pointer-events-none truncate z-10 flex items-center">
-                      <span className="font-black text-sm bg-gradient-to-r from-[#8E1B24] via-[#B83232] to-[#C9963F] bg-clip-text text-transparent truncate">
-                        CN {selectedBranch.cnNumber} • {selectedBranch.address.includes(selectedBranch.district) ? selectedBranch.address : `${selectedBranch.address}, ${selectedBranch.district}`}
+                  <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
+                    {/* Chỉ có học việc mới có thẻ Học nghề có lương */}
+                    {isHocViecJob(selectedJob) && (
+                      <span className="px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-black bg-gradient-to-r from-amber-500 to-amber-400 text-amber-950 uppercase tracking-wide shadow-xs">
+                        Học nghề có lương
                       </span>
-                    </div>
-                  )}
+                    )}
 
-                  <select
-                    value={formData.appliedRegion}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        appliedRegion: e.target.value,
-                      }))
-                    }
-                    className={`w-full pl-10 pr-9 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none bg-white cursor-pointer ${
-                      selectedBranch
-                        ? "text-transparent border-amber-300/80 bg-gradient-to-r from-amber-50/40 via-red-50/20 to-white shadow-sm"
-                        : "text-gray-400 font-normal border-gray-300"
-                    }`}
-                    required
-                  >
-                    <option value="" disabled hidden className="text-gray-400">
-                      Hãy chọn chi nhánh gần bạn nhất
-                    </option>
-
-                    {/* Lựa chọn linh hoạt */}
-                    <option value="Gần nhà nhất (HR liên hệ xếp chi nhánh thuận tiện)">
-                      ⭐ Gần nhà nhất (HR sẽ liên hệ xếp chi nhánh gần bạn nhất)
-                    </option>
-
-                    {/* Phân chia chi nhánh theo 3 vùng địa lý chuẩn như Footer */}
-                    {regionGroups.map((group) => (
-                      <optgroup
-                        key={group.title}
-                        label={`📍 ${group.title.toUpperCase()} (${group.subtitle})`}
-                        className="font-bold text-[#8E1B24] bg-amber-50/60"
-                      >
-                        {group.branches.map((b) => {
-                          const branchText = `CN ${b.cnNumber} (${b.district}): ${b.address}`;
-                          const displayAddr = b.address.includes(b.district)
-                            ? b.address
-                            : `${b.address}, ${b.district}`;
-                          return (
-                            <option
-                              key={b.id}
-                              value={branchText}
-                              className="font-normal text-gray-800 bg-white"
-                            >
-                              CN {b.cnNumber} • {displayAddr}
-                            </option>
-                          );
-                        })}
-                      </optgroup>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Card Liên Kết Hiển Thị Địa Chỉ Chi Tiết */}
-                {selectedBranch ? (
-                  <div className="mt-2 p-3 rounded-2xl bg-gradient-to-r from-amber-50/90 via-red-50/30 to-white border border-amber-200/80 text-xs space-y-1.5 animate-in fade-in duration-150 shadow-sm">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-1.5 font-black text-sm">
-                        <Building2 className="w-4 h-4 text-brand-800 shrink-0" />
-                        <span className="font-black text-sm bg-gradient-to-r from-[#8E1B24] via-[#B83232] to-[#C9963F] bg-clip-text text-transparent">
-                          CN {selectedBranch.cnNumber} - {selectedBranch.name}
-                        </span>
-                      </div>
-                      {selectedBranch.mapUrl && (
-                        <a
-                          href={selectedBranch.mapUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[11px] font-bold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 shrink-0"
-                          title="Xem vị trí trên Google Maps"
-                        >
-                          <span>Bản đồ</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      )}
-                    </div>
-
-                    <div className="text-gray-700 text-xs leading-relaxed flex items-start gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-red-600 shrink-0 mt-0.5" />
-                      <span>{selectedBranch.address}, {selectedBranch.district}, {selectedBranch.city || "TP.HCM"}</span>
-                    </div>
-
-                    {selectedBranch.phone && (
-                      <div className="text-[11px] text-gray-500 flex items-center gap-1.5 pt-0.5">
-                        <Phone className="w-3 h-3 text-emerald-600 shrink-0" />
-                        <span>Hotline chi nhánh: <b>{selectedBranch.phone}</b></span>
+                    {selectedJob?.workHours && (
+                      <div className="text-[11px] md:text-xs text-gray-500 flex items-center gap-1 font-medium hidden sm:flex">
+                        <Clock className="w-3 h-3 md:w-3.5 md:h-3.5 text-blue-600 shrink-0" />
+                        <span className="truncate max-w-[130px] md:max-w-[170px]">{selectedJob.workHours}</span>
                       </div>
                     )}
                   </div>
-                ) : formData.appliedRegion.startsWith("Gần nhà nhất") ? (
-                  <div className="mt-2 p-2.5 rounded-xl bg-blue-50/80 border border-blue-200/80 text-[11px] text-blue-900 leading-relaxed flex items-center gap-2">
-                    <span>💡</span>
-                    <span>
-                      <b>Tuyệt vời!</b> Anh Kiên HR sẽ gọi điện hỏi địa chỉ nhà bạn và sắp xếp chi nhánh gần bạn nhất để tiện đi lại.
-                    </span>
-                  </div>
-                ) : null}
+                </div>
               </div>
 
               {/* ========================================================================= */}
-              {/* 3. HỌ TÊN & TUỔI */}
+              {/* 2. ĐỊA CHỈ CHI NHÁNH (KẾ BÊN ĐỊA CHỈ THÊM NÚT ĐIỀU HƯỚNG TỚI MAPS, BỎ HOTLINE, KHÔNG DUPLICATE) */}
               {/* ========================================================================= */}
-              <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="block text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wider mb-1 md:mb-1.5">
+                  <span>Địa chỉ chi nhánh làm việc</span> <span className="text-red-500">*</span>
+                </label>
+
+                <div className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5">
+                  <div className="relative flex-1 min-w-0">
+                    <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-brand-800 absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <select
+                      value={formData.appliedRegion}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          appliedRegion: e.target.value,
+                        }))
+                      }
+                      className="w-full pl-8 md:pl-9.5 pr-6 py-2 md:py-2.5 text-xs sm:text-sm md:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none bg-white font-medium text-gray-800 truncate"
+                      required
+                    >
+                      <option value="" disabled hidden>
+                        Chọn chi nhánh gần bạn nhất
+                      </option>
+                      <option value="Gần nhà nhất (HR liên hệ xếp chi nhánh thuận tiện)">
+                        ⭐ Gần nhà nhất (HR sẽ liên hệ xếp chi nhánh gần bạn)
+                      </option>
+                      {regionGroups.map((group) => (
+                        <optgroup
+                          key={group.key}
+                          label={`📍 ${group.title.toUpperCase()}`}
+                          className="font-bold text-[#8E1B24] bg-amber-50/60"
+                        >
+                          {group.branches.map((b) => {
+                            const branchText = `CN ${b.cnNumber} (${b.district}): ${b.address}`;
+                            const displayAddr = b.address.includes(b.district)
+                              ? b.address
+                              : `${b.address}, ${b.district}`;
+                            return (
+                              <option
+                                key={b.id}
+                                value={branchText}
+                                className="font-normal text-gray-800 bg-white"
+                              >
+                                CN {b.cnNumber} • {displayAddr}
+                              </option>
+                            );
+                          })}
+                        </optgroup>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Nút điều hướng tới Google Maps kế bên địa chỉ */}
+                  <a
+                    href={getBranchMapsUrl(selectedBranch)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2.5 sm:px-3 md:px-3.5 py-2 md:py-2.5 rounded-xl bg-gradient-to-r from-amber-50 to-amber-100/80 hover:from-amber-100 hover:to-amber-200 text-brand-950 border border-amber-300/80 text-xs md:text-sm font-bold flex items-center gap-1 md:gap-1.5 shrink-0 transition shadow-xs"
+                    title="Chỉ đường Google Maps đến chi nhánh này"
+                  >
+                    <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-red-600 shrink-0" />
+                    <span className="text-[11px] sm:text-xs md:text-sm">Bản đồ</span>
+                    <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5 text-brand-800 shrink-0" />
+                  </a>
+                </div>
+              </div>
+
+              {/* ========================================================================= */}
+              {/* 3. SỐ ĐIỆN THOẠI ZALO (ĐƯỢC ĐƯA LÊN TRÊN HỌ TÊN!) */}
+              {/* ========================================================================= */}
+              <div>
+                <label className="block text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wider mb-1 md:mb-1.5 flex items-center justify-between">
+                  <span>Số điện thoại Zalo <span className="text-red-500">*</span></span>
+                  <span className="text-[11px] md:text-xs font-semibold text-emerald-700 normal-case">HR gọi sau 5 phút</span>
+                </label>
+                <div className="relative">
+                  <Phone className="w-4 h-4 md:w-4.5 md:h-4.5 text-brand-800 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="tel"
+                    required
+                    placeholder="VD: 0981256712 (để HR gọi phỏng vấn)"
+                    value={formData.phoneZalo}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phoneZalo: e.target.value })
+                    }
+                    className="w-full pl-9 md:pl-10.5 pr-3 py-2 md:py-2.5 text-sm md:text-base border-2 border-brand-700/60 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none font-bold text-brand-950 placeholder:font-normal placeholder:text-xs md:placeholder:text-sm bg-white shadow-xs"
+                  />
+                </div>
+              </div>
+
+              {/* ========================================================================= */}
+              {/* 4. HỌ TÊN & TUỔI (OPTION TÙY CHỌN) */}
+              {/* ========================================================================= */}
+              <div className="grid grid-cols-3 gap-2 md:gap-3">
                 <div className="col-span-2">
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                  <label className="block text-[11px] md:text-xs font-semibold text-gray-500 mb-0.5 md:mb-1 flex items-center justify-between">
                     <span>Họ và tên</span>
-                    <span className="text-[11px] font-normal text-gray-400 normal-case">(Tùy chọn)</span>
+                    <span className="text-[10px] md:text-[11px] text-gray-400 font-normal">(Tùy chọn)</span>
                   </label>
                   <input
                     type="text"
@@ -652,13 +647,13 @@ export default function QuickApplyModal({
                     onChange={(e) =>
                       setFormData({ ...formData, fullName: e.target.value })
                     }
-                    className="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none font-medium"
+                    className="w-full px-2.5 md:px-3 py-1.5 md:py-2 text-xs md:text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-brand-700 focus:outline-none text-gray-800 placeholder:text-gray-400 placeholder:text-xs md:placeholder:text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                  <label className="block text-[11px] md:text-xs font-semibold text-gray-500 mb-0.5 md:mb-1 flex items-center justify-between">
                     <span>Tuổi</span>
-                    <span className="text-[11px] font-normal text-gray-400 normal-case">(Tùy chọn)</span>
+                    <span className="text-[10px] md:text-[11px] text-gray-400 font-normal">(Tùy chọn)</span>
                   </label>
                   <input
                     type="number"
@@ -669,67 +664,43 @@ export default function QuickApplyModal({
                     onChange={(e) =>
                       setFormData({ ...formData, age: e.target.value })
                     }
-                    className="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none font-medium"
+                    className="w-full px-2.5 md:px-3 py-1.5 md:py-2 text-xs md:text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-brand-700 focus:outline-none text-gray-800 placeholder:text-gray-400 placeholder:text-xs md:placeholder:text-sm"
                   />
                 </div>
               </div>
 
               {/* ========================================================================= */}
-              {/* 4. SỐ ĐIỆN THOẠI / ZALO */}
+              {/* 5. EMAIL ỨNG VIÊN (KHÔNG BẮT BUỘC) */}
               {/* ========================================================================= */}
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-                  Số điện thoại Zalo <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="tel"
-                    required
-                    placeholder="VD: 0981256712 (để HR gọi phỏng vấn)"
-                    value={formData.phoneZalo}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phoneZalo: e.target.value })
-                    }
-                    className="w-full pl-10 pr-3.5 py-2.5 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none font-bold text-brand-950"
-                  />
-                </div>
-              </div>
-
-              {/* ========================================================================= */}
-              {/* 5. EMAIL ỨNG VIÊN */}
-              {/* ========================================================================= */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                <label className="block text-[11px] md:text-xs font-semibold text-gray-500 mb-0.5 md:mb-1 flex items-center justify-between">
                   <span>Email của bạn</span>
-                  <span className="text-[11px] font-normal text-gray-400 normal-case">
-                    (Không bắt buộc)
-                  </span>
+                  <span className="text-[10px] md:text-[11px] text-gray-400 font-normal">(Không bắt buộc)</span>
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400 absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="email"
-                    placeholder="Khuyến khích điền email để xác nhận lịch phỏng vấn"
+                    placeholder="Khuyến khích điền email để nhận lịch phỏng vấn"
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    className="w-full pl-10 pr-3.5 py-2.5 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none font-medium text-gray-900 placeholder:text-gray-400 placeholder:text-xs sm:placeholder:text-sm"
+                    className="w-full pl-8 md:pl-9.5 pr-2.5 md:pr-3 py-1.5 md:py-2 text-xs md:text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-brand-700 focus:outline-none text-gray-800 placeholder:text-gray-400 placeholder:text-xs md:placeholder:text-sm"
                   />
                 </div>
               </div>
 
               {/* ========================================================================= */}
-              {/* 6. ĐÍNH KÈM FILE CV (NẾU ĐƯỢC BẬT TRONG CẤU HÌNH) */}
+              {/* 6. ĐÍNH KÈM FILE CV (TÙY CHỌN, NHỎ GỌN) */}
               {/* ========================================================================= */}
               {config.allowCvUpload && (
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      CV đính kèm <span className="text-gray-400 font-normal lowercase">(không bắt buộc)</span>
+                  <div className="flex items-center justify-between mb-0.5 md:mb-1">
+                    <label className="block text-[11px] md:text-xs font-semibold text-gray-500">
+                      CV đính kèm <span className="text-gray-400 font-normal">(không bắt buộc)</span>
                     </label>
-                    <span className="text-[10px] text-gray-400 font-medium">PDF, Word, Ảnh ≤ 10MB</span>
+                    <span className="text-[10px] md:text-[11px] text-gray-400">PDF, Word, Ảnh ≤ 10MB</span>
                   </div>
 
                   <input
@@ -741,32 +712,32 @@ export default function QuickApplyModal({
                   />
 
                   {cvFile ? (
-                    <div className="flex items-center justify-between p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs">
-                      <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                        <FileText className="w-5 h-5 text-emerald-600 shrink-0" />
-                        <span className="font-bold text-emerald-950 truncate">
+                    <div className="flex items-center justify-between p-2 md:p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs md:text-sm">
+                      <div className="flex items-center gap-2 min-w-0 pr-1">
+                        <FileText className="w-4 h-4 md:w-5 md:h-5 text-emerald-600 shrink-0" />
+                        <span className="font-bold text-emerald-950 truncate text-[11px] md:text-xs">
                           {cvFile.name}
                         </span>
-                        <span className="text-emerald-700 text-[11px] shrink-0 font-medium">
+                        <span className="text-emerald-700 text-[10px] md:text-[11px] shrink-0 font-medium">
                           ({formatFileSize(cvFile.size)})
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={handleRemoveFile}
-                        className="p-1 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-700 transition shrink-0 cursor-pointer"
+                        className="p-1 rounded text-red-500 hover:bg-red-50 hover:text-red-700 transition shrink-0 cursor-pointer"
                         title="Xóa file CV"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                       </button>
                     </div>
                   ) : (
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full py-2.5 px-3.5 border border-dashed border-gray-300 hover:border-brand-500 hover:bg-brand-50/20 rounded-xl text-xs text-gray-600 hover:text-brand-900 transition flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full py-1.5 md:py-2.5 px-3 border border-dashed border-gray-300 hover:border-brand-500 hover:bg-brand-50/20 rounded-lg text-[11px] md:text-xs text-gray-500 hover:text-brand-900 transition flex items-center justify-center gap-1.5 md:gap-2 cursor-pointer"
                     >
-                      <FileUp className="w-4 h-4 text-brand-700" />
+                      <FileUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-brand-700" />
                       <span>Bấm vào đây để tải lên CV hoặc ảnh hồ sơ của bạn</span>
                     </button>
                   )}
@@ -774,24 +745,24 @@ export default function QuickApplyModal({
               )}
 
               {/* ========================================================================= */}
-              {/* 6. NÚT GỬI ĐƠN ỨNG TUYỂN */}
+              {/* 7. NÚT SUBMIT BÊN DƯỚI (HIỂN THỊ RÕ RÀNG TRÊN PC KHÔNG CẦN SCROLL) */}
               {/* ========================================================================= */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-2 py-3.5 px-4 bg-gradient-to-r from-brand-800 to-brand-900 hover:from-brand-900 hover:to-brand-950 active:scale-[0.99] text-white font-black rounded-xl shadow-lg shadow-brand-900/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 text-sm uppercase tracking-wide"
+                className="w-full mt-1 md:mt-2 py-2.5 sm:py-3 md:py-3.5 px-4 bg-gradient-to-r from-brand-800 to-brand-900 hover:from-brand-900 hover:to-brand-950 active:scale-[0.99] text-white font-black rounded-xl shadow-md transition-all flex items-center justify-center gap-2 md:gap-2.5 cursor-pointer disabled:opacity-70 text-xs sm:text-sm md:text-base uppercase tracking-wide"
               >
                 {loading ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
-                    <Send className="w-4 h-4" />
+                    <Send className="w-4 h-4 md:w-5 md:h-5" />
                     <span>Gửi Đơn Ứng Tuyển Ngay</span>
                   </>
                 )}
               </button>
 
-              <p className="text-[11px] text-gray-500 text-center pt-1 font-medium">
+              <p className="text-[10px] md:text-xs text-gray-400 text-center font-medium">
                 🔒 Cam kết không thu bất kỳ khoản phí nào khi phỏng vấn hoặc nhận việc.
               </p>
             </form>

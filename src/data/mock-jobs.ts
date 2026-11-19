@@ -8,6 +8,86 @@ export const MOCK_JOBS_DATA: JobItem[] = [
   // ===========================================================================
   // NHÓM 1: HỌC NGHỀ CÓ LƯƠNG
   // ===========================================================================
+  // Vị trí ưu tiên hàng đầu theo yêu cầu
+  {
+    id: "JOB-GS-BEP",
+    slug: "giam-sat-bep",
+    title: "Giám sát Bếp Chi Nhánh",
+    category: "Trưởng, Quản lý",
+    parentMenu: "Trưởng, Quản lý",
+    menuPlacement: "PARENT",
+    showInMenu: true,
+    badge: "25–35 tuổi, Kinh nghiệm từ 2 năm trở lên",
+    badges: ["25–35 tuổi", "Kinh nghiệm từ 2 năm", "Quản trị chuỗi bếp", "Thưởng cao"],
+    salaryDisplay: "11 - 14 triệu/tháng + Thưởng",
+    minSalary: 11000000,
+    maxSalary: 14000000,
+    salaryUnit: "MONTH",
+    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú"],
+    ageRequirement: "25 – 35 tuổi",
+    workType: "FULL_TIME",
+    workTypeDisplay: "Toàn thời gian (14h00 – 01h00)",
+    workHours: "14h00 – 01h00 mỗi ngày",
+    experienceDisplay: "Kinh nghiệm từ 2 năm trở lên",
+    experienceRequirements: "Có ít nhất 2 năm làm việc trong bếp nhà hàng",
+    isActive: true,
+    contactZalo: "0981256712",
+    images: [
+      "/images/posters/giamsat1.webp",
+      "/images/posters/giamsat2.webp",
+      "/images/posters/giamsat-detail-1.webp",
+    ],
+    videoUrl: "/videos/culture/beef-slicing.mp4",
+    videoPoster: "",
+    concisePost: {
+      headline: "GIÁM SÁT BẾP CHI NHÁNH - ĐẦU BẾP ĐAM MÊ THĂNG TIẾN CHUỖI F&B",
+      intro:
+        "Tiệm Lẩu Bò Trăm Rưỡi tìm kiếm Giám sát Bếp chi nhánh: quản trị bếp chuỗi, kiểm soát chất lượng & chi phí, ứng dụng AI & Data trong quản lý vận hành.",
+      points: [
+        {
+          icon: "📊",
+          label: "Quản trị bếp chuỗi:",
+          content:
+            "Kiểm soát COGs (giá vốn), chất lượng & định lượng món ăn, tối ưu tốc độ ra món.",
+        },
+        {
+          icon: "🤖",
+          label: "AI & Data:",
+          content:
+            "Trải nghiệm ứng dụng trí tuệ nhân tạo và dữ liệu thực chiến trong vận hành bếp.",
+        },
+        {
+          icon: "🤝",
+          label: "Huấn luyện đội ngũ:",
+          content:
+            "Đào tạo nhân sự bếp mới, xây dựng tinh thần đồng đội hợp tác cùng thắng.",
+        },
+        {
+          icon: "💰",
+          label: "Thu nhập:",
+          content: "11.000.000đ – 14.000.000đ + Thưởng xứng đáng!",
+        },
+      ],
+      zalo: "0981256712",
+    },
+    responsibilities: [
+      "Quản lý chất lượng món ăn, kiểm tra vệ sinh an toàn thực phẩm toàn bộ khu vực bếp",
+      "Kiểm soát hao hụt và chi phí nguyên vật liệu đầu vào của chi nhánh",
+      "Đào tạo kỹ năng chế biến và tác phong cho nhân sự phụ bếp mới",
+    ],
+    requirements: [
+      "Từ 25 – 35 tuổi, có kinh nghiệm tối thiểu 2 năm làm bếp F&B",
+      "Kỹ năng quản lý nhân sự và giao việc tốt",
+    ],
+    benefits: [
+      "Lương 11 – 14 triệu/tháng + Thưởng doanh thu",
+      "Bao ăn ở hoặc hỗ trợ chi phí, chế độ phúc lợi đầy đủ",
+      "Lộ trình thăng tiến: Giám sát Bếp ➡️ Bếp trưởng chi nhánh ➡️ Quản lý Bếp Vùng",
+    ],
+    datePosted: "2026-11-01T08:00:00.000Z",
+    validThrough: "2027-12-31T23:59:59.000Z",
+    isUrgent: true,
+  },
   {
     id: "HV-BEP-01",
     slug: "hoc-viec-bep",
@@ -274,85 +354,6 @@ export const MOCK_JOBS_DATA: JobItem[] = [
     datePosted: "2026-11-01T08:00:00.000Z",
     validThrough: "2027-12-31T23:59:59.000Z",
     isUrgent: false,
-  },
-  {
-    id: "JOB-GS-BEP",
-    slug: "giam-sat-bep",
-    title: "Giám sát Bếp Chi Nhánh",
-    category: "Học nghề có lương",
-    parentMenu: "Học nghề có lương",
-    menuPlacement: "PARENT",
-    showInMenu: true,
-    badge: "25–35 tuổi, Kinh nghiệm từ 2 năm trở lên",
-    badges: ["25–35 tuổi", "Kinh nghiệm từ 2 năm", "Quản trị chuỗi bếp", "Thưởng cao"],
-    salaryDisplay: "11 - 14 triệu/tháng + Thưởng",
-    minSalary: 11000000,
-    maxSalary: 14000000,
-    salaryUnit: "MONTH",
-    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú"],
-    ageRequirement: "25 – 35 tuổi",
-    workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian (14h00 – 01h00)",
-    workHours: "14h00 – 01h00 mỗi ngày",
-    experienceDisplay: "Kinh nghiệm từ 2 năm trở lên",
-    experienceRequirements: "Có ít nhất 2 năm làm việc trong bếp nhà hàng",
-    isActive: true,
-    contactZalo: "0981256712",
-    images: [
-      "/images/posters/giamsat1.webp",
-      "/images/posters/giamsat2.webp",
-      "/images/posters/giamsat-detail-1.webp",
-    ],
-    videoUrl: "/videos/culture/beef-slicing.mp4",
-    videoPoster: "",
-    concisePost: {
-      headline: "GIÁM SÁT BẾP CHI NHÁNH - ĐẦU BẾP ĐAM MÊ THĂNG TIẾN CHUỖI F&B",
-      intro:
-        "Tiệm Lẩu Bò Trăm Rưỡi tìm kiếm Giám sát Bếp chi nhánh: quản trị bếp chuỗi, kiểm soát chất lượng & chi phí, ứng dụng AI & Data trong quản lý vận hành.",
-      points: [
-        {
-          icon: "📊",
-          label: "Quản trị bếp chuỗi:",
-          content:
-            "Kiểm soát COGs (giá vốn), chất lượng & định lượng món ăn, tối ưu tốc độ ra món.",
-        },
-        {
-          icon: "🤖",
-          label: "AI & Data:",
-          content:
-            "Trải nghiệm ứng dụng trí tuệ nhân tạo và dữ liệu thực chiến trong vận hành bếp.",
-        },
-        {
-          icon: "🤝",
-          label: "Huấn luyện đội ngũ:",
-          content:
-            "Đào tạo nhân sự bếp mới, xây dựng tinh thần đồng đội hợp tác cùng thắng.",
-        },
-        {
-          icon: "💰",
-          label: "Thu nhập:",
-          content: "11.000.000đ – 14.000.000đ + Thưởng xứng đáng!",
-        },
-      ],
-      zalo: "0981256712",
-    },
-    responsibilities: [
-      "Quản lý chất lượng món ăn, kiểm tra vệ sinh an toàn thực phẩm toàn bộ khu vực bếp",
-      "Kiểm soát hao hụt và chi phí nguyên vật liệu đầu vào của chi nhánh",
-      "Đào tạo kỹ năng chế biến và tác phong cho nhân sự phụ bếp mới",
-    ],
-    requirements: [
-      "Từ 25 – 35 tuổi, có kinh nghiệm tối thiểu 2 năm làm bếp F&B",
-      "Kỹ năng quản lý nhân sự và giao việc tốt",
-    ],
-    benefits: [
-      "Lương 11 – 14 triệu/tháng + Thưởng doanh thu",
-      "Bao ăn ở hoặc hỗ trợ chi phí, chế độ phúc lợi đầy đủ",
-      "Lộ trình thăng tiến: Giám sát Bếp ➡️ Bếp trưởng chi nhánh ➡️ Quản lý Bếp Vùng",
-    ],
-    datePosted: "2026-11-01T08:00:00.000Z",
-    validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: true,
   },
 
   // ===========================================================================
