@@ -14,10 +14,10 @@ export function getRelatedJobs(currentSlug: string, limit: number = 3): JobItem[
 }
 
 export const APPLICATION_POSITIONS = [
+  { id: "giam-sat-bep", title: "Giám sát Bếp Chi Nhánh" },
   { id: "hoc-viec-bep", title: "Học việc bếp" },
   { id: "phu-bep-hoc-nghe", title: "Phụ bếp (Học nghề)" },
   { id: "hoc-viec-to-truong", title: "Học việc tổ trưởng" },
-  { id: "giam-sat-bep", title: "Giám sát Bếp" },
   { id: "phuc-vu-part-time", title: "Part-time" },
   { id: "cham-soc-khach-hang", title: "Hỗ trợ trải nghiệm KH (CSKH)" },
   { id: "phuc-vu-full-time", title: "Phục vụ" },

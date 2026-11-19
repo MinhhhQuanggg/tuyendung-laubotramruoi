@@ -1,4 +1,10 @@
 export type RegionType =
+  | "qdong"
+  | "qtt2"
+  | "qbac"
+  | "qtt"
+  | "qtay"
+  | "qnam"
   | "thu-duc-khu-dong"
   | "go-vap-phu-nhuan"
   | "trung-tam";
@@ -21,6 +27,7 @@ export interface Branch {
 export interface BranchGroup {
   region: RegionType;
   title: string;
+  subtitle?: string;
   description?: string;
   branches: Branch[];
 }

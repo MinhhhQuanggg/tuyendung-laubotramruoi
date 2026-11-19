@@ -6,12 +6,12 @@ import JobCard from "./JobCard";
 import QuickApplyModal from "../common/QuickApplyModal";
 import { CheckCircle2 } from "lucide-react";
 
-// Thứ tự hiển thị chuẩn 100% theo các menu con trong Header
+// Thứ tự hiển thị việc làm: Ưu tiên "Giám sát Bếp Chi Nhánh" lên vị trí đầu tiên
 const ORDERED_SLUGS = [
+  "giam-sat-bep",
   "hoc-viec-bep",
   "phu-bep-hoc-nghe",
   "hoc-viec-to-truong",
-  "giam-sat-bep",
   "phuc-vu-part-time",
   "cham-soc-khach-hang",
   "phuc-vu-full-time",

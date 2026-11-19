@@ -8,12 +8,12 @@ import { ChevronDown, X } from "lucide-react";
 import { JobItem } from "@/types/job";
 import { getCategorySlug, getJobUrl, isJobActiveOnPath } from "@/lib/job-url";
 
-// Thứ tự hiển thị menu con chuẩn
+// Thứ tự hiển thị menu con chuẩn (Ưu tiên Giám sát Bếp Chi Nhánh lên đầu)
 const ORDERED_SLUGS = [
+  "giam-sat-bep",
   "hoc-viec-bep",
   "phu-bep-hoc-nghe",
   "hoc-viec-to-truong",
-  "giam-sat-bep",
   "phuc-vu-part-time",
   "cham-soc-khach-hang",
   "phuc-vu-full-time",

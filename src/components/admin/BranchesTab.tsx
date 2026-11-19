@@ -18,12 +18,13 @@ import {
   Navigation,
 } from "lucide-react";
 import { Branch, RegionType } from "@/types/branch";
+import { REGION_METADATA, getBranchRegionKey } from "@/data/branches";
 
-const REGION_OPTIONS: { value: RegionType; label: string }[] = [
-  { value: "thu-duc-khu-dong", label: "Thủ Đức & Khu Đông" },
-  { value: "go-vap-phu-nhuan", label: "Gò Vấp & Phú Nhuận" },
-  { value: "trung-tam", label: "Trung Tâm & Khu Vực Khác" },
-];
+const REGION_OPTIONS: { value: RegionType; label: string; code: string }[] = REGION_METADATA.map((m) => ({
+  value: m.key,
+  code: m.code,
+  label: m.name,
+}));
 
 export default function BranchesTab() {
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -73,7 +74,7 @@ export default function BranchesTab() {
       district: "Gò Vấp",
       city: "Hồ Chí Minh",
       phone: "0981256712",
-      region: "go-vap-phu-nhuan",
+      region: "qdong",
       mapUrl: "",
       isActive: true,
     });
@@ -175,7 +176,10 @@ export default function BranchesTab() {
       (b.phone && b.phone.includes(q)) ||
       `cn ${b.cnNumber}`.includes(q);
 
-    const matchesRegion = selectedRegion === "ALL" || b.region === selectedRegion;
+    const matchesRegion =
+      selectedRegion === "ALL" ||
+      getBranchRegionKey(b) === selectedRegion ||
+      b.region === selectedRegion;
     const matchesStatus =
       statusFilter === "ALL" ||
       (statusFilter === "ACTIVE" && b.isActive !== false) ||
@@ -331,32 +335,32 @@ export default function BranchesTab() {
           </div>
         </button>
 
-        {/* Card 4: Gò Vấp & Phú Nhuận */}
+        {/* Card 4: Quận Đông */}
         <button
           type="button"
-          onClick={() => setSelectedRegion(selectedRegion === "go-vap-phu-nhuan" ? "ALL" : "go-vap-phu-nhuan")}
+          onClick={() => setSelectedRegion(selectedRegion === "qdong" ? "ALL" : "qdong")}
           className={`p-4 sm:p-5 rounded-2xl border text-left flex items-center gap-3.5 transition duration-200 cursor-pointer active:scale-95 ${
-            selectedRegion === "go-vap-phu-nhuan"
-              ? "bg-amber-50/70 border-amber-400 ring-2 ring-amber-500/40 shadow-md scale-[1.01]"
-              : "bg-white border-gray-200/80 shadow-sm hover:border-amber-300 hover:shadow-md"
+            selectedRegion === "qdong"
+              ? "bg-purple-50/70 border-purple-400 ring-2 ring-purple-500/40 shadow-md scale-[1.01]"
+              : "bg-white border-gray-200/80 shadow-sm hover:border-purple-300 hover:shadow-md"
           }`}
-          title="Bấm để lọc chi nhánh khu vực Gò Vấp & Phú Nhuận"
+          title="Bấm để lọc chi nhánh khu vực Quận Đông (Quận 2, Quận 9, Thủ Đức)"
         >
           <div
             className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold transition shrink-0 ${
-              selectedRegion === "go-vap-phu-nhuan" ? "bg-amber-600 text-white shadow-sm" : "bg-amber-50 text-amber-700"
+              selectedRegion === "qdong" ? "bg-purple-600 text-white shadow-sm" : "bg-purple-50 text-purple-600"
             }`}
           >
-            <MapPin className="w-5 h-5" />
+            <Navigation className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-black text-amber-700">
-              {branches.filter((b) => b.region === "go-vap-phu-nhuan").length}
+            <div className="text-xl sm:text-2xl font-black text-purple-700">
+              {branches.filter((b) => getBranchRegionKey(b) === "qdong" || b.region === "qdong").length}
             </div>
             <div className="text-xs font-semibold text-gray-500 flex items-center gap-1">
-              <span>Gò Vấp & P.Nhuận</span>
-              {selectedRegion === "go-vap-phu-nhuan" && (
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900">
+              <span>Quận Đông</span>
+              {selectedRegion === "qdong" && (
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-900">
                   Lọc
                 </span>
               )}
@@ -364,32 +368,32 @@ export default function BranchesTab() {
           </div>
         </button>
 
-        {/* Card 5: Thủ Đức & Khu Đông */}
+        {/* Card 5: Quận Trung Tâm 2 */}
         <button
           type="button"
-          onClick={() => setSelectedRegion(selectedRegion === "thu-duc-khu-dong" ? "ALL" : "thu-duc-khu-dong")}
+          onClick={() => setSelectedRegion(selectedRegion === "qtt2" ? "ALL" : "qtt2")}
           className={`p-4 sm:p-5 rounded-2xl border text-left flex items-center gap-3.5 transition duration-200 cursor-pointer active:scale-95 ${
-            selectedRegion === "thu-duc-khu-dong"
-              ? "bg-purple-50/70 border-purple-400 ring-2 ring-purple-500/40 shadow-md scale-[1.01]"
-              : "bg-white border-gray-200/80 shadow-sm hover:border-purple-300 hover:shadow-md"
+            selectedRegion === "qtt2"
+              ? "bg-amber-50/70 border-amber-400 ring-2 ring-amber-500/40 shadow-md scale-[1.01]"
+              : "bg-white border-gray-200/80 shadow-sm hover:border-amber-300 hover:shadow-md"
           }`}
-          title="Bấm để lọc chi nhánh khu vực Thủ Đức & Khu Đông"
+          title="Bấm để lọc chi nhánh khu vực Quận Trung Tâm 2 (Tân Bình, Tân Phú, Bình Thạnh, Phú Nhuận)"
         >
           <div
             className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold transition shrink-0 ${
-              selectedRegion === "thu-duc-khu-dong" ? "bg-purple-600 text-white shadow-sm" : "bg-purple-50 text-purple-600"
+              selectedRegion === "qtt2" ? "bg-amber-600 text-white shadow-sm" : "bg-amber-50 text-amber-700"
             }`}
           >
-            <Navigation className="w-5 h-5" />
+            <MapPin className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-black text-purple-700">
-              {branches.filter((b) => b.region === "thu-duc-khu-dong").length}
+            <div className="text-xl sm:text-2xl font-black text-amber-700">
+              {branches.filter((b) => getBranchRegionKey(b) === "qtt2" || b.region === "qtt2").length}
             </div>
             <div className="text-xs font-semibold text-gray-500 flex items-center gap-1">
-              <span>Thủ Đức & Đông</span>
-              {selectedRegion === "thu-duc-khu-dong" && (
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-900">
+              <span>Quận Trung Tâm 2</span>
+              {selectedRegion === "qtt2" && (
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900">
                   Lọc
                 </span>
               )}
@@ -455,7 +459,7 @@ export default function BranchesTab() {
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
-              {reg.label} ({branches.filter((b) => b.region === reg.value).length})
+              {reg.label} ({branches.filter((b) => getBranchRegionKey(b) === reg.value || b.region === reg.value).length})
             </button>
           ))}
 

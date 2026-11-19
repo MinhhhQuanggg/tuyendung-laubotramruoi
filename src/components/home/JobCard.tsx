@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { JobItem } from "@/types/job";
-import { DollarSign, Clock, Calendar, ArrowRight, Flame } from "lucide-react";
+import { Clock, Calendar, ArrowRight, Flame } from "lucide-react";
 import { getJobUrl } from "@/lib/job-url";
 
 interface JobCardProps {
@@ -8,7 +8,29 @@ interface JobCardProps {
   onApplyClick?: (job: JobItem) => void;
 }
 
+/**
+ * Ở thẻ công việc: Chỉ giữ số lương + đơn vị (/tháng hoặc /giờ),
+ * loại bỏ phần chữ phía sau dấu cộng (+) và các ghi chú trong ngoặc
+ */
+function formatCardSalary(salary?: string): string {
+  if (!salary) return "";
+
+  // Ưu tiên trích xuất định dạng khoảng lương theo tháng dạng: "X - Y triệu/tháng" hoặc "X triệu/tháng"
+  const monthMatch = salary.match(/(\d+[\d,.]*(?:\s*-\s*\d+[\d,.]*)?\s*triệu\/tháng)/i);
+  if (monthMatch) {
+    return monthMatch[1].trim();
+  }
+
+  // Đối với các vị trí tính theo giờ hoặc định dạng khác, loại bỏ dấu cộng (+), ghi chú trong ngoặc đơn
+  let cleaned = salary.split(/[+＋]/)[0];
+  cleaned = cleaned.replace(/\([^)]*\)/g, "");
+  cleaned = cleaned.replace(/\s*-\s*Nhận lương tuần/i, "");
+  return cleaned.trim();
+}
+
 export default function JobCard({ job, onApplyClick }: JobCardProps) {
+  const salaryText = formatCardSalary(job.salaryDisplay);
+
   return (
     <div className="relative group bg-white rounded-2xl p-6 sm:p-7 border border-red-200 sm:border-gray-100 shadow-md sm:shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
       {/* Họa tiết chìm mờ góc phải dưới như ảnh 11.JPG */}
@@ -42,23 +64,20 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
           );
         })()}
 
-        {/* Tiêu đề vị trí: Tăng 2px lên 20px (mobile) / 22px (desktop) */}
-        <h3 className="text-[20px] sm:text-[22px] font-bold text-gray-900 group-hover:text-brand-800 transition-colors line-clamp-2 mb-4 leading-snug">
-          <Link href={getJobUrl(job)}>{job.title}</Link>
-        </h3>
-
-        {/* Thông tin: Lương, Ca làm & Yêu cầu */}
-        <div className="space-y-3 text-[18px] sm:text-[20px] text-gray-700 mb-6 leading-relaxed">
-          {/* 💰 Lương */}
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-              <DollarSign className="w-4 h-4 text-amber-700" />
-            </div>
-            <span className="font-semibold text-brand-900">
-              <b>Lương:</b> {job.salaryDisplay}
+        {/* Tiêu đề vị trí & Mức lương cùng hàng, lương đặt bên phải */}
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <h3 className="text-[19px] sm:text-[21px] font-bold text-gray-900 group-hover:text-brand-800 transition-colors line-clamp-2 leading-snug flex-1">
+            <Link href={getJobUrl(job)}>{job.title}</Link>
+          </h3>
+          {salaryText && (
+            <span className="shrink-0 text-[14px] sm:text-[16px] font-bold text-brand-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/80 whitespace-nowrap mt-0.5">
+              {salaryText}
             </span>
-          </div>
+          )}
+        </div>
 
+        {/* Thông tin: Ca làm & Yêu cầu */}
+        <div className="space-y-3 text-[17px] sm:text-[19px] text-gray-700 mb-6 leading-relaxed">
           {/* ⏰ Ca làm */}
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
