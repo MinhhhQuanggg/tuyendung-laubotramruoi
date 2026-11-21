@@ -67,13 +67,13 @@ const DEFAULT_EXPERIENCE_TAGS = [
 ];
 
 const DEFAULT_WORK_HOURS_TAGS = [
-  "14h00 – 24h00 mỗi ngày",
+  "14h00 – 00h00 mỗi ngày",
   "Ca xoay linh hoạt",
   "Ca xoay hoặc ca cố định",
   "Ca làm việc 8h/ngày",
   "Ca sáng (6h00 – 14h00)",
   "Ca chiều (14h00 – 22h00)",
-  "Ca tối (16h00 – 24h00)",
+  "Ca tối (16h00 – 00h00)",
   "Đăng ký linh hoạt theo lịch học",
   "Xoay ca theo lịch quản lý",
   "Giờ hành chính & theo lịch quản lý",
@@ -327,8 +327,8 @@ export default function AdminDashboardPage() {
       ageRequirement: "18 – 30 tuổi",
       badges: ["18–30 tuổi", "Đào tạo từ số 0"],
       workType: "FULL_TIME",
-      workTypeDisplay: "Toàn thời gian (Ca 14h00 – 24h00)",
-      workHours: "14h00 – 24h00 mỗi ngày",
+      workTypeDisplay: "Toàn thời gian (Ca 14h00 – 00h00)",
+      workHours: "14h00 – 00h00 mỗi ngày",
       experienceDisplay: "Không yêu cầu (Đào tạo từ số 0)",
       locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3"],
       contactZalo: "0981256712",

@@ -83,9 +83,29 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
             <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
               <Clock className="w-4 h-4 text-blue-700" />
             </div>
-            <span className="line-clamp-2 sm:truncate leading-snug sm:leading-relaxed break-words">
-              <b>Ca làm:</b> {job.workHours || job.workTypeDisplay}
-            </span>
+            {(() => {
+              const rawHours = (job.workHours || job.workTypeDisplay || "").replace(/24h00/g, "00h00");
+              const match = rawHours.match(/^(.*?)\s+(hoặc)\s+(.*)$/i);
+
+              if (match) {
+                const [, shift1, conjunction, shift2] = match;
+                return (
+                  <span className="line-clamp-2 sm:truncate leading-snug sm:leading-relaxed break-words">
+                    <b>Ca làm:</b> {shift1} {conjunction}
+                    <br className="sm:hidden" />
+                    <span className="sm:inline sm:ml-1 whitespace-nowrap sm:whitespace-normal">
+                      {shift2}
+                    </span>
+                  </span>
+                );
+              }
+
+              return (
+                <span className="line-clamp-2 sm:truncate leading-snug sm:leading-relaxed break-words">
+                  <b>Ca làm:</b> {rawHours}
+                </span>
+              );
+            })()}
           </div>
 
           {/* 📅 Độ tuổi / Yêu cầu */}
