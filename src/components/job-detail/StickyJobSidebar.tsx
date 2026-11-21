@@ -9,10 +9,10 @@ export default function StickyJobSidebar({ job }: StickyJobSidebarProps) {
   return (
     <div className="hidden lg:flex w-full items-center justify-center">
       <Image
-        src="/logo.webp"
+        src="/images/logo/logo-brand.webp"
         alt="Tiệm Lẩu Bò Trăm Rưỡi"
-        width={409}
-        height={400}
+        width={897}
+        height={877}
         priority
         className="w-full h-auto object-contain"
       />

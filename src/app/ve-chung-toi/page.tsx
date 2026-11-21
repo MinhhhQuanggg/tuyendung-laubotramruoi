@@ -145,10 +145,10 @@ export default function AboutPage() {
           <div className="lg:col-span-4">
             <div className="w-full sticky top-24">
               <Image
-                src="/logo.webp"
+                src="/images/logo/logo-brand.webp"
                 alt="Tiệm Lẩu Bò Trăm Rưỡi"
-                width={409}
-                height={400}
+                width={897}
+                height={877}
                 priority
                 className="w-full h-auto rounded-3xl object-contain shadow-sm border border-gray-100 bg-white"
               />

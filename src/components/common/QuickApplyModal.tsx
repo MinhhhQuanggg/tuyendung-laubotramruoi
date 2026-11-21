@@ -402,28 +402,25 @@ export default function QuickApplyModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/65 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-lg md:max-w-[615px] bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-gray-100 max-h-[96vh] sm:max-h-[92vh] flex flex-col"
+        className="relative w-full max-w-[560px] md:max-w-[800px] lg:max-w-[830px] md:min-h-[580px] lg:min-h-[620px] bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-gray-100 max-h-[96vh] sm:max-h-[94vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Modal - Gradient Option A (Đỏ son + Vàng đồng) */}
-        <div className="bg-gradient-to-r from-[#8E1B24] via-[#5c1015] to-[#3A0910] text-white p-3 sm:p-4 md:p-5 px-4 sm:px-5 md:px-6 relative shrink-0 flex items-center justify-between gap-3 border-b border-[#C9963F]/30">
-          <div className="flex items-center gap-2.5 sm:gap-3 md:gap-3.5 min-w-0">
+        <div className="bg-gradient-to-r from-[#8E1B24] via-[#5c1015] to-[#3A0910] text-white py-3.5 sm:py-4.5 md:py-5 px-4 sm:px-6 md:px-7 relative shrink-0 flex items-center justify-between gap-2.5 border-b border-[#C9963F]/30">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <Image
               src="/logo.webp"
               alt="Lẩu Bò Trăm Rưỡi"
-              width={48}
-              height={48}
-              className="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 object-contain shrink-0 drop-shadow-sm"
+              width={42}
+              height={42}
+              className="w-8.5 h-8.5 sm:w-10 sm:h-10 md:w-11 md:h-11 object-contain shrink-0 drop-shadow-sm"
             />
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg md:text-[21px] font-bold truncate leading-tight">{config.formTitle}</h3>
-              <p className="text-[11px] sm:text-xs md:text-sm text-red-100 truncate mt-0.5 leading-tight">
-                {config.formSubtitle}
-              </p>
+              <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold leading-tight truncate">{config.formTitle}</h3>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {/* Nút Submit ở Header (tránh lỗi bàn phím điện thoại che nút bên dưới) */}
             {!success && (
               <button
@@ -431,14 +428,14 @@ export default function QuickApplyModal({
                 form="quick-apply-form"
                 onClick={() => handleSubmit()}
                 disabled={loading}
-                className="px-3 sm:px-3.5 md:px-4 py-1.5 sm:py-2 md:py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:brightness-105 active:scale-95 text-[#3A0910] font-black text-xs sm:text-sm md:text-base shadow-md flex items-center gap-1.5 md:gap-2 cursor-pointer disabled:opacity-70 transition-all shrink-0"
+                className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:brightness-105 active:scale-95 text-[#3A0910] font-black text-xs sm:text-sm shadow-md flex items-center gap-1.5 cursor-pointer disabled:opacity-70 transition-all shrink-0"
                 title="Bấm để nộp đơn ứng tuyển ngay"
               >
                 {loading ? (
-                  <div className="w-3.5 h-3.5 md:w-4 md:h-4 border-2 border-[#3A0910] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-3.5 h-3.5 border-2 border-[#3A0910] border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
-                    <Send className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#3A0910]" />
+                    <Send className="w-3.5 h-3.5 text-[#3A0910]" />
                     <span>Nộp đơn</span>
                   </>
                 )}
@@ -447,16 +444,18 @@ export default function QuickApplyModal({
 
             <button
               onClick={handleResetAndClose}
-              className="p-1.5 md:p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer text-white"
+              className="p-1.5 sm:p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer text-white"
               aria-label="Đóng"
             >
-              <X className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </button>
           </div>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-3 sm:p-4 md:p-6 overflow-y-auto space-y-2.5 sm:space-y-3 md:space-y-4">
+        {/* Modal Container 2 Cột trên Desktop (Form 560px bên trái + Khung Logo & Ảnh User bên phải) */}
+        <div className="flex flex-col md:flex-row overflow-hidden flex-1 min-h-0">
+          {/* CỘT TRÁI: FORM ỨNG TUYỂN (Tăng 20% -> 560px, Tăng chiều cao 15%) */}
+          <div className="flex-1 min-w-0 md:max-w-[560px] p-4 sm:p-5 md:p-6 lg:p-7 overflow-y-auto space-y-3 sm:space-y-4 md:space-y-4.5">
           {success ? (
             <div className="text-center py-4 sm:py-6 md:py-8">
               <CheckCircle2 className="w-14 h-14 md:w-16 md:h-16 text-emerald-500 mx-auto mb-3 md:mb-4 animate-bounce" />
@@ -482,7 +481,7 @@ export default function QuickApplyModal({
               </button>
             </div>
           ) : (
-            <form id="quick-apply-form" onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3 md:space-y-4">
+            <form id="quick-apply-form" onSubmit={handleSubmit} className="space-y-3 sm:space-y-3.5 md:space-y-4.5">
               {errorMsg && (
                 <div className="p-2.5 md:p-3 bg-red-50 text-red-700 text-xs md:text-sm rounded-xl border border-red-200">
                   {errorMsg}
@@ -501,7 +500,7 @@ export default function QuickApplyModal({
                   <select
                     value={formData.positionId}
                     onChange={handlePositionChange}
-                    className="w-full pl-8 md:pl-9.5 pr-7 py-2 md:py-2.5 text-xs sm:text-sm md:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none bg-white font-bold text-gray-900 truncate"
+                    className="w-full pl-8 md:pl-9.5 pr-7 py-2.5 md:py-3 text-xs sm:text-sm md:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none bg-white font-bold text-gray-900 truncate"
                     required
                   >
                     {prioritizedJobsList.map((job) => (
@@ -513,7 +512,7 @@ export default function QuickApplyModal({
                 </div>
 
                 {/* Khối LƯƠNG: Font size to ngang Tiêu đề title, nổi bật & không bị duplicate */}
-                <div className="mt-1.5 md:mt-2 px-3 md:px-3.5 py-1.5 sm:py-2 md:py-2.5 rounded-xl bg-gradient-to-r from-amber-50/90 via-red-50/30 to-white border border-amber-200/80 flex items-center justify-between gap-2 shadow-xs">
+                <div className="mt-2 md:mt-2.5 px-3 md:px-4 py-2 sm:py-2.5 md:py-3 rounded-xl bg-gradient-to-r from-amber-50/90 via-red-50/30 to-white border border-amber-200/80 flex items-center justify-between gap-2 shadow-xs">
                   <div className="flex items-center gap-1.5 md:gap-2 min-w-0">
                     <DollarSign className="w-4 h-4 md:w-5 md:h-5 text-amber-700 shrink-0" />
                     <span className="font-black text-sm sm:text-base md:text-lg bg-gradient-to-r from-[#8E1B24] via-[#B83232] to-[#C9963F] bg-clip-text text-transparent truncate">
@@ -558,7 +557,7 @@ export default function QuickApplyModal({
                           appliedRegion: e.target.value,
                         }))
                       }
-                      className="w-full pl-8 md:pl-9.5 pr-6 py-2 md:py-2.5 text-xs sm:text-sm md:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none bg-white font-medium text-gray-800 truncate"
+                      className="w-full pl-8 md:pl-9.5 pr-6 py-2.5 md:py-3 text-xs sm:text-sm md:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none bg-white font-medium text-gray-800 truncate"
                       required
                     >
                       <option value="" disabled hidden>
@@ -598,7 +597,7 @@ export default function QuickApplyModal({
                     href={getBranchMapsUrl(selectedBranch)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-2.5 sm:px-3 md:px-3.5 py-2 md:py-2.5 rounded-xl bg-gradient-to-r from-amber-50 to-amber-100/80 hover:from-amber-100 hover:to-amber-200 text-brand-950 border border-amber-300/80 text-xs md:text-sm font-bold flex items-center gap-1 md:gap-1.5 shrink-0 transition shadow-xs"
+                    className="px-2.5 sm:px-3 md:px-3.5 py-2.5 md:py-3 rounded-xl bg-gradient-to-r from-amber-50 to-amber-100/80 hover:from-amber-100 hover:to-amber-200 text-brand-950 border border-amber-300/80 text-xs md:text-sm font-bold flex items-center gap-1 md:gap-1.5 shrink-0 transition shadow-xs"
                     title="Chỉ đường Google Maps đến chi nhánh này"
                   >
                     <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-red-600 shrink-0" />
@@ -626,19 +625,19 @@ export default function QuickApplyModal({
                     onChange={(e) =>
                       setFormData({ ...formData, phoneZalo: e.target.value })
                     }
-                    className="w-full pl-9 md:pl-10.5 pr-3 py-2 md:py-2.5 text-sm md:text-base border-2 border-brand-700/60 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none font-bold text-brand-950 placeholder:font-normal placeholder:text-xs md:placeholder:text-sm bg-white shadow-xs"
+                    className="w-full pl-9 md:pl-10.5 pr-3 py-2.5 md:py-3 text-sm md:text-base border-2 border-brand-700/60 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none font-bold text-brand-950 placeholder:font-normal placeholder:text-xs md:placeholder:text-sm bg-white shadow-xs"
                   />
                 </div>
               </div>
 
               {/* ========================================================================= */}
-              {/* 4. HỌ TÊN & TUỔI (OPTION TÙY CHỌN) */}
+              {/* 4. HỌ TÊN, TUỔI & EMAIL (CHUNG 1 HÀNG TRÊN DESKTOP & IPAD) */}
               {/* ========================================================================= */}
-              <div className="grid grid-cols-3 gap-2 md:gap-3">
-                <div className="col-span-2">
-                  <label className="block text-[11px] md:text-xs font-semibold text-gray-500 mb-0.5 md:mb-1 flex items-center justify-between">
-                    <span>Họ và tên</span>
-                    <span className="text-[10px] md:text-[11px] text-gray-400 font-normal">(Tùy chọn)</span>
+              <div className="grid grid-cols-12 gap-1.5 sm:gap-2">
+                {/* Họ và tên: 5 cột trên Desktop & iPad */}
+                <div className="col-span-7 sm:col-span-5">
+                  <label className="block text-[11px] font-semibold text-gray-500 mb-1 truncate">
+                    <span>Họ và tên</span> <span className="text-[10px] text-gray-400 font-normal">(Tùy chọn)</span>
                   </label>
                   <input
                     type="text"
@@ -647,120 +646,119 @@ export default function QuickApplyModal({
                     onChange={(e) =>
                       setFormData({ ...formData, fullName: e.target.value })
                     }
-                    className="w-full px-2.5 md:px-3 py-1.5 md:py-2 text-xs md:text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-brand-700 focus:outline-none text-gray-800 placeholder:text-gray-400 placeholder:text-xs md:placeholder:text-sm"
+                    className="w-full px-2.5 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none text-gray-800 placeholder:text-gray-400 placeholder:text-xs"
                   />
                 </div>
-                <div>
-                  <label className="block text-[11px] md:text-xs font-semibold text-gray-500 mb-0.5 md:mb-1 flex items-center justify-between">
+
+                {/* Tuổi: 2 cột trên Desktop & iPad */}
+                <div className="col-span-5 sm:col-span-2">
+                  <label className="block text-[11px] font-semibold text-gray-500 mb-1 truncate">
                     <span>Tuổi</span>
-                    <span className="text-[10px] md:text-[11px] text-gray-400 font-normal">(Tùy chọn)</span>
                   </label>
                   <input
                     type="number"
                     min={16}
                     max={60}
-                    placeholder="VD: 20"
+                    placeholder="20"
                     value={formData.age}
                     onChange={(e) =>
                       setFormData({ ...formData, age: e.target.value })
                     }
-                    className="w-full px-2.5 md:px-3 py-1.5 md:py-2 text-xs md:text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-brand-700 focus:outline-none text-gray-800 placeholder:text-gray-400 placeholder:text-xs md:placeholder:text-sm"
+                    className="w-full px-1.5 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none text-gray-800 placeholder:text-gray-400 placeholder:text-xs text-center"
                   />
                 </div>
-              </div>
 
-              {/* ========================================================================= */}
-              {/* 5. EMAIL ỨNG VIÊN (KHÔNG BẮT BUỘC) */}
-              {/* ========================================================================= */}
-              <div>
-                <label className="block text-[11px] md:text-xs font-semibold text-gray-500 mb-0.5 md:mb-1 flex items-center justify-between">
-                  <span>Email của bạn</span>
-                  <span className="text-[10px] md:text-[11px] text-gray-400 font-normal">(Không bắt buộc)</span>
-                </label>
-                <div className="relative">
-                  <Mail className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400 absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="email"
-                    placeholder="Khuyến khích điền email để nhận lịch phỏng vấn"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    className="w-full pl-8 md:pl-9.5 pr-2.5 md:pr-3 py-1.5 md:py-2 text-xs md:text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-brand-700 focus:outline-none text-gray-800 placeholder:text-gray-400 placeholder:text-xs md:placeholder:text-sm"
-                  />
-                </div>
-              </div>
-
-              {/* ========================================================================= */}
-              {/* 6. ĐÍNH KÈM FILE CV (TÙY CHỌN, NHỎ GỌN) */}
-              {/* ========================================================================= */}
-              {config.allowCvUpload && (
-                <div>
-                  <div className="flex items-center justify-between mb-0.5 md:mb-1">
-                    <label className="block text-[11px] md:text-xs font-semibold text-gray-500">
-                      CV đính kèm <span className="text-gray-400 font-normal">(không bắt buộc)</span>
-                    </label>
-                    <span className="text-[10px] md:text-[11px] text-gray-400">PDF, Word, Ảnh ≤ 10MB</span>
+                {/* Email: 5 cột trên Desktop & iPad */}
+                <div className="col-span-12 sm:col-span-5">
+                  <label className="block text-[11px] font-semibold text-gray-500 mb-1 truncate">
+                    <span>Email của bạn</span> <span className="text-[10px] text-gray-400 font-normal">(Tùy chọn)</span>
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="email"
+                      placeholder="email@gmail.com"
+                      value={formData.email}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
+                      className="w-full pl-8 pr-2.5 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none text-gray-800 placeholder:text-gray-400 placeholder:text-xs"
+                    />
                   </div>
+                </div>
+              </div>
 
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                    className="hidden"
-                  />
+              {/* ========================================================================= */}
+              {/* 5. ĐÍNH KÈM FILE CV & NÚT NỘP ĐƠN (CHUNG 1 HÀNG TRÊN DESKTOP & IPAD) */}
+              {/* ========================================================================= */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2 sm:gap-2.5">
+                {config.allowCvUpload && (
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-0.5">
+                      <label className="block text-[11px] font-semibold text-gray-500 truncate">
+                        CV đính kèm <span className="text-gray-400 font-normal">(tùy chọn)</span>
+                      </label>
+                      <span className="text-[10px] text-gray-400">PDF, Word, Ảnh ≤ 10MB</span>
+                    </div>
 
-                  {cvFile ? (
-                    <div className="flex items-center justify-between p-2 md:p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs md:text-sm">
-                      <div className="flex items-center gap-2 min-w-0 pr-1">
-                        <FileText className="w-4 h-4 md:w-5 md:h-5 text-emerald-600 shrink-0" />
-                        <span className="font-bold text-emerald-950 truncate text-[11px] md:text-xs">
-                          {cvFile.name}
-                        </span>
-                        <span className="text-emerald-700 text-[10px] md:text-[11px] shrink-0 font-medium">
-                          ({formatFileSize(cvFile.size)})
-                        </span>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                      className="hidden"
+                    />
+
+                    {cvFile ? (
+                      <div className="h-[44px] sm:h-[46px] md:h-[48px] flex items-center justify-between px-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs">
+                        <div className="flex items-center gap-1.5 min-w-0 pr-1">
+                          <FileText className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span className="font-bold text-emerald-950 truncate text-[11px]">
+                            {cvFile.name}
+                          </span>
+                          <span className="text-emerald-700 text-[10px] shrink-0 font-medium">
+                            ({formatFileSize(cvFile.size)})
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleRemoveFile}
+                          className="p-1 rounded text-red-500 hover:bg-red-50 hover:text-red-700 transition shrink-0 cursor-pointer"
+                          title="Xóa file CV"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
+                    ) : (
                       <button
                         type="button"
-                        onClick={handleRemoveFile}
-                        className="p-1 rounded text-red-500 hover:bg-red-50 hover:text-red-700 transition shrink-0 cursor-pointer"
-                        title="Xóa file CV"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full h-[44px] sm:h-[46px] md:h-[48px] px-2.5 border border-dashed border-gray-300 hover:border-brand-500 hover:bg-brand-50/20 rounded-xl text-[11px] sm:text-xs text-gray-500 hover:text-brand-900 transition flex items-center justify-center gap-1.5 cursor-pointer truncate"
                       >
-                        <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                        <FileUp className="w-3.5 h-3.5 text-brand-700 shrink-0" />
+                        <span className="truncate">Tải lên CV / Ảnh hồ sơ</span>
                       </button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full py-1.5 md:py-2.5 px-3 border border-dashed border-gray-300 hover:border-brand-500 hover:bg-brand-50/20 rounded-lg text-[11px] md:text-xs text-gray-500 hover:text-brand-900 transition flex items-center justify-center gap-1.5 md:gap-2 cursor-pointer"
-                    >
-                      <FileUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-brand-700" />
-                      <span>Bấm vào đây để tải lên CV hoặc ảnh hồ sơ của bạn</span>
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* ========================================================================= */}
-              {/* 7. NÚT SUBMIT BÊN DƯỚI (HIỂN THỊ RÕ RÀNG TRÊN PC KHÔNG CẦN SCROLL) */}
-              {/* ========================================================================= */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full mt-1 md:mt-2 py-2.5 sm:py-3 md:py-3.5 px-4 bg-gradient-to-r from-brand-800 to-brand-900 hover:from-brand-900 hover:to-brand-950 active:scale-[0.99] text-white font-black rounded-xl shadow-md transition-all flex items-center justify-center gap-2 md:gap-2.5 cursor-pointer disabled:opacity-70 text-xs sm:text-sm md:text-base uppercase tracking-wide"
-              >
-                {loading ? (
-                  <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <Send className="w-4 h-4 md:w-5 md:h-5" />
-                    <span>Gửi Đơn Ứng Tuyển Ngay</span>
-                  </>
+                    )}
+                  </div>
                 )}
-              </button>
+
+                {/* Nút Nộp Đơn bên phải - Style màu vàng kim đồng bộ 100% với nút trên Header */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`h-[44px] sm:h-[46px] md:h-[48px] px-4 sm:px-5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:brightness-105 active:scale-95 text-[#3A0910] font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-70 transition-all shrink-0 ${config.allowCvUpload ? "w-full sm:w-auto sm:min-w-[130px] md:min-w-[145px]" : "w-full"}`}
+                  title="Bấm để nộp đơn ứng tuyển"
+                >
+                  {loading ? (
+                    <div className="w-3.5 h-3.5 border-2 border-[#3A0910] border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5 text-[#3A0910] shrink-0" />
+                      <span>Nộp đơn</span>
+                    </>
+                  )}
+                </button>
+              </div>
 
               <p className="text-[10px] md:text-xs text-gray-400 text-center font-medium">
                 🔒 Cam kết không thu bất kỳ khoản phí nào khi phỏng vấn hoặc nhận việc.
@@ -768,7 +766,62 @@ export default function QuickApplyModal({
             </form>
           )}
         </div>
+
+        {/* ========================================================================= */}
+        {/* CỘT PHẢI: KHUNG HÌNH CHỮ NHẬT (LOGO Ở TRÊN, ẢNH USER Ở DƯỚI) */}
+        {/* ========================================================================= */}
+        <div className="hidden md:flex flex-col items-center justify-between p-5 lg:p-6 bg-gradient-to-b from-amber-50/50 via-white to-amber-50/40 border-l border-amber-200/70 w-[240px] lg:w-[265px] shrink-0 text-center select-none overflow-y-auto">
+          {/* 1. GẮN LOGO Ở TRÊN */}
+          <div className="w-full flex flex-col items-center pt-1">
+            <div className="relative w-36 h-36 lg:w-40 lg:h-40 rounded-2xl overflow-hidden shadow-md border-2 border-amber-300/80 bg-white p-1 transition-transform hover:scale-102">
+              <Image
+                src="/images/logo/logo-brand.webp"
+                alt="Tiệm Lẩu Bò Trăm Rưỡi"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+            <h4 className="mt-2.5 text-xs lg:text-sm font-black text-[#3A0910] uppercase tracking-wide">
+              Lẩu Bò Trăm Rưỡi
+            </h4>
+          </div>
+
+          {/* Dải phân cách trang trí */}
+          <div className="w-full my-auto py-3 flex items-center gap-2">
+            <div className="h-px bg-gradient-to-r from-transparent via-amber-300 to-transparent flex-1" />
+            <span className="text-[10px] font-bold text-amber-900 bg-amber-100/90 px-2.5 py-0.5 rounded-full border border-amber-300/60 shadow-2xs">
+              Hỗ Trợ Ứng Viên
+            </span>
+            <div className="h-px bg-gradient-to-r from-transparent via-amber-300 to-transparent flex-1" />
+          </div>
+
+          {/* 2. GẮN ẢNH USER Ở DƯỚI */}
+          <div className="w-full flex flex-col items-center pb-1">
+            <div className="relative w-24 h-24 lg:w-28 lg:h-28 rounded-full overflow-hidden shadow-md border-2 border-amber-400 bg-white p-0.5 transition-transform hover:scale-102">
+              <div className="relative w-full h-full rounded-full overflow-hidden bg-amber-50">
+                <Image
+                  src="/images/user-avatar.webp"
+                  alt="Ảnh Nhân Sự Tuyển Dụng"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+            <span className="mt-2 text-xs lg:text-sm font-bold text-gray-900">
+              {config.hrName || "Bộ Phận Nhân Sự (HR)"}
+            </span>
+            <div className="mt-0.5 flex items-center gap-1.5 text-[10px] lg:text-[11px] font-semibold text-emerald-700">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Liên hệ phỏng vấn ngay</span>
+            </div>
+            <p className="text-[10px] text-gray-500 mt-0.5">
+              Hotline / Zalo: <span className="font-bold text-[#8E1B24]">{config.hrPhone || "0981256712"}</span>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
   );
 }

@@ -94,7 +94,7 @@ export function JobDetailImages({ images }: JobDetailImagesProps) {
               >
                 <div className="relative w-9 h-9 sm:w-11 sm:h-11">
                   <Image
-                    src="/logo.webp"
+                    src="/images/logo/logo-brand.webp"
                     alt="Logo Lẩu Bò Trăm Rưỡi"
                     fill
                     sizes="44px"
@@ -136,7 +136,7 @@ export function JobDetailImages({ images }: JobDetailImagesProps) {
               <div className="hidden lg:block fixed top-3 left-3 sm:top-5 sm:left-5 z-[100000] pointer-events-none select-none opacity-80 drop-shadow-[0_4px_14px_rgba(0,0,0,0.85)]">
                 <div className="relative w-11 h-11 sm:w-14 sm:h-14">
                   <Image
-                    src="/logo.webp"
+                    src="/images/logo/logo-brand.webp"
                     alt="Logo Lẩu Bò Trăm Rưỡi"
                     fill
                     sizes="56px"

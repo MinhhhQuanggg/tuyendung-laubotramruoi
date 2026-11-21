@@ -723,7 +723,7 @@ export default function AdminDashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-brand-200 bg-brand-50 flex items-center justify-center">
-              <Image src="/logo.webp" alt="Logo" width={40} height={40} className="object-cover" />
+              <Image src="/images/logo/logo-brand.webp" alt="Logo" width={40} height={40} className="object-cover" />
             </div>
             <div>
               <div className="flex items-center gap-2">

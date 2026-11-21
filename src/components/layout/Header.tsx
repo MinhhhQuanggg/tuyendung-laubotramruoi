@@ -329,14 +329,14 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20 sm:h-24">
-            {/* Logo thương hiệu */}
+            {/* Logo thương hiệu trên thanh menu */}
             <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group" title="Trang chủ Tuyển Dụng Lẩu Bò Trăm Rưỡi">
-              <div className="relative w-[50px] h-[50px] sm:w-[64px] sm:h-[64px] shrink-0 drop-shadow-md group-hover:scale-105 transition-transform flex items-center justify-center">
+              <div className="relative w-[52px] h-[52px] sm:w-[66px] sm:h-[66px] shrink-0 drop-shadow-md group-hover:scale-105 transition-transform flex items-center justify-center">
                 <Image
-                  src="/logo.webp"
+                  src="/images/logo/logo-brand.webp"
                   alt="Logo Lẩu Bò Trăm Rưỡi"
-                  width={64}
-                  height={64}
+                  width={897}
+                  height={877}
                   className="w-full h-full object-contain drop-shadow"
                   priority
                 />
