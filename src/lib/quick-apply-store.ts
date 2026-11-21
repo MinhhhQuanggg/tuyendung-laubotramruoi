@@ -6,7 +6,7 @@ const CONFIG_FILE_PATH = path.join(process.cwd(), "src", "config", "quick-apply-
 
 const DEFAULT_CONFIG: QuickApplyConfig = {
   formTitle: "Ứng Tuyển Lẩu Bò Trăm Rưỡi",
-  formSubtitle: "Đào tạo nghề miễn phí có lương • Phỏng vấn đi làm ngay",
+  formSubtitle: "",
   hrName: "Nguyễn Trung Kiên (Kiên HR)",
   hrPhone: "0981256712",
   zaloUrl: "https://zalo.me/0981256712",
