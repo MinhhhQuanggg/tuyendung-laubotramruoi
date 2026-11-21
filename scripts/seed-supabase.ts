@@ -1,3 +1,4 @@
+
 import { createClient } from "@supabase/supabase-js";
 import * as path from "path";
 import * as fs from "fs";
@@ -112,6 +113,9 @@ async function seed() {
     valid_through: j.validThrough,
     is_urgent: j.isUrgent ?? false,
     is_active: j.isActive ?? true,
+    show_in_menu: j.showInMenu !== undefined ? j.showInMenu : true,
+    menu_placement: j.menuPlacement || "PARENT",
+    parent_menu: j.parentMenu || null,
     contact_zalo: j.contactZalo || "0981256712",
     images: (j.images as any) || [],
     video_url: j.videoUrl || null,

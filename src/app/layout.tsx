@@ -25,9 +25,9 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   icons: {
-    icon: "/logo.webp",
-    shortcut: "/logo.webp",
-    apple: "/logo.webp",
+    icon: "/images/logo/logo-brand.webp",
+    shortcut: "/images/logo/logo-brand.webp",
+    apple: "/images/logo/logo-brand.webp",
   },
   description: siteConfig.description,
   keywords: [

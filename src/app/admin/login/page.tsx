@@ -63,7 +63,7 @@ export default function AdminLoginPage() {
           <div className="flex flex-col items-center text-center mb-8">
             <div className="relative w-20 h-20 rounded-2xl overflow-hidden shadow-md border-2 border-brand-100 bg-brand-50 mb-3 flex items-center justify-center">
               <Image
-                src="/logo.webp"
+                src="/images/logo/logo-brand.webp"
                 alt="Logo Lẩu Bò Trăm Rưỡi"
                 width={80}
                 height={80}

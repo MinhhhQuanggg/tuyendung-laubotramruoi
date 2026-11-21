@@ -44,10 +44,10 @@ export default function HeroSection() {
         <Image
           src="/images/logo-tuyendung.webp"
           alt="Logo Tuyển Dụng Tiệm Lẩu Bò Trăm Rưỡi"
-          width={190}
-          height={198}
+          width={897}
+          height={877}
           priority
-          className="w-full h-auto object-contain block rounded-xl sm:rounded-2xl"
+          className="w-full h-auto object-contain block drop-shadow-md"
         />
       </div>
 
