@@ -64,13 +64,13 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
           );
         })()}
 
-        {/* Tiêu đề vị trí & Mức lương cùng hàng, lương đặt bên phải */}
-        <div className="flex items-start justify-between gap-3 mb-4">
+        {/* Tiêu đề vị trí & Mức lương: Mobile xếp dọc (lương dưới tiêu đề), Desktop cùng hàng (lương bên phải) */}
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2.5 sm:gap-3 mb-4">
           <h3 className="text-[19px] sm:text-[21px] font-bold text-gray-900 group-hover:text-brand-800 transition-colors line-clamp-2 leading-snug flex-1">
             <Link href={getJobUrl(job)}>{job.title}</Link>
           </h3>
           {salaryText && (
-            <span className="shrink-0 text-[14px] sm:text-[16px] font-bold text-brand-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/80 whitespace-nowrap mt-0.5">
+            <span className="self-start w-fit shrink-0 text-[14px] sm:text-[16px] font-bold text-brand-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/80 whitespace-nowrap sm:mt-0.5">
               {salaryText}
             </span>
           )}
@@ -79,13 +79,33 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
         {/* Thông tin: Ca làm & Yêu cầu */}
         <div className="space-y-3 text-[17px] sm:text-[19px] text-gray-700 mb-6 leading-relaxed">
           {/* ⏰ Ca làm */}
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
               <Clock className="w-4 h-4 text-blue-700" />
             </div>
-            <span className="truncate">
-              <b>Ca làm:</b> {job.workHours || job.workTypeDisplay}
-            </span>
+            {(() => {
+              const rawHours = (job.workHours || job.workTypeDisplay || "").replace(/24h00/g, "00h00");
+              const match = rawHours.match(/^(.*?)\s+(hoặc)\s+(.*)$/i);
+
+              if (match) {
+                const [, shift1, conjunction, shift2] = match;
+                return (
+                  <span className="line-clamp-2 sm:truncate leading-snug sm:leading-relaxed break-words">
+                    <b>Ca làm:</b> {shift1} {conjunction}
+                    <br className="sm:hidden" />
+                    <span className="sm:inline sm:ml-1 whitespace-nowrap sm:whitespace-normal">
+                      {shift2}
+                    </span>
+                  </span>
+                );
+              }
+
+              return (
+                <span className="line-clamp-2 sm:truncate leading-snug sm:leading-relaxed break-words">
+                  <b>Ca làm:</b> {rawHours}
+                </span>
+              );
+            })()}
           </div>
 
           {/* 📅 Độ tuổi / Yêu cầu */}

@@ -2,13 +2,17 @@ import { Branch, BranchGroup, RegionType } from "@/types/branch";
 
 /**
  * Single source of truth cho toàn bộ hệ thống chi nhánh Tiệm Lẩu Bò Trăm Rưỡi.
- * Ưu tiên đưa chi nhánh 210 Nguyễn Duy Trinh (CN 14) lên hàng đầu bên trái.
+ * Sắp xếp lại thứ tự chi nhánh từ trái sang phải bắt đầu bằng CN 1:
+ * Cột 1 (Quận Đông): CN 1 -> CN 4 (210 Nguyễn Duy Trinh là CN 1)
+ * Cột 2 (Quận Trung Tâm 2): CN 5 -> CN 7
+ * Cột 3 (Quận Bắc): CN 8 -> CN 11
+ * Cột 4 (Quận Trung Tâm & Tây): CN 12 -> CN 15
  */
 export const ALL_BRANCHES: Branch[] = [
-  // 1. CN 14 - 210 Nguyễn Duy Trinh (Ưu tiên hàng đầu)
+  // 1. Cột 1: Quận Đông (CN 1 - CN 4)
   {
-    id: "cn-14",
-    cnNumber: 14,
+    id: "cn-01",
+    cnNumber: 1,
     name: "210 Nguyễn Duy Trinh",
     address: "210 Nguyễn Duy Trinh, Quận 2",
     district: "Quận 2",
@@ -19,10 +23,9 @@ export const ALL_BRANCHES: Branch[] = [
     lng: 106.7635,
     isActive: true,
   },
-  // Các chi nhánh Quận Đông khác
   {
-    id: "cn-01",
-    cnNumber: 1,
+    id: "cn-02",
+    cnNumber: 2,
     name: "228 Hoàng Diệu 2",
     address: "228 Hoàng Diệu 2, Thủ Đức",
     district: "Thủ Đức",
@@ -34,8 +37,8 @@ export const ALL_BRANCHES: Branch[] = [
     isActive: true,
   },
   {
-    id: "cn-05",
-    cnNumber: 5,
+    id: "cn-03",
+    cnNumber: 3,
     name: "323 Đỗ Xuân Hợp",
     address: "323 Đỗ Xuân Hợp, Quận 9",
     district: "Quận 9",
@@ -47,8 +50,8 @@ export const ALL_BRANCHES: Branch[] = [
     isActive: true,
   },
   {
-    id: "cn-12",
-    cnNumber: 12,
+    id: "cn-04",
+    cnNumber: 4,
     name: "245 Võ Thị Sáu",
     address: "245 Võ Thị Sáu, Biên Hòa",
     district: "Biên Hòa",
@@ -60,10 +63,10 @@ export const ALL_BRANCHES: Branch[] = [
     isActive: true,
   },
 
-  // 2. Quận Trung Tâm 2 - Tân Bình, Tân Phú, Bình Thạnh, Phú Nhuận
+  // 2. Cột 2: Quận Trung Tâm 2 - Tân Bình, Tân Phú, Bình Thạnh, Phú Nhuận (CN 5 - CN 7)
   {
-    id: "cn-04",
-    cnNumber: 4,
+    id: "cn-05",
+    cnNumber: 5,
     name: "76 Ung Văn Khiêm",
     address: "76 Ung Văn Khiêm, Bình Thạnh",
     district: "Bình Thạnh",
@@ -75,8 +78,8 @@ export const ALL_BRANCHES: Branch[] = [
     isActive: true,
   },
   {
-    id: "cn-08",
-    cnNumber: 8,
+    id: "cn-06",
+    cnNumber: 6,
     name: "117 Phan Đình Phùng",
     address: "117 Phan Đình Phùng, Phú Nhuận",
     district: "Phú Nhuận",
@@ -88,8 +91,8 @@ export const ALL_BRANCHES: Branch[] = [
     isActive: true,
   },
   {
-    id: "cn-10",
-    cnNumber: 10,
+    id: "cn-07",
+    cnNumber: 7,
     name: "3 Nguyễn Sơn",
     address: "3 Nguyễn Sơn, Tân Phú",
     district: "Tân Phú",
@@ -101,10 +104,10 @@ export const ALL_BRANCHES: Branch[] = [
     isActive: true,
   },
 
-  // 3. Quận Bắc - Quận 12, Gò Vấp, Hóc Môn
+  // 3. Cột 3: Quận Bắc - Quận 12, Gò Vấp, Hóc Môn (CN 8 - CN 11)
   {
-    id: "cn-02",
-    cnNumber: 2,
+    id: "cn-08",
+    cnNumber: 8,
     name: "701 Phan Văn Trị",
     address: "701 Phan Văn Trị, Gò Vấp",
     district: "Gò Vấp",
@@ -116,8 +119,8 @@ export const ALL_BRANCHES: Branch[] = [
     isActive: true,
   },
   {
-    id: "cn-03",
-    cnNumber: 3,
+    id: "cn-09",
+    cnNumber: 9,
     name: "685 Quang Trung",
     address: "685 Quang Trung, Gò Vấp",
     district: "Gò Vấp",
@@ -129,8 +132,8 @@ export const ALL_BRANCHES: Branch[] = [
     isActive: true,
   },
   {
-    id: "cn-07",
-    cnNumber: 7,
+    id: "cn-10",
+    cnNumber: 10,
     name: "107 Lê Đức Thọ",
     address: "107 Lê Đức Thọ, Gò Vấp",
     district: "Gò Vấp",
@@ -142,8 +145,8 @@ export const ALL_BRANCHES: Branch[] = [
     isActive: true,
   },
   {
-    id: "cn-09",
-    cnNumber: 9,
+    id: "cn-11",
+    cnNumber: 11,
     name: "342 Phan Huy Ích",
     address: "342 Phan Huy Ích, Gò Vấp",
     district: "Gò Vấp",
@@ -155,10 +158,10 @@ export const ALL_BRANCHES: Branch[] = [
     isActive: true,
   },
 
-  // 4. Quận Trung Tâm - Quận 1, Quận 3, Quận 4, Quận 5, Quận 10
+  // 4. Cột 4: Quận Trung Tâm (CN 12 - CN 14) & Quận Tây (CN 15)
   {
-    id: "cn-15",
-    cnNumber: 15,
+    id: "cn-12",
+    cnNumber: 12,
     name: "2 Đinh Tiên Hoàng",
     address: "2 Đinh Tiên Hoàng, Quận 1",
     district: "Quận 1",
@@ -170,8 +173,8 @@ export const ALL_BRANCHES: Branch[] = [
     isActive: true,
   },
   {
-    id: "cn-06",
-    cnNumber: 6,
+    id: "cn-13",
+    cnNumber: 13,
     name: "516 Cách Mạng Tháng Tám",
     address: "516 Cách Mạng Tháng Tám, Quận 3",
     district: "Quận 3",
@@ -183,8 +186,8 @@ export const ALL_BRANCHES: Branch[] = [
     isActive: true,
   },
   {
-    id: "cn-11",
-    cnNumber: 11,
+    id: "cn-14",
+    cnNumber: 14,
     name: "828 Sư Vạn Hạnh",
     address: "828 Sư Vạn Hạnh, Quận 10",
     district: "Quận 10",
@@ -195,11 +198,9 @@ export const ALL_BRANCHES: Branch[] = [
     lng: 106.6678,
     isActive: true,
   },
-
-  // 5. Quận Tây - Quận 6, Quận 8, Bình Tân, Bình Chánh
   {
-    id: "cn-13",
-    cnNumber: 13,
+    id: "cn-15",
+    cnNumber: 15,
     name: "33 Nguyễn Thị Tú (Vĩnh Lộc)",
     address: "33 Nguyễn Thị Tú, Bình Tân",
     district: "Bình Tân",
@@ -362,14 +363,8 @@ export function getBranchRegionKey(b: Branch): RegionType {
 export const BRANCH_GROUPS: BranchGroup[] = REGION_METADATA.map((meta) => {
   const branches = ALL_BRANCHES.filter((b) => getBranchRegionKey(b) === meta.key);
 
-  // Sắp xếp chi nhánh trong nhóm: Nếu là Quận Đông thì luôn ưu tiên 210 Nguyễn Duy Trinh lên số 1
-  branches.sort((a, b) => {
-    const isANdt = a.address.toLowerCase().includes("nguyễn duy trinh") || a.name.toLowerCase().includes("nguyễn duy trinh");
-    const isBNdt = b.address.toLowerCase().includes("nguyễn duy trinh") || b.name.toLowerCase().includes("nguyễn duy trinh");
-    if (isANdt && !isBNdt) return -1;
-    if (!isANdt && isBNdt) return 1;
-    return a.cnNumber - b.cnNumber;
-  });
+  // Sắp xếp chi nhánh trong nhóm theo số thứ tự CN
+  branches.sort((a, b) => a.cnNumber - b.cnNumber);
 
   return {
     region: meta.key,

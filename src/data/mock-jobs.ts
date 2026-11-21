@@ -105,8 +105,8 @@ export const MOCK_JOBS_DATA: JobItem[] = [
     locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú", "Bình Tân"],
     ageRequirement: "18 – 30 tuổi",
     workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian (14h00 – 24h00 hoặc 15h00 – 00h00)",
-    workHours: "14h00 – 24h00 hoặc 15h00 – 00h00",
+    workTypeDisplay: "Toàn thời gian (14h00 – 00h00 hoặc 15h00 – 00h00)",
+    workHours: "14h00 – 00h00 hoặc 15h00 – 00h00",
     experienceDisplay: "Không yêu cầu (Đào tạo từ số 0)",
     experienceRequirements: "Không yêu cầu kinh nghiệm, chỉ cần chịu khó và có trách nhiệm",
     isActive: true,
@@ -139,7 +139,7 @@ export const MOCK_JOBS_DATA: JobItem[] = [
         {
           icon: "🌙",
           label: "Ca làm việc:",
-          content: "14h00 – 24h00 hoặc 15h00 – 00h00 mỗi ngày",
+          content: "14h00 – 00h00 hoặc 15h00 – 00h00 mỗi ngày",
         },
         {
           icon: "👤",
@@ -199,8 +199,8 @@ export const MOCK_JOBS_DATA: JobItem[] = [
     locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú", "Bình Tân"],
     ageRequirement: "18 – 30 tuổi",
     workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian (14h00 – 24h00)",
-    workHours: "14h00 – 24h00 hoặc 15h00 – 00h00",
+    workTypeDisplay: "Toàn thời gian (14h00 – 00h00)",
+    workHours: "14h00 – 00h00 hoặc 15h00 – 00h00",
     experienceDisplay: "Không yêu cầu (Đào tạo từ số 0)",
     experienceRequirements: "Chưa từng có kinh nghiệm sẽ được đào tạo",
     isActive: true,
@@ -233,7 +233,7 @@ export const MOCK_JOBS_DATA: JobItem[] = [
         {
           icon: "🌙",
           label: "Ca làm việc:",
-          content: "14h00 – 24h00 hoặc 15h00 – 00h00 mỗi ngày",
+          content: "14h00 – 00h00 hoặc 15h00 – 00h00 mỗi ngày",
         },
         {
           icon: "👤",
@@ -375,7 +375,7 @@ export const MOCK_JOBS_DATA: JobItem[] = [
     ageRequirement: "18 – 25 tuổi",
     workType: "PART_TIME",
     workTypeDisplay: "Bán thời gian / Thời vụ 3 buổi/tuần",
-    workHours: "Ca 17h00 – 24h00 (Đăng ký tối thiểu 3 buổi/tuần)",
+    workHours: "Ca 17h00 – 00h00 (Đăng ký tối thiểu 3 buổi/tuần)",
     experienceDisplay: "Không yêu cầu kinh nghiệm",
     experienceRequirements: "Không yêu cầu, sinh viên đi làm thêm được ưu tiên",
     isActive: true,
@@ -391,12 +391,12 @@ export const MOCK_JOBS_DATA: JobItem[] = [
     concisePost: {
       headline: "TUYỂN DỤNG PHỤC VỤ THỜI VỤ 3 BUỔI/TUẦN - 30K/H NHẬN LƯƠNG TUẦN",
       intro:
-        "Bạn là sinh viên hoặc cần tìm việc làm thêm linh động? Gia nhập ngay Tiệm Lẩu Bò Trăm Rưỡi, chỉ cần làm 3 buổi/tuần từ 17h00-24h00, 210k/buổi nhận lương đều đặn mỗi tuần!",
+        "Bạn là sinh viên hoặc cần tìm việc làm thêm linh động? Gia nhập ngay Tiệm Lẩu Bò Trăm Rưỡi, chỉ cần làm 3 buổi/tuần từ 17h00-00h00, 210k/buổi nhận lương đều đặn mỗi tuần!",
       points: [
         {
           icon: "⏰",
           label: "Lịch làm linh hoạt:",
-          content: "Ca 17h00 – 24h00, tự do đăng ký 3 buổi/tuần phù hợp lịch học.",
+          content: "Ca 17h00 – 00h00, tự do đăng ký 3 buổi/tuần phù hợp lịch học.",
         },
         {
           icon: "💵",
@@ -423,7 +423,7 @@ export const MOCK_JOBS_DATA: JobItem[] = [
     ],
     requirements: [
       "Nam/Nữ từ 18 – 25 tuổi, nhanh nhẹn, vui vẻ",
-      "Có thể làm tối thiểu 3 ca/tuần (17h00 – 24h00)",
+      "Có thể làm tối thiểu 3 ca/tuần (17h00 – 00h00)",
     ],
     benefits: [
       "Mức lương: 30.000 VNĐ/giờ (210.000 VNĐ/buổi), nhận lương tuần",

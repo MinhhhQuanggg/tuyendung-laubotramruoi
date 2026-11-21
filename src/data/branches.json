@@ -1,7 +1,7 @@
 [
   {
-    "id": "cn-14",
-    "cnNumber": 14,
+    "id": "cn-01",
+    "cnNumber": 1,
     "name": "210 Nguyễn Duy Trinh",
     "address": "210 Nguyễn Duy Trinh, Quận 2",
     "district": "Quận 2",
@@ -13,8 +13,8 @@
     "isActive": true
   },
   {
-    "id": "cn-01",
-    "cnNumber": 1,
+    "id": "cn-02",
+    "cnNumber": 2,
     "name": "228 Hoàng Diệu 2",
     "address": "228 Hoàng Diệu 2, Thủ Đức",
     "district": "Thủ Đức",
@@ -26,8 +26,8 @@
     "isActive": true
   },
   {
-    "id": "cn-05",
-    "cnNumber": 5,
+    "id": "cn-03",
+    "cnNumber": 3,
     "name": "323 Đỗ Xuân Hợp",
     "address": "323 Đỗ Xuân Hợp, Quận 9",
     "district": "Quận 9",
@@ -39,8 +39,8 @@
     "isActive": true
   },
   {
-    "id": "cn-12",
-    "cnNumber": 12,
+    "id": "cn-04",
+    "cnNumber": 4,
     "name": "245 Võ Thị Sáu",
     "address": "245 Võ Thị Sáu, Biên Hòa",
     "district": "Biên Hòa",
@@ -52,8 +52,8 @@
     "isActive": true
   },
   {
-    "id": "cn-04",
-    "cnNumber": 4,
+    "id": "cn-05",
+    "cnNumber": 5,
     "name": "76 Ung Văn Khiêm",
     "address": "76 Ung Văn Khiêm, Bình Thạnh",
     "district": "Bình Thạnh",
@@ -65,8 +65,8 @@
     "isActive": true
   },
   {
-    "id": "cn-08",
-    "cnNumber": 8,
+    "id": "cn-06",
+    "cnNumber": 6,
     "name": "117 Phan Đình Phùng",
     "address": "117 Phan Đình Phùng, Phú Nhuận",
     "district": "Phú Nhuận",
@@ -78,8 +78,8 @@
     "isActive": true
   },
   {
-    "id": "cn-10",
-    "cnNumber": 10,
+    "id": "cn-07",
+    "cnNumber": 7,
     "name": "3 Nguyễn Sơn",
     "address": "3 Nguyễn Sơn, Tân Phú",
     "district": "Tân Phú",
@@ -91,8 +91,8 @@
     "isActive": true
   },
   {
-    "id": "cn-02",
-    "cnNumber": 2,
+    "id": "cn-08",
+    "cnNumber": 8,
     "name": "701 Phan Văn Trị",
     "address": "701 Phan Văn Trị, Gò Vấp",
     "district": "Gò Vấp",
@@ -104,8 +104,8 @@
     "isActive": true
   },
   {
-    "id": "cn-03",
-    "cnNumber": 3,
+    "id": "cn-09",
+    "cnNumber": 9,
     "name": "685 Quang Trung",
     "address": "685 Quang Trung, Gò Vấp",
     "district": "Gò Vấp",
@@ -117,8 +117,8 @@
     "isActive": true
   },
   {
-    "id": "cn-07",
-    "cnNumber": 7,
+    "id": "cn-10",
+    "cnNumber": 10,
     "name": "107 Lê Đức Thọ",
     "address": "107 Lê Đức Thọ, Gò Vấp",
     "district": "Gò Vấp",
@@ -130,8 +130,8 @@
     "isActive": true
   },
   {
-    "id": "cn-09",
-    "cnNumber": 9,
+    "id": "cn-11",
+    "cnNumber": 11,
     "name": "342 Phan Huy Ích",
     "address": "342 Phan Huy Ích, Gò Vấp",
     "district": "Gò Vấp",
@@ -143,8 +143,8 @@
     "isActive": true
   },
   {
-    "id": "cn-15",
-    "cnNumber": 15,
+    "id": "cn-12",
+    "cnNumber": 12,
     "name": "2 Đinh Tiên Hoàng",
     "address": "2 Đinh Tiên Hoàng, Quận 1",
     "district": "Quận 1",
@@ -156,8 +156,8 @@
     "isActive": true
   },
   {
-    "id": "cn-06",
-    "cnNumber": 6,
+    "id": "cn-13",
+    "cnNumber": 13,
     "name": "516 Cách Mạng Tháng Tám",
     "address": "516 Cách Mạng Tháng Tám, Quận 3",
     "district": "Quận 3",
@@ -169,8 +169,8 @@
     "isActive": true
   },
   {
-    "id": "cn-11",
-    "cnNumber": 11,
+    "id": "cn-14",
+    "cnNumber": 14,
     "name": "828 Sư Vạn Hạnh",
     "address": "828 Sư Vạn Hạnh, Quận 10",
     "district": "Quận 10",
@@ -182,8 +182,8 @@
     "isActive": true
   },
   {
-    "id": "cn-13",
-    "cnNumber": 13,
+    "id": "cn-15",
+    "cnNumber": 15,
     "name": "33 Nguyễn Thị Tú (Vĩnh Lộc)",
     "address": "33 Nguyễn Thị Tú, Bình Tân",
     "district": "Bình Tân",

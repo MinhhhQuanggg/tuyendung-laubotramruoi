@@ -40,14 +40,8 @@ export default function Footer() {
     return REGION_METADATA.map((meta) => {
       const colBranches = branches.filter((b) => getBranchRegionKey(b) === meta.key);
 
-      // Sắp xếp chi nhánh: với Quận Đông (hoặc bất kỳ nhóm nào có Nguyễn Duy Trinh), đưa Nguyễn Duy Trinh lên đầu tiên
-      colBranches.sort((a, b) => {
-        const isANdt = a.address.toLowerCase().includes("nguyễn duy trinh") || a.name.toLowerCase().includes("nguyễn duy trinh");
-        const isBNdt = b.address.toLowerCase().includes("nguyễn duy trinh") || b.name.toLowerCase().includes("nguyễn duy trinh");
-        if (isANdt && !isBNdt) return -1;
-        if (!isANdt && isBNdt) return 1;
-        return a.cnNumber - b.cnNumber;
-      });
+      // Sắp xếp chi nhánh theo số thứ tự CN từ bé đến lớn
+      colBranches.sort((a, b) => a.cnNumber - b.cnNumber);
 
       return {
         key: meta.key,
@@ -139,16 +133,6 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8 flex-1 flex flex-col justify-between w-full relative z-10 space-y-6">
         {/* PHẦN TRÊN: DANH SÁCH ĐỊA CHỈ CHI NHÁNH CHIA 4 CỘT: QUẬN ĐÔNG | QUẬN TRUNG TÂM 2 | QUẬN BẮC | QUẬN TRUNG TÂM (CỘT QUẬN TÂY Ở DƯỚI) */}
         <div className="pb-6 border-b border-brand-900/80">
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-white font-extrabold text-sm sm:text-base md:text-lg uppercase tracking-wider flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
-              Danh Sách Tiệm Lẩu Bò Trăm Rưỡi ({branches.length > 0 ? `${branches.length} ` : ""}Chi Nhánh)
-            </h3>
-            <span className="text-xs text-amber-200/80 font-medium bg-white/5 border border-white/10 px-3 py-1 rounded-full">
-              📍 Phân nhóm theo 4 cột (Quận Đông • Quận Trung Tâm 2 • Quận Bắc • Quận Trung Tâm & Tây)
-            </span>
-          </div>
-
           {/* GRID 4 CỘT: QUẬN ĐÔNG | QUẬN TRUNG TÂM 2 | QUẬN BẮC | QUẬN TRUNG TÂM (CỘT QUẬN TÂY Ở DƯỚI) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 lg:gap-x-7 gap-y-7">
             {/* Cột 1: Quận Đông (Nguyễn Duy Trinh lên hàng đầu bên trái) */}
