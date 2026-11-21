@@ -24,6 +24,28 @@ import { JobItem } from "@/types/job";
 import { ALL_BRANCHES, REGION_METADATA, getBranchRegionKey } from "@/data/branches";
 import { MOCK_JOBS_DATA } from "@/data/mock-jobs";
 
+const ALLOWED_CV_EXTENSIONS = ["pdf", "doc", "docx", "png", "jpg", "jpeg", "webp"];
+
+/**
+ * Ở form ứng tuyển: Chỉ giữ số lương + đơn vị (/tháng hoặc /giờ),
+ * loại bỏ chữ "Lương:", bỏ phần chữ sau dấu cộng (+) và các ghi chú trong ngoặc
+ */
+export function formatModalSalary(salary?: string): string {
+  if (!salary) return "Thoả thuận hấp dẫn";
+
+  // Ưu tiên trích xuất định dạng khoảng lương theo tháng dạng: "X - Y triệu/tháng" hoặc "X triệu/tháng"
+  const monthMatch = salary.match(/(\d+[\d,.]*(?:\s*-\s*\d+[\d,.]*)?\s*triệu\/tháng)/i);
+  if (monthMatch) {
+    return monthMatch[1].trim();
+  }
+
+  // Đối với các vị trí tính theo giờ hoặc định dạng khác, loại bỏ dấu cộng (+), ghi chú trong ngoặc đơn
+  let cleaned = salary.split(/[+＋]/)[0];
+  cleaned = cleaned.replace(/\([^)]*\)/g, "");
+  cleaned = cleaned.replace(/\s*-\s*Nhận lương tuần/i, "");
+  return cleaned.trim() || "Thoả thuận";
+}
+
 /**
  * Chỉ các công việc thực sự là học việc, học nghề mới hiển thị huy hiệu "Học nghề có lương"
  */
@@ -113,7 +135,7 @@ export default function QuickApplyModal({
     age: "",
     phoneZalo: "",
     email: "",
-    appliedRegion: "CN 14 (Quận 2): 210 Nguyễn Duy Trinh, Quận 2",
+    appliedRegion: "CN 1 (Quận 2): 210 Nguyễn Duy Trinh, Quận 2",
     positionId: "JOB-GS-BEP",
     positionTitle: "Giám sát Bếp Chi Nhánh",
   });
@@ -128,6 +150,8 @@ export default function QuickApplyModal({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [cvError, setCvError] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -187,7 +211,7 @@ export default function QuickApplyModal({
         );
       }
 
-      let defaultBranchText = "CN 14 (Quận 2): 210 Nguyễn Duy Trinh, Quận 2";
+      let defaultBranchText = "CN 1 (Quận 2): 210 Nguyễn Duy Trinh, Quận 2";
       const ndtBranch = branchesList.find(
         (b) =>
           b.address.toLowerCase().includes("nguyễn duy trinh") ||
@@ -260,17 +284,7 @@ export default function QuickApplyModal({
         (b) => getBranchRegionKey(b) === meta.key
       );
 
-      branches.sort((a, b) => {
-        const isANdt =
-          a.address.toLowerCase().includes("nguyễn duy trinh") ||
-          a.name.toLowerCase().includes("nguyễn duy trinh");
-        const isBNdt =
-          b.address.toLowerCase().includes("nguyễn duy trinh") ||
-          b.name.toLowerCase().includes("nguyễn duy trinh");
-        if (isANdt && !isBNdt) return -1;
-        if (!isANdt && isBNdt) return 1;
-        return a.cnNumber - b.cnNumber;
-      });
+      branches.sort((a, b) => a.cnNumber - b.cnNumber);
 
       return {
         key: meta.key,
@@ -294,30 +308,91 @@ export default function QuickApplyModal({
     }));
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawVal = e.target.value;
+    setFormData((prev) => ({ ...prev, phoneZalo: rawVal }));
+
+    const trimmed = rawVal.trim();
+    if (!trimmed) {
+      setPhoneError("");
+      return;
+    }
+
+    // Kiểm tra ký tự không phải số
+    if (/[^\d]/.test(trimmed)) {
+      setPhoneError("Số điện thoại chỉ được chứa chữ số");
+      return;
+    }
+
+    if (trimmed.length > 10) {
+      setPhoneError("Dư số điện thoại");
+      return;
+    }
+
+    setPhoneError("");
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      alert("Dung lượng file CV tối đa là 10MB");
+    setCvError("");
+    setErrorMsg("");
+
+    // 1. Kiểm tra phần mở rộng file (extension)
+    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    if (!ALLOWED_CV_EXTENSIONS.includes(ext)) {
+      setCvFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      const msg = "File CV không đúng định dạng. Chỉ chấp nhận file PDF, Word (.doc, .docx) hoặc file Ảnh (.jpg, .jpeg, .png).";
+      setCvError(msg);
+      setErrorMsg(msg);
+      return;
+    }
+
+    // 2. Kiểm tra dung lượng rỗng (0 bytes)
+    if (file.size <= 0) {
+      setCvFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      const msg = "File CV bị lỗi hoặc rỗng (0 bytes). Vui lòng chọn file khác.";
+      setCvError(msg);
+      setErrorMsg(msg);
+      return;
+    }
+
+    // 3. Kiểm tra dung lượng tối đa (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setCvFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      const msg = "Dung lượng file CV vượt quá 10MB. Vui lòng chọn file nhỏ hơn 10MB.";
+      setCvError(msg);
+      setErrorMsg(msg);
       return;
     }
 
     const reader = new FileReader();
     reader.onload = () => {
+      setCvError("");
       setCvFile({
         name: file.name,
         size: file.size,
-        type: file.type || "application/octet-stream",
+        type: file.type || (ext === "pdf" ? "application/pdf" : "application/octet-stream"),
         base64: reader.result as string,
       });
+    };
+    reader.onerror = () => {
+      setCvFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      const msg = "Không thể đọc file CV. File có thể bị hỏng, vui lòng chọn file khác.";
+      setCvError(msg);
+      setErrorMsg(msg);
     };
     reader.readAsDataURL(file);
   };
 
   const handleRemoveFile = () => {
     setCvFile(null);
+    setCvError("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -350,9 +425,66 @@ export default function QuickApplyModal({
 
     const phoneTrimmed = formData.phoneZalo.trim();
     if (!phoneTrimmed) {
+      setPhoneError("Vui lòng nhập số điện thoại hoặc Zalo");
       setErrorMsg("Vui lòng nhập số điện thoại hoặc Zalo để HR liên hệ phỏng vấn");
       setLoading(false);
       return;
+    }
+
+    if (/[^\d]/.test(phoneTrimmed)) {
+      setPhoneError("Số điện thoại chỉ được chứa chữ số");
+      setErrorMsg("Số điện thoại chỉ được chứa chữ số (vui lòng không nhập chữ hoặc ký tự đặc biệt)");
+      setLoading(false);
+      return;
+    }
+
+    if (phoneTrimmed.length > 10) {
+      setPhoneError("Dư số điện thoại");
+      setErrorMsg("Dư số điện thoại");
+      setLoading(false);
+      return;
+    }
+
+    if (phoneTrimmed.length < 10) {
+      setPhoneError("Số điện thoại chưa đủ 10 số");
+      setErrorMsg("Số điện thoại chưa đủ 10 số (cần đúng 10 chữ số)");
+      setLoading(false);
+      return;
+    }
+
+    if (!/^0[0-9]{9}$/.test(phoneTrimmed)) {
+      setPhoneError("Số điện thoại không hợp lệ");
+      setErrorMsg("Số điện thoại không hợp lệ (phải bắt đầu bằng số 0 và có đúng 10 số)");
+      setLoading(false);
+      return;
+    }
+
+    // Xóa lỗi phone nếu hợp lệ
+    setPhoneError("");
+
+    // Kiểm tra tính hợp lệ của CV đính kèm (nếu có lỗi chọn sai định dạng hay sai CV thì không cho apply)
+    if (cvError) {
+      setErrorMsg(cvError);
+      setLoading(false);
+      return;
+    }
+
+    if (cvFile) {
+      const ext = cvFile.name.split(".").pop()?.toLowerCase() || "";
+      if (!ALLOWED_CV_EXTENSIONS.includes(ext)) {
+        const msg = "File CV không đúng định dạng. Chỉ chấp nhận file PDF, Word (.doc, .docx) hoặc file Ảnh (.jpg, .jpeg, .png).";
+        setCvError(msg);
+        setErrorMsg(msg);
+        setLoading(false);
+        return;
+      }
+      if (cvFile.size <= 0 || cvFile.size > 10 * 1024 * 1024) {
+        const msg = "Dung lượng file CV không hợp lệ (tối đa 10MB).";
+        setCvError(msg);
+        setErrorMsg(msg);
+        setLoading(false);
+        return;
+      }
     }
 
     const emailTrimmed = formData.email.trim();
@@ -405,6 +537,8 @@ export default function QuickApplyModal({
   const handleResetAndClose = () => {
     setSuccess(false);
     setErrorMsg("");
+    setPhoneError("");
+    setCvError("");
     setCvFile(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
     setFormData({
@@ -412,7 +546,7 @@ export default function QuickApplyModal({
       age: "",
       phoneZalo: "",
       email: "",
-      appliedRegion: "CN 14 (Quận 2): 210 Nguyễn Duy Trinh, Quận 2",
+      appliedRegion: "CN 1 (Quận 2): 210 Nguyễn Duy Trinh, Quận 2",
       positionId: "JOB-GS-BEP",
       positionTitle: "Giám sát Bếp Chi Nhánh",
     });
@@ -544,30 +678,25 @@ export default function QuickApplyModal({
                   </select>
                 </div>
 
-                {/* Khối LƯƠNG: Font size to ngang Tiêu đề title, nổi bật & không bị duplicate */}
+                {/* Khối LƯƠNG & CA LÀM: Chỉ giữ icon & số lương/tháng, ca làm */}
                 <div className="mt-2 md:mt-2.5 px-3 md:px-4 py-2 sm:py-2.5 md:py-3 rounded-xl bg-gradient-to-r from-amber-50/90 via-red-50/30 to-white border border-amber-200/80 flex items-center justify-between gap-2 shadow-xs">
+                  {/* Icon & Số lương/tháng */}
                   <div className="flex items-center gap-1.5 md:gap-2 min-w-0">
                     <DollarSign className="w-4 h-4 md:w-5 md:h-5 text-amber-700 shrink-0" />
                     <span className="font-black text-sm sm:text-base md:text-lg bg-gradient-to-r from-[#8E1B24] via-[#B83232] to-[#C9963F] bg-clip-text text-transparent truncate">
-                      Lương: {selectedJob?.salaryDisplay || "Thoả thuận hấp dẫn"}
+                      {formatModalSalary(selectedJob?.salaryDisplay)}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
-                    {/* Chỉ có học việc mới có thẻ Học nghề có lương */}
-                    {isHocViecJob(selectedJob) && (
-                      <span className="px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-black bg-gradient-to-r from-amber-500 to-amber-400 text-amber-950 uppercase tracking-wide shadow-xs">
-                        Học nghề có lương
+                  {/* Ca làm */}
+                  {(selectedJob?.workHours || selectedJob?.workTypeDisplay) && (
+                    <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs md:text-sm text-gray-600 font-medium shrink-0">
+                      <Clock className="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600 shrink-0" />
+                      <span className="truncate max-w-[150px] sm:max-w-[220px] md:max-w-[300px]">
+                        {selectedJob.workHours || selectedJob.workTypeDisplay}
                       </span>
-                    )}
-
-                    {selectedJob?.workHours && (
-                      <div className="text-[11px] md:text-xs text-gray-500 flex items-center gap-1 font-medium hidden sm:flex">
-                        <Clock className="w-3 h-3 md:w-3.5 md:h-3.5 text-blue-600 shrink-0" />
-                        <span className="truncate max-w-[130px] md:max-w-[170px]">{selectedJob.workHours}</span>
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -653,18 +782,28 @@ export default function QuickApplyModal({
                   <span className="text-[11px] md:text-xs font-semibold text-emerald-700 normal-case">HR gọi sau 5 phút</span>
                 </label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 md:w-4.5 md:h-4.5 text-brand-800 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Phone className={`w-4 h-4 md:w-4.5 md:h-4.5 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${
+                    phoneError ? "text-red-500" : "text-brand-800"
+                  }`} />
                   <input
                     type="tel"
                     required
                     placeholder="VD: 0981256712 (để HR gọi phỏng vấn)"
                     value={formData.phoneZalo}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phoneZalo: e.target.value })
-                    }
-                    className="w-full pl-9 md:pl-10.5 pr-3 py-2.5 md:py-3 text-sm md:text-base border-2 border-brand-700/60 rounded-xl focus:ring-2 focus:ring-brand-700 focus:outline-none font-bold text-brand-950 placeholder:font-normal placeholder:text-xs md:placeholder:text-sm bg-white shadow-xs"
+                    onChange={handlePhoneChange}
+                    className={`w-full pl-9 md:pl-10.5 pr-3 py-2.5 md:py-3 text-sm md:text-base border-2 rounded-xl focus:outline-none font-bold placeholder:font-normal placeholder:text-xs md:placeholder:text-sm shadow-xs transition-colors ${
+                      phoneError
+                        ? "border-red-500 bg-red-50/50 text-red-900 focus:border-red-600 focus:ring-2 focus:ring-red-200"
+                        : "border-brand-700/60 bg-white text-brand-950 focus:ring-2 focus:ring-brand-700"
+                    }`}
                   />
                 </div>
+                {phoneError && (
+                  <p className="mt-1 text-xs font-bold text-red-600 flex items-center gap-1 animate-in fade-in">
+                    <span>⚠️</span>
+                    <span>{phoneError}</span>
+                  </p>
+                )}
               </div>
 
               {/* ========================================================================= */}
@@ -770,11 +909,21 @@ export default function QuickApplyModal({
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-full h-[44px] sm:h-[46px] md:h-[48px] px-2.5 border border-dashed border-gray-300 hover:border-brand-500 hover:bg-brand-50/20 rounded-xl text-[11px] sm:text-xs text-gray-500 hover:text-brand-900 transition flex items-center justify-center gap-1.5 cursor-pointer truncate"
+                        className={`w-full h-[44px] sm:h-[46px] md:h-[48px] px-2.5 border rounded-xl text-[11px] sm:text-xs transition flex items-center justify-center gap-1.5 cursor-pointer truncate ${
+                          cvError
+                            ? "border-2 border-red-500 bg-red-50/50 text-red-700 hover:bg-red-100/50"
+                            : "border-dashed border-gray-300 hover:border-brand-500 hover:bg-brand-50/20 text-gray-500 hover:text-brand-900"
+                        }`}
                       >
-                        <FileUp className="w-3.5 h-3.5 text-brand-700 shrink-0" />
-                        <span className="truncate">Tải lên CV / Ảnh hồ sơ</span>
+                        <FileUp className={`w-3.5 h-3.5 shrink-0 ${cvError ? "text-red-600" : "text-brand-700"}`} />
+                        <span className="truncate">{cvError ? "Chọn lại file CV hợp lệ" : "Tải lên CV / Ảnh hồ sơ"}</span>
                       </button>
+                    )}
+                    {cvError && (
+                      <p className="mt-1 text-[11px] font-bold text-red-600 flex items-center gap-1 animate-in fade-in">
+                        <span>⚠️</span>
+                        <span>{cvError}</span>
+                      </p>
                     )}
                   </div>
                 )}
@@ -807,20 +956,20 @@ export default function QuickApplyModal({
         {/* ========================================================================= */}
         {/* CỘT PHẢI: KHUNG HÌNH CHỮ NHẬT (LOGO Ở TRÊN, ẢNH USER Ở DƯỚI) */}
         {/* ========================================================================= */}
-        <div className="hidden md:flex flex-col items-center justify-between p-5 lg:p-6 bg-gradient-to-b from-amber-50/50 via-white to-amber-50/40 border-l border-amber-200/70 w-[240px] lg:w-[265px] shrink-0 text-center select-none overflow-y-auto">
+        <div className="hidden md:flex flex-col items-center justify-between p-5 lg:p-6 bg-gradient-to-b from-amber-50/50 via-white to-amber-50/40 border-l border-amber-200/70 w-[260px] lg:w-[290px] shrink-0 text-center select-none overflow-y-auto">
           {/* 1. GẮN LOGO Ở TRÊN */}
-          <div className="w-full flex flex-col items-center pt-1">
-            <div className="relative w-32 h-32 lg:w-36 lg:h-36 rounded-2xl overflow-hidden shadow-md border-2 border-amber-300/80 bg-white p-2 transition-transform hover:scale-102 flex items-center justify-center">
+          <div className="w-full flex flex-col items-center pt-2">
+            <div className="relative w-36 h-36 lg:w-44 lg:h-44 rounded-2xl overflow-hidden shadow-md border-2 border-amber-300/80 bg-white p-2.5 transition-transform hover:scale-102 flex items-center justify-center">
               <Image
                 src="/images/logo/logo-brand.webp"
                 alt="Tiệm Lẩu Bò Trăm Rưỡi"
                 fill
                 unoptimized
-                className="object-contain p-1"
+                className="object-contain p-1.5"
                 priority
               />
             </div>
-            <h4 className="mt-2.5 text-xs lg:text-sm font-black text-[#3A0910] uppercase tracking-wide">
+            <h4 className="mt-3 text-sm lg:text-base font-black text-[#3A0910] uppercase tracking-wide">
               Lẩu Bò Trăm Rưỡi
             </h4>
           </div>
@@ -828,17 +977,17 @@ export default function QuickApplyModal({
           {/* Dải phân cách trang trí */}
           <div className="w-full my-auto py-3 flex items-center gap-2">
             <div className="h-px bg-gradient-to-r from-transparent via-amber-300 to-transparent flex-1" />
-            <span className="text-[10px] font-bold text-amber-900 bg-amber-100/90 px-2.5 py-0.5 rounded-full border border-amber-300/60 shadow-2xs">
+            <span className="text-[11px] lg:text-xs font-bold text-amber-900 bg-amber-100/90 px-3 py-1 rounded-full border border-amber-300/60 shadow-2xs">
               Hỗ Trợ Ứng Viên
             </span>
             <div className="h-px bg-gradient-to-r from-transparent via-amber-300 to-transparent flex-1" />
           </div>
 
           {/* 2. GẮN ẢNH USER Ở DƯỚI */}
-          <div className="w-full flex flex-col items-center pb-1">
-            <div className="relative w-22 h-22 lg:w-24 lg:h-24 rounded-full overflow-hidden shadow-md border-2 border-amber-400 bg-white p-0.5 transition-transform hover:scale-102">
+          <div className="w-full flex flex-col items-center pb-2">
+            <div className="relative w-28 h-28 lg:w-36 lg:h-36 rounded-full overflow-hidden shadow-md border-[3px] border-amber-400 bg-white p-1 transition-transform hover:scale-102">
               <div className="relative w-full h-full rounded-full overflow-hidden bg-amber-100 flex items-center justify-center">
-                <User className="w-8 h-8 text-amber-700/60 absolute" />
+                <User className="w-12 h-12 lg:w-16 lg:h-16 text-amber-700/60 absolute" />
                 <Image
                   src="/images/user-avatar.webp"
                   alt="Ảnh Nhân Sự Tuyển Dụng"
@@ -848,14 +997,14 @@ export default function QuickApplyModal({
                 />
               </div>
             </div>
-            <span className="mt-2 text-xs lg:text-sm font-bold text-gray-900">
+            <span className="mt-2.5 text-sm lg:text-base font-bold text-gray-900">
               {config.hrName || "Bộ Phận Nhân Sự (HR)"}
             </span>
-            <div className="mt-0.5 flex items-center gap-1.5 text-[10px] lg:text-[11px] font-semibold text-emerald-700">
+            <div className="mt-1 flex items-center gap-1.5 text-xs lg:text-[13px] font-semibold text-emerald-700">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>Liên hệ phỏng vấn ngay</span>
             </div>
-            <p className="text-[10px] text-gray-500 mt-0.5">
+            <p className="text-xs lg:text-sm text-gray-500 mt-1">
               Hotline / Zalo: <span className="font-bold text-[#8E1B24]">{config.hrPhone || "0981256712"}</span>
             </p>
           </div>

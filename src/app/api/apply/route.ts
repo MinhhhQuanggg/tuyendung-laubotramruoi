@@ -15,12 +15,31 @@ import { saveApplication } from "@/lib/applications-store";
 const ENABLE_GOOGLE_SHEETS = false;
 const ENABLE_SLACK = false;
 
+const ALLOWED_CV_EXTENSIONS = ["pdf", "doc", "docx", "png", "jpg", "jpeg", "webp"];
+
 const ApplySchema = z.object({
   fullName: z.string().optional(),
   age: z.string().optional(),
   phoneZalo: z
     .string()
-    .regex(/^(0|\+84)[0-9]{9,10}$/, "Số điện thoại không hợp lệ"),
+    .refine(
+      (val) => !/[^\d]/.test(val.trim()),
+      { message: "Số điện thoại chỉ được chứa chữ số" }
+    )
+    .refine(
+      (val) => {
+        const clean = val.trim();
+        return clean.length <= 10;
+      },
+      { message: "Dư số điện thoại" }
+    )
+    .refine(
+      (val) => {
+        const clean = val.trim();
+        return /^0[0-9]{9}$/.test(clean);
+      },
+      { message: "Số điện thoại không hợp lệ (phải bắt đầu bằng số 0 và có đúng 10 số)" }
+    ),
   email: z
     .string()
     .trim()
@@ -35,10 +54,29 @@ const ApplySchema = z.object({
   positionTitle: z.string().min(1, "Vị trí không hợp lệ"),
   salaryDisplay: z.string().optional(),
   preferredBranch: z.string().optional(),
-  cvFileName: z.string().optional(),
+  cvFileName: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        const ext = val.split(".").pop()?.toLowerCase() || "";
+        return ALLOWED_CV_EXTENSIONS.includes(ext);
+      },
+      { message: "File CV sai định dạng. Chỉ chấp nhận file PDF, Word (.doc, .docx) hoặc file Ảnh (.jpg, .jpeg, .png)" }
+    ),
   cvBase64: z.string().optional(),
   cvFileUrl: z.string().optional(),
-  cvFileSize: z.number().optional(),
+  cvFileSize: z
+    .number()
+    .optional()
+    .refine(
+      (val) => {
+        if (val === undefined || val === null) return true;
+        return val > 0 && val <= 10 * 1024 * 1024;
+      },
+      { message: "Dung lượng file CV không hợp lệ (tối đa 10MB)" }
+    ),
   cvFileType: z.string().optional(),
   note: z.string().optional(),
 });
@@ -191,7 +229,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: "Dữ liệu không hợp lệ",
+          error: error.errors[0]?.message || "Dữ liệu không hợp lệ",
           details: error.errors.map((e) => e.message),
         },
         { status: 400 }
