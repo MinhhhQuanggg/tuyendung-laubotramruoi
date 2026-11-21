@@ -16,6 +16,7 @@ import {
   Clock,
   ExternalLink,
   Mail,
+  User,
 } from "lucide-react";
 import { QuickApplyConfig } from "@/types/quick-apply";
 import { Branch } from "@/types/branch";
@@ -60,18 +61,21 @@ export function isHocViecJob(
 
 /**
  * Tạo đường dẫn mở bản đồ Google Maps cho chi nhánh
+ * Ưu tiên mở đúng tên quán + địa chỉ đầy đủ để hiển thị thông tin cửa hàng, hình ảnh và nút chỉ đường
  */
 function getBranchMapsUrl(branch?: Branch | null): string {
   if (!branch) {
-    return "https://www.google.com/maps/search/?api=1&query=L%E1%BA%A3u+B%C3%B2+Tr%C4%83m+R%C6%B0%E1%BB%A1i";
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Lẩu Bò Trăm Rưỡi")}`;
   }
   if (branch.mapUrl) return branch.mapUrl;
-  if (branch.lat && branch.lng) {
-    return `https://www.google.com/maps/search/?api=1&query=${branch.lat},${branch.lng}`;
-  }
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    `Lẩu Bò Trăm Rưỡi CN ${branch.cnNumber} ${branch.address}`
-  )}`;
+
+  const city = branch.city || "Hồ Chí Minh";
+  const addressText = branch.address.toLowerCase().includes(city.toLowerCase())
+    ? branch.address
+    : `${branch.address}, ${city}`;
+
+  const query = `Lẩu Bò Trăm Rưỡi CN ${branch.cnNumber} ${addressText}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
 
 interface QuickApplyModalProps {
@@ -89,7 +93,7 @@ export default function QuickApplyModal({
 }: QuickApplyModalProps) {
   const [config, setConfig] = useState<QuickApplyConfig>({
     formTitle: "Ứng Tuyển Lẩu Bò Trăm Rưỡi",
-    formSubtitle: "Đào tạo nghề miễn phí có lương • Phỏng vấn đi làm ngay",
+    formSubtitle: "",
     hrName: "Nguyễn Trung Kiên (Kiên HR)",
     hrPhone: "0981256712",
     zaloUrl: "https://zalo.me/0981256712",
@@ -225,12 +229,28 @@ export default function QuickApplyModal({
     if (!formData.appliedRegion || formData.appliedRegion.startsWith("Gần nhà nhất")) {
       return null;
     }
-    return branchesList.find(
-      (b) =>
-        formData.appliedRegion.includes(b.address) ||
-        formData.appliedRegion.includes(`CN ${b.cnNumber}`) ||
-        formData.appliedRegion.includes(b.name)
+
+    // 1. Khớp chính xác theo mã chi nhánh CN XX (tránh lỗi CN 10, CN 14 bị nhận nhầm thành CN 1)
+    const cnMatch = formData.appliedRegion.match(/\bCN\s*(\d+)\b/i);
+    if (cnMatch) {
+      const cnNumber = parseInt(cnMatch[1], 10);
+      const matched = branchesList.find((b) => b.cnNumber === cnNumber);
+      if (matched) return matched;
+    }
+
+    // 2. Khớp theo địa chỉ đầy đủ
+    const matchedByAddress = branchesList.find(
+      (b) => b.address && formData.appliedRegion.toLowerCase().includes(b.address.toLowerCase())
     );
+    if (matchedByAddress) return matchedByAddress;
+
+    // 3. Khớp theo tên chi nhánh
+    const matchedByName = branchesList.find(
+      (b) => b.name && formData.appliedRegion.toLowerCase().includes(b.name.toLowerCase())
+    );
+    if (matchedByName) return matchedByName;
+
+    return null;
   }, [branchesList, formData.appliedRegion]);
 
   // Phân chia danh sách chi nhánh theo 5 cụm quận (Quận Đông • Quận Trung Tâm 2 • Quận Bắc • Quận Trung Tâm • Quận Tây)
@@ -402,11 +422,11 @@ export default function QuickApplyModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/65 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-[560px] md:max-w-[800px] lg:max-w-[830px] md:min-h-[580px] lg:min-h-[620px] bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-gray-100 max-h-[96vh] sm:max-h-[94vh] flex flex-col"
+        className="relative w-full max-w-[540px] md:max-w-[840px] lg:max-w-[880px] md:min-h-[580px] lg:min-h-[600px] bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-gray-100 max-h-[96vh] sm:max-h-[94vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header Modal - Gradient Option A (Đỏ son + Vàng đồng) */}
-        <div className="bg-gradient-to-r from-[#8E1B24] via-[#5c1015] to-[#3A0910] text-white py-3.5 sm:py-4.5 md:py-5 px-4 sm:px-6 md:px-7 relative shrink-0 flex items-center justify-between gap-2.5 border-b border-[#C9963F]/30">
+        {/* Header Modal - Gradient Option A (Đỏ son + Vàng đồng) - Bao phủ 100% chiều rộng cả 2 cột */}
+        <div className="w-full bg-gradient-to-r from-[#8E1B24] via-[#5c1015] to-[#3A0910] text-white py-3.5 sm:py-4 md:py-4.5 px-4 sm:px-6 md:px-7 relative shrink-0 flex items-center justify-between gap-2.5 border-b border-[#C9963F]/30">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <Image
               src="/logo.webp"
@@ -415,8 +435,21 @@ export default function QuickApplyModal({
               height={42}
               className="w-8.5 h-8.5 sm:w-10 sm:h-10 md:w-11 md:h-11 object-contain shrink-0 drop-shadow-sm"
             />
-            <div className="min-w-0">
-              <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold leading-tight truncate">{config.formTitle}</h3>
+            <div className="min-w-0 flex flex-col justify-center">
+              {/* Trên mobile: Chữ "Ứng tuyển" ở trên, chữ "Lẩu Bò Trăm Rưỡi" ở dưới */}
+              <div className="sm:hidden leading-snug">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-amber-300">
+                  Ứng tuyển
+                </span>
+                <span className="block text-sm font-black text-white truncate">
+                  Lẩu Bò Trăm Rưỡi
+                </span>
+              </div>
+
+              {/* Trên Desktop & iPad: Giữ nguyên trên 1 hàng */}
+              <h3 className="hidden sm:block text-base md:text-lg lg:text-xl font-bold leading-tight truncate">
+                {config.formTitle}
+              </h3>
             </div>
           </div>
 
@@ -452,10 +485,10 @@ export default function QuickApplyModal({
           </div>
         </div>
 
-        {/* Modal Container 2 Cột trên Desktop (Form 560px bên trái + Khung Logo & Ảnh User bên phải) */}
+        {/* Modal Container 2 Cột trên Desktop (Form bên trái + Khung Logo & Ảnh User bên phải) */}
         <div className="flex flex-col md:flex-row overflow-hidden flex-1 min-h-0">
-          {/* CỘT TRÁI: FORM ỨNG TUYỂN (Tăng 20% -> 560px, Tăng chiều cao 15%) */}
-          <div className="flex-1 min-w-0 md:max-w-[560px] p-4 sm:p-5 md:p-6 lg:p-7 overflow-y-auto space-y-3 sm:space-y-4 md:space-y-4.5">
+          {/* CỘT TRÁI: FORM ỨNG TUYỂN (Rộng rãi, không bị bóp nghẹt, 1 hàng cho Họ tên/Tuổi/Email và CV/Nộp đơn) */}
+          <div className="flex-1 min-w-0 p-4 sm:p-5 md:p-6 lg:p-7 overflow-y-auto space-y-3 sm:space-y-4 md:space-y-4.5">
           {success ? (
             <div className="text-center py-4 sm:py-6 md:py-8">
               <CheckCircle2 className="w-14 h-14 md:w-16 md:h-16 text-emerald-500 mx-auto mb-3 md:mb-4 animate-bounce" />
@@ -598,7 +631,11 @@ export default function QuickApplyModal({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-2.5 sm:px-3 md:px-3.5 py-2.5 md:py-3 rounded-xl bg-gradient-to-r from-amber-50 to-amber-100/80 hover:from-amber-100 hover:to-amber-200 text-brand-950 border border-amber-300/80 text-xs md:text-sm font-bold flex items-center gap-1 md:gap-1.5 shrink-0 transition shadow-xs"
-                    title="Chỉ đường Google Maps đến chi nhánh này"
+                    title={
+                      selectedBranch
+                        ? `Mở vị trí CN ${selectedBranch.cnNumber} (${selectedBranch.address}) trên Google Maps`
+                        : "Tìm hệ thống chi nhánh Lẩu Bò Trăm Rưỡi trên Google Maps"
+                    }
                   >
                     <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-red-600 shrink-0" />
                     <span className="text-[11px] sm:text-xs md:text-sm">Bản đồ</span>
@@ -773,12 +810,13 @@ export default function QuickApplyModal({
         <div className="hidden md:flex flex-col items-center justify-between p-5 lg:p-6 bg-gradient-to-b from-amber-50/50 via-white to-amber-50/40 border-l border-amber-200/70 w-[240px] lg:w-[265px] shrink-0 text-center select-none overflow-y-auto">
           {/* 1. GẮN LOGO Ở TRÊN */}
           <div className="w-full flex flex-col items-center pt-1">
-            <div className="relative w-36 h-36 lg:w-40 lg:h-40 rounded-2xl overflow-hidden shadow-md border-2 border-amber-300/80 bg-white p-1 transition-transform hover:scale-102">
+            <div className="relative w-32 h-32 lg:w-36 lg:h-36 rounded-2xl overflow-hidden shadow-md border-2 border-amber-300/80 bg-white p-2 transition-transform hover:scale-102 flex items-center justify-center">
               <Image
                 src="/images/logo/logo-brand.webp"
                 alt="Tiệm Lẩu Bò Trăm Rưỡi"
                 fill
-                className="object-contain"
+                unoptimized
+                className="object-contain p-1"
                 priority
               />
             </div>
@@ -798,13 +836,15 @@ export default function QuickApplyModal({
 
           {/* 2. GẮN ẢNH USER Ở DƯỚI */}
           <div className="w-full flex flex-col items-center pb-1">
-            <div className="relative w-24 h-24 lg:w-28 lg:h-28 rounded-full overflow-hidden shadow-md border-2 border-amber-400 bg-white p-0.5 transition-transform hover:scale-102">
-              <div className="relative w-full h-full rounded-full overflow-hidden bg-amber-50">
+            <div className="relative w-22 h-22 lg:w-24 lg:h-24 rounded-full overflow-hidden shadow-md border-2 border-amber-400 bg-white p-0.5 transition-transform hover:scale-102">
+              <div className="relative w-full h-full rounded-full overflow-hidden bg-amber-100 flex items-center justify-center">
+                <User className="w-8 h-8 text-amber-700/60 absolute" />
                 <Image
                   src="/images/user-avatar.webp"
                   alt="Ảnh Nhân Sự Tuyển Dụng"
                   fill
-                  className="object-cover"
+                  unoptimized
+                  className="object-cover relative z-10"
                 />
               </div>
             </div>
