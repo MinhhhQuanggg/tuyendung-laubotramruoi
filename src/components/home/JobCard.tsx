@@ -105,42 +105,49 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
             </div>
             {(() => {
               let rawHours = (job.workHours || job.workTypeDisplay || "").replace(/24h00/g, "00h00");
+              rawHours = rawHours.replace(/\\n/g, "\n");
               rawHours = rawHours.replace(/\s*\(Đăng ký linh hoạt, nghỉ 1 ngày\/tuần\)/gi, "").trim();
 
+              let line1 = "";
+              let line2: string | null = null;
+
               if (rawHours.includes("\n") || rawHours.includes("|")) {
-                const lines = rawHours
+                const parts = rawHours
                   .split(/[\n|]/)
                   .map((s) => s.trim())
                   .filter(Boolean);
-
-                return (
-                  <span className="line-clamp-2 leading-snug sm:leading-relaxed break-words block">
-                    <span>
-                      <b>Ca làm:</b> {lines[0]}
-                    </span>
-                    {lines.slice(1).map((line, idx) => (
-                      <span key={idx} className="block">
-                        {line}
-                      </span>
-                    ))}
-                  </span>
-                );
-              }
-
-              const match = rawHours.match(/^(.*?)\s+(hoặc)\s+(.*)$/i);
-
-              if (match) {
-                const [, shift1, conjunction, shift2] = match;
-                return (
-                  <span className="line-clamp-2 leading-snug sm:leading-relaxed break-words">
-                    <b>Ca làm:</b> {shift1} {conjunction} {shift2}
-                  </span>
-                );
+                line1 = parts[0] || "";
+                line2 = parts.slice(1).join(" | ") || null;
+              } else if (/\s+(?:hoặc|hoac)\s+/i.test(rawHours)) {
+                const match = rawHours.match(/^(.*?)\s+(?:hoặc|hoac)\s+(.*)$/i);
+                if (match) {
+                  line1 = match[1].trim();
+                  line2 = "hoặc " + match[2].trim();
+                } else {
+                  line1 = rawHours;
+                }
+              } else if (/\s*[/]\s*(?:\d{1,2}[h:]|ca\s*\d)/i.test(rawHours)) {
+                const match = rawHours.match(/^(.*?)\s*[/]\s*(.*)$/i);
+                if (match) {
+                  line1 = match[1].trim();
+                  line2 = match[2].trim();
+                } else {
+                  line1 = rawHours;
+                }
+              } else {
+                line1 = rawHours;
               }
 
               return (
-                <span className="line-clamp-2 leading-snug sm:leading-relaxed break-words">
-                  <b>Ca làm:</b> {rawHours}
+                <span className="line-clamp-2 leading-snug sm:leading-relaxed break-words block min-w-0">
+                  <span className="block">
+                    <b>Ca làm:</b> {line1}
+                  </span>
+                  {line2 && (
+                    <span className="block text-gray-700">
+                      {line2}
+                    </span>
+                  )}
                 </span>
               );
             })()}

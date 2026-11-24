@@ -583,10 +583,11 @@ export default function QuickApplyModal({
         <div className="w-full bg-gradient-to-r from-[#8E1B24] via-[#5c1015] to-[#3A0910] text-white py-3.5 sm:py-4 md:py-4.5 px-4 sm:px-6 md:px-7 relative shrink-0 flex items-center justify-between gap-2.5 border-b border-[#C9963F]/30">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <Image
-              src="/logo.webp"
+              src="/images/logo/logo-brand.webp"
               alt="Lẩu Bò Trăm Rưỡi"
               width={42}
               height={42}
+              style={{ width: "auto", height: "auto" }}
               className="w-8.5 h-8.5 sm:w-10 sm:h-10 md:w-11 md:h-11 object-contain shrink-0 drop-shadow-sm"
             />
             <div className="min-w-0 flex flex-col justify-center">
@@ -719,7 +720,7 @@ export default function QuickApplyModal({
                     <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs md:text-sm text-gray-600 font-medium shrink-0">
                       <Clock className="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600 shrink-0" />
                       <span className="truncate max-w-[150px] sm:max-w-[220px] md:max-w-[300px]">
-                        {selectedJob.workHours || selectedJob.workTypeDisplay}
+                        {(selectedJob.workHours || selectedJob.workTypeDisplay || "").replace(/\n/g, " - ")}
                       </span>
                     </div>
                   )}

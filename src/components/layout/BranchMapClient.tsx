@@ -94,7 +94,7 @@ export default function BranchMapClient({ branches: propBranches }: BranchMapCli
           </svg>
           
           <!-- Badge Text inside the white circle: CN number -->
-          <div style="position: absolute; top: 7px; left: 0; width: 32px; text-align: center; font-size: 10px; font-weight: 900; color: #B31412; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; pointer-events: none;">
+          <div style="position: absolute; top: 7px; left: 0; width: 32px; text-align: center; font-size: 10px; font-weight: 900; color: #B31412; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; pointer-events: none;">
             ${labelText}
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function BranchMapClient({ branches: propBranches }: BranchMapCli
 
       // Google Maps InfoWindow Card
       const popupHtml = `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; min-width: 250px; max-width: 300px; padding: 4px; color: #202124;">
+        <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; min-width: 250px; max-width: 300px; padding: 4px; color: #202124;">
           <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
             <span style="background: #EA4335; color: #ffffff; font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 4px;">
               CN ${b.cnNumber}

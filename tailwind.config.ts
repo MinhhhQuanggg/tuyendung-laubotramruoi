@@ -11,7 +11,7 @@ const config: Config = {
       fontFamily: {
         lora: ["var(--font-lora)", "Georgia", "serif"],
         serif: ["var(--font-lora)", "Georgia", "serif"],
-        sans: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        sans: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
       },
       colors: {
         brand: {

@@ -87,8 +87,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={lora.variable}>
-      <body className={`${lora.className} flex flex-col min-h-screen bg-surface font-normal`}>
+    <html lang="vi" className={lora.variable} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (var r of registrations) { r.unregister(); }
+                });
+              }
+            `,
+          }}
+        />
+      </head>
+      <body
+        className={`${lora.className} flex flex-col min-h-screen bg-surface font-normal`}
+        suppressHydrationWarning
+      >
         <AppLayout>{children}</AppLayout>
       </body>
     </html>
