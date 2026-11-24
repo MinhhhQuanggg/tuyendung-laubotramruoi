@@ -764,14 +764,7 @@ export const MOCK_JOBS_DATA: JobItem[] = [
     experienceRequirements: "Không yêu cầu kinh nghiệm, được đào tạo công thức bài bản",
     isActive: true,
     contactZalo: "0981256712",
-    images: [
-      "/images/culture/phucvu-full.webp",
-      "/images/culture/bep-operation.webp",
-      "/images/culture/phucvu-store-opening.webp",
-      "/images/culture/phucvu-team.webp",
-    ],
-    videoUrl: "/videos/jobs/phucvu.mp4",
-    videoPoster: "",
+    images: [],
     concisePost: {
       headline: "NHÂN VIÊN PHA CHẾ ĐỒ UỐNG & NƯỚC CHẤM GIA TRUYỀN",
       intro:

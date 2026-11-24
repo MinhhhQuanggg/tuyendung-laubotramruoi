@@ -12,6 +12,10 @@ interface JobDetailViewProps {
 }
 
 export default function JobDetailView({ job, isAdmin = false }: JobDetailViewProps) {
+  const hasImages = Boolean(
+    job.images && job.images.filter((src) => Boolean(src && src.trim())).length > 0
+  );
+
   return (
     <>
       {/* Header Banner với Breadcrumb - Gradient Option A */}
@@ -32,12 +36,12 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
         </div>
       </section>
 
-      {/* Bố cục 3 cột hiện đại: Cột trái (Logo + Video), Cột giữa (Mô tả công việc), Cột phải (2 cột ảnh thumbnail) */}
+      {/* Bố cục: 3 cột khi có ảnh, 2 cột cân đối thoáng rộng khi không có ảnh */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
+        <div className={`grid grid-cols-1 ${hasImages ? "lg:grid-cols-12" : "lg:grid-cols-12 max-w-5xl mx-auto"} gap-6 xl:gap-8 items-start`}>
           
           {/* CỘT 1 (BÊN TRÁI): Logo thương hiệu & Video thực tế */}
-          <div className="order-2 lg:order-1 lg:col-span-3 lg:col-start-1 lg:row-start-1 lg:sticky lg:top-6 self-start space-y-4 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1">
+          <div className={`order-2 lg:order-1 ${hasImages ? "lg:col-span-3 lg:col-start-1" : "lg:col-span-4 lg:col-start-1"} lg:row-start-1 lg:sticky lg:top-6 self-start space-y-4 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1`}>
             {/* Logo thương hiệu */}
             <StickyJobSidebar job={job} />
 
@@ -48,8 +52,8 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
             />
           </div>
 
-          {/* CỘT 2 (Ở GIỮA): Bảng mô tả công việc & FAQ */}
-          <div className="order-1 lg:order-2 lg:col-span-5 lg:col-start-4 lg:row-start-1 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
+          {/* CỘT 2: Bảng mô tả công việc & FAQ */}
+          <div className={`order-1 lg:order-2 ${hasImages ? "lg:col-span-5 lg:col-start-4" : "lg:col-span-8 lg:col-start-5"} lg:row-start-1 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100`}>
             {/* Badge & Tên vị trí */}
             <div className="border-b border-gray-100 pb-5 mb-6">
               {/* Pill Badges phân loại đưa lên trên tiêu đề thẻ: hiển thị từ Độ tuổi & Kinh nghiệm */}
@@ -134,10 +138,12 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
             )}
           </div>
 
-          {/* CỘT 3 (BÊN PHẢI): 2 Cột ảnh thực tế dạng thumbnail thu nhỏ 50%, nằm đúng cột scroll */}
-          <div className="order-3 lg:order-3 lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:sticky lg:top-6 self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1">
-            <JobDetailImages images={job.images} />
-          </div>
+          {/* CỘT 3 (BÊN PHẢI): 2 Cột ảnh thực tế dạng thumbnail thu nhỏ 50%, chỉ hiển thị khi có ảnh */}
+          {hasImages && (
+            <div className="order-3 lg:order-3 lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:sticky lg:top-6 self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1">
+              <JobDetailImages images={job.images} />
+            </div>
+          )}
 
         </div>
       </div>
