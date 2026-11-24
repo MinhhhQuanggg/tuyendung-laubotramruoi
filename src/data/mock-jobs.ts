@@ -2,13 +2,26 @@ import { JobItem } from "@/types/job";
 
 /**
  * MOCK DATA CHUẨN CỦA HỆ THỐNG TUYỂN DỤNG LẨU BÒ TRĂM RƯỠI
- * Bao gồm đầy đủ tất cả vị trí việc làm, 4 hình ảnh chuẩn .webp và video thực tế riêng cho từng vị trí.
+ * Danh sách các vị trí việc làm đang tuyển dụng chính thức:
+ * 1. Giám sát Bếp Chi Nhánh
+ * 2. Giám đốc bếp
+ * 3. Quản lý
+ * 4. Quản lý vùng
+ * 5. Tổ trưởng
+ * 6. Học việc bếp
+ * 7. Học việc phó quản lý
+ * 8. Phụ bếp
+ * 9. Thu ngân
+ * 10. Pha chế
+ * 11. Tạp vụ, rửa chén
+ * 12. Phục vụ bàn
+ * 13. Lễ tân, chăm sóc khách hàng
+ * 14. Thời vụ 3 buổi
  */
 export const MOCK_JOBS_DATA: JobItem[] = [
   // ===========================================================================
-  // NHÓM 1: HỌC NGHỀ CÓ LƯƠNG
+  // NHÓM 1: TRƯỞNG, QUẢN LÝ & CHUYÊN MÔN BẾP
   // ===========================================================================
-  // Vị trí ưu tiên hàng đầu theo yêu cầu
   {
     id: "JOB-GS-BEP",
     slug: "giam-sat-bep",
@@ -17,8 +30,13 @@ export const MOCK_JOBS_DATA: JobItem[] = [
     parentMenu: "Trưởng, Quản lý",
     menuPlacement: "PARENT",
     showInMenu: true,
-    badge: "25–35 tuổi, Kinh nghiệm từ 2 năm trở lên",
-    badges: ["25–35 tuổi", "Kinh nghiệm từ 2 năm", "Quản trị chuỗi bếp", "Thưởng cao"],
+    badge: "25–35 tuổi, 11–14 triệu/tháng + Thưởng",
+    badges: [
+      "25–35 tuổi",
+      "11 – 14 triệu + Thưởng",
+      "Kinh nghiệm từ 3 năm",
+      "Quản trị chuỗi bếp",
+    ],
     salaryDisplay: "11 - 14 triệu/tháng + Thưởng",
     minSalary: 11000000,
     maxSalary: 14000000,
@@ -27,1103 +45,363 @@ export const MOCK_JOBS_DATA: JobItem[] = [
     ageRequirement: "25 – 35 tuổi",
     workType: "FULL_TIME",
     workTypeDisplay: "Toàn thời gian (14h00 – 01h00)",
-    workHours: "14h00 – 01h00 mỗi ngày",
-    experienceDisplay: "Kinh nghiệm từ 2 năm trở lên",
-    experienceRequirements: "Có ít nhất 2 năm làm việc trong bếp nhà hàng",
+    workHours: "14h00 – 01h00",
+    experienceDisplay: "Kinh nghiệm từ 3 năm trở lên trong công việc bếp",
+    experienceRequirements: "Có kinh nghiệm ít nhất 3 năm trong công việc bếp, có kinh nghiệm đào tạo, dẫn dắt các nhân sự bếp mới",
     isActive: true,
     contactZalo: "0981256712",
     images: [
-      "/images/posters/giamsat1.webp",
-      "/images/posters/giamsat2.webp",
-      "/images/posters/giamsat-detail-1.webp",
+      "/images/posters/giamsatbep1.webp",
+      "/images/posters/giamsatbep2.webp",
     ],
-    videoUrl: "/videos/culture/beef-slicing.mp4",
-    videoPoster: "",
     concisePost: {
-      headline: "GIÁM SÁT BẾP CHI NHÁNH - ĐẦU BẾP ĐAM MÊ THĂNG TIẾN CHUỖI F&B",
-      intro:
-        "Tiệm Lẩu Bò Trăm Rưỡi tìm kiếm Giám sát Bếp chi nhánh: quản trị bếp chuỗi, kiểm soát chất lượng & chi phí, ứng dụng AI & Data trong quản lý vận hành.",
-      points: [
-        {
-          icon: "📊",
-          label: "Quản trị bếp chuỗi:",
-          content:
-            "Kiểm soát COGs (giá vốn), chất lượng & định lượng món ăn, tối ưu tốc độ ra món.",
-        },
-        {
-          icon: "🤖",
-          label: "AI & Data:",
-          content:
-            "Trải nghiệm ứng dụng trí tuệ nhân tạo và dữ liệu thực chiến trong vận hành bếp.",
-        },
-        {
-          icon: "🤝",
-          label: "Huấn luyện đội ngũ:",
-          content:
-            "Đào tạo nhân sự bếp mới, xây dựng tinh thần đồng đội hợp tác cùng thắng.",
-        },
-        {
-          icon: "💰",
-          label: "Thu nhập:",
-          content: "11.000.000đ – 14.000.000đ + Thưởng xứng đáng!",
-        },
-      ],
-      zalo: "0981256712",
-    },
-    responsibilities: [
-      "Quản lý chất lượng món ăn, kiểm tra vệ sinh an toàn thực phẩm toàn bộ khu vực bếp",
-      "Kiểm soát hao hụt và chi phí nguyên vật liệu đầu vào của chi nhánh",
-      "Đào tạo kỹ năng chế biến và tác phong cho nhân sự phụ bếp mới",
-    ],
-    requirements: [
-      "Từ 25 – 35 tuổi, có kinh nghiệm tối thiểu 2 năm làm bếp F&B",
-      "Kỹ năng quản lý nhân sự và giao việc tốt",
-    ],
-    benefits: [
-      "Lương 11 – 14 triệu/tháng + Thưởng doanh thu",
-      "Bao ăn ở hoặc hỗ trợ chi phí, chế độ phúc lợi đầy đủ",
-      "Lộ trình thăng tiến: Giám sát Bếp ➡️ Bếp trưởng chi nhánh ➡️ Quản lý Bếp Vùng",
-    ],
-    datePosted: "2026-11-01T08:00:00.000Z",
-    validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: true,
-  },
-  {
-    id: "HV-BEP-01",
-    slug: "hoc-viec-bep",
-    title: "Học việc bếp",
-    category: "Học nghề có lương",
-    parentMenu: "Học nghề có lương",
-    menuPlacement: "PARENT",
-    showInMenu: true,
-    badge: "18–30 tuổi, Đào tạo từ số 0",
-    badges: ["18–30 tuổi", "Chưa có tay nghề", "Đào tạo từ số 0", "Bao ăn ca"],
-    salaryDisplay: "8 - 10 triệu/tháng",
-    minSalary: 8000000,
-    maxSalary: 10000000,
-    salaryUnit: "MONTH",
-    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú", "Bình Tân"],
-    ageRequirement: "18 – 30 tuổi",
-    workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian (14h00 – 00h00 hoặc 15h00 – 00h00)",
-    workHours: "14h00 – 00h00 hoặc 15h00 – 00h00",
-    experienceDisplay: "Không yêu cầu (Đào tạo từ số 0)",
-    experienceRequirements: "Không yêu cầu kinh nghiệm, chỉ cần chịu khó và có trách nhiệm",
-    isActive: true,
-    contactZalo: "0981256712",
-    images: [
-      "/images/posters/bep1.webp",
-      "/images/posters/bep2.webp",
-      "/images/culture/bep-operation.webp",
-      "/images/culture/bep-govap.webp",
-    ],
-    videoUrl: "/videos/jobs/phubep.mp4",
-    videoPoster: "",
-    concisePost: {
-      headline: "HỌC VIỆC BẾP MIỄN PHÍ - VẪN CÓ LƯƠNG ĐỦ",
-      intro:
-        "Bạn muốn học nghề bếp bài bản nhưng ngại đóng học phí? Đừng lo, Tiệm Lẩu Bò Trăm Rưỡi chỉ dạy thực chiến từ A-Z, không cần kinh nghiệm, vừa học vừa có thu nhập cực ổn áp mỗi tháng!",
-      points: [
-        {
-          icon: "🔪",
-          label: "Khởi đầu nhẹ nhàng:",
-          content:
-            "Làm quen gian bếp, phụ trách sơ chế rau nấm và chuẩn bị quầy nguyên liệu tươi ngon.",
-        },
-        {
-          icon: "👨‍🍳",
-          label: "Đào tạo 1-1:",
-          content:
-            "Bếp trưởng kèm cặp trực tiếp thao tác cắt thái thịt bò, pha nước lẩu bí truyền.",
-        },
-        {
-          icon: "🌙",
-          label: "Ca làm việc:",
-          content: "14h00 – 00h00 hoặc 15h00 – 00h00 mỗi ngày",
-        },
-        {
-          icon: "👤",
-          label: "Độ tuổi:",
-          content: "18 – 30 tuổi",
-        },
-        {
-          icon: "💵",
-          label: "Thu nhập:",
-          content: "8 – 10 triệu / tháng, xét tăng lương sau tuần đầu cố gắng.",
-        },
-        {
-          icon: "🍲",
-          label: "Đãi ngộ:",
-          content: "Bao cơm ca, thưởng chuyên cần, cấp đồng phục miễn phí.",
-        },
-      ],
-      zalo: "0981256712",
-    },
-    responsibilities: [
-      "Học quy trình sơ chế các loại rau xanh, nấm, củ quả và bảo quản theo tiêu chuẩn",
-      "Thực hành kỹ thuật dùng dao, máy cắt thái thịt bò tươi và đông lạnh đúng định lượng",
-      "Hỗ trợ Bếp trưởng và Phụ bếp chính chuẩn bị nồi lẩu, múc sốt và ra món cho khách",
-      "Vệ sinh sạch sẽ khu vực quầy bếp và thiết bị trước và sau ca làm việc",
-    ],
-    requirements: [
-      "Nam/Nữ trong độ tuổi 18 – 30, sức khỏe tốt",
-      "Chăm chỉ, nhanh nhẹn, có tinh thần cầu tiến học hỏi",
-      "Không yêu cầu kinh nghiệm hay bằng cấp, được đào tạo hoàn toàn miễn phí",
-      "Ưu tiên ứng viên có thể gắn bó lâu dài cùng hệ thống",
-    ],
-    benefits: [
-      "Thu nhập: 8.000.000 – 10.000.000 VNĐ/tháng",
-      "Được đào tạo nghề bếp chuẩn nhà hàng hoàn toàn miễn phí",
-      "Bao 1-2 bữa cơm ca nóng hổi, ngon miệng",
-      "Xét đánh giá nâng bậc lên Phụ bếp chính thức sau 1-3 tháng với mức lương cao hơn",
-      "Môi trường làm việc trẻ trung, thân thiện, đồng nghiệp nhiệt tình giúp đỡ",
-    ],
-    datePosted: "2026-11-01T08:00:00.000Z",
-    validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: true,
-  },
-  {
-    id: "PB-HN-01",
-    slug: "phu-bep-hoc-nghe",
-    title: "Phụ bếp (Học nghề)",
-    category: "Học nghề có lương",
-    parentMenu: "Học nghề có lương",
-    menuPlacement: "PARENT",
-    showInMenu: true,
-    badge: "18–30 tuổi, Đào tạo thực chiến",
-    badges: ["18–30 tuổi", "Đào tạo thực chiến", "Lương cứng + Thưởng", "Bao cơm"],
-    salaryDisplay: "8 - 10 triệu/tháng",
-    minSalary: 8000000,
-    maxSalary: 10000000,
-    salaryUnit: "MONTH",
-    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú", "Bình Tân"],
-    ageRequirement: "18 – 30 tuổi",
-    workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian (14h00 – 00h00)",
-    workHours: "14h00 – 00h00 hoặc 15h00 – 00h00",
-    experienceDisplay: "Không yêu cầu (Đào tạo từ số 0)",
-    experienceRequirements: "Chưa từng có kinh nghiệm sẽ được đào tạo",
-    isActive: true,
-    contactZalo: "0981256712",
-    images: [
-      "/images/posters/bep2.webp",
-      "/images/posters/hocnghebep.webp",
-      "/images/culture/bep-operation.webp",
-      "/images/culture/bep-q9.webp",
-    ],
-    videoUrl: "/videos/jobs/bep-training.mp4",
-    videoPoster: "",
-    concisePost: {
-      headline: "PHỤ BẾP HỌC NGHỀ - THỰC CHIẾN GIAN BẾP CHUYÊN NGHIỆP",
-      intro:
-        "Không cần kinh nghiệm nấu nướng, được các Bếp trưởng giàu kinh nghiệm tại Lẩu Bò Trăm Rưỡi cầm tay chỉ việc, rèn luyện kỹ năng dao thớt và đứng bếp tự tin!",
-      points: [
-        {
-          icon: "🥩",
-          label: "Công việc:",
-          content:
-            "Sơ chế thịt bò tươi, cắt thái theo đúng định lượng bằng dao chuyên dụng và máy cắt.",
-        },
-        {
-          icon: "🍲",
-          label: "Phối hợp ra món:",
-          content:
-            "Chuẩn bị đĩa topping, kiểm tra chất lượng nồi lẩu trước khi chuyển ra sảnh.",
-        },
-        {
-          icon: "🌙",
-          label: "Ca làm việc:",
-          content: "14h00 – 00h00 hoặc 15h00 – 00h00 mỗi ngày",
-        },
-        {
-          icon: "👤",
-          label: "Độ tuổi:",
-          content: "18 – 30 tuổi",
-        },
-        {
-          icon: "✨",
-          label: "Thu nhập:",
-          content: "8 – 10 triệu/tháng, xét nâng bậc bếp chính sau 1-3 tháng.",
-        },
-      ],
-      zalo: "0981256712",
-    },
-    responsibilities: [
-      "Học cách nhận biết các phần thịt bò ngon và phương pháp pha lóc, cắt thái đúng sớ",
-      "Phụ trách quầy sơ chế thịt, topping lẩu và chuẩn bị gia vị",
-      "Đóng gói, bảo quản thịt và nước cốt lẩu đúng nhiệt độ tiêu chuẩn an toàn thực phẩm",
-    ],
-    requirements: [
-      "Độ tuổi từ 18 – 30 tuổi, trung thực và siêng năng",
-      "Yêu thích nghề ẩm thực, có tinh thần trách nhiệm",
-    ],
-    benefits: [
-      "Thu nhập 8 - 10 triệu/tháng",
-      "Bao cơm tại quán, miễn phí đồng phục",
-      "Lộ trình đào tạo rõ ràng, có cơ hội thăng tiến lên Bếp trưởng chi nhánh",
-    ],
-    datePosted: "2026-11-01T08:00:00.000Z",
-    validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: false,
-  },
-  {
-    id: "HV-TT-02",
-    slug: "hoc-viec-to-truong",
-    title: "Học việc tổ trưởng",
-    category: "Học nghề có lương",
-    parentMenu: "Học nghề có lương",
-    menuPlacement: "PARENT",
-    showInMenu: true,
-    badge: "18–28 tuổi, Lộ trình 2 tháng",
-    badges: ["18–28 tuổi", "Đào tạo quản lý", "Lộ trình 2 tháng", "Thưởng KPI"],
-    salaryDisplay: "7 - 8 triệu/tháng (Lộ trình 2 tháng)",
-    minSalary: 7000000,
-    maxSalary: 8000000,
-    salaryUnit: "MONTH",
-    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Tân Phú", "Bình Tân"],
-    ageRequirement: "18 – 28 tuổi",
-    workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian (16h00 – 01h00)",
-    workHours: "16h00 – 01h00 mỗi ngày",
-    experienceDisplay: "Được đào tạo quản lý từ số 0",
-    experienceRequirements: "Không yêu cầu kinh nghiệm quản lý, ưu tiên từng làm phục vụ F&B",
-    isActive: true,
-    contactZalo: "0981256712",
-    images: [
-      "/images/posters/hocviectotruong1.webp",
-      "/images/posters/hocviectotruong2.webp",
-      "/images/posters/laubotramruoi-totruong-1.webp",
-      "/images/culture/quanly-birthday.webp",
-    ],
-    videoUrl: "/videos/jobs/hocviectotruong.mp4",
-    videoPoster: "",
-    concisePost: {
-      headline: "HỌC VIỆC TỔ TRƯỞNG - ĐÀO TẠO KỸ NĂNG QUẢN LÝ CHUỖI F&B",
-      intro:
-        "Bạn muốn học kỹ năng quản trị chuỗi F&B thực chiến? Tiệm Lẩu Bò Trăm Rưỡi đào tạo từ con số 0, vẫn nhận đủ lương hàng tháng và lộ trình lên Tổ trưởng chỉ trong 2 tháng!",
-      points: [
-        {
-          icon: "📋",
-          label: "Nhiệm vụ chính:",
-          content:
-            "Học quy trình vận hành sảnh & bếp, phân chia ca trực và điều phối nhân sự.",
-        },
-        {
-          icon: "🤝",
-          label: "Kèm cặp 1-1:",
-          content:
-            "Được Quản lý tiệm hướng dẫn trực tiếp cách xử lý tình huống và chăm sóc khách.",
-        },
-        {
-          icon: "🌙",
-          label: "Thời gian:",
-          content: "16h00 – 01h00 mỗi ngày",
-        },
-        {
-          icon: "👤",
-          label: "Độ tuổi:",
-          content: "18 – 28 tuổi",
-        },
-        {
-          icon: "✨",
-          label: "Khởi điểm:",
-          content: "7 – 8 triệu / tháng + Thưởng KPI doanh số.",
-        },
-        {
-          icon: "📈",
-          label: "Lộ trình:",
-          content: "Thăng tiến rõ ràng lên Tổ trưởng chính thức sau 2 tháng.",
-        },
-      ],
-      zalo: "0981256712",
-    },
-    responsibilities: [
-      "Quan sát và học hỏi quy trình đón tiếp khách hàng, set up bàn và điều phối món",
-      "Học kỹ năng giải quyết khiếu nại của khách hàng khéo léo, chuyên nghiệp",
-      "Hỗ trợ phân chia ca làm việc và đốc thúc tinh thần làm việc của nhân viên trong ca",
-    ],
-    requirements: [
-      "Nam/Nữ từ 18 – 28 tuổi, tác phong chững chạc, giao tiếp tự tin",
-      "Có tinh thần trách nhiệm, chủ động và muốn học hỏi kỹ năng lãnh đạo",
-    ],
-    benefits: [
-      "Lương 7 – 8 triệu/tháng + Thưởng KPI doanh thu",
-      "Lộ trình đào tạo chuẩn hóa, xét lên Tổ trưởng sau 2 tháng",
-      "Bao ăn ca, chế độ BHXH khi lên chính thức",
-    ],
-    datePosted: "2026-11-01T08:00:00.000Z",
-    validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: false,
-  },
+      headline: "🔥 [CƠ HỘI VÀNG CHO BẠN ĐẦU BẾP ĐAM MÊ THĂNG TIẾN TRONG NGÀNH] 🔥",
+      intro: `🔥 [CƠ HỘI VÀNG CHO BẠN ĐẦU BẾP ĐAM MÊ THĂNG TIẾN TRONG NGÀNH] 🔥
+🍲 Tiệm Lẩu Bò Trăm Rưỡi đang tìm kiếm và đào tạo những "thủ lĩnh" tương lai cho vị trí: GIÁM SÁT BẾP CHI NHÁNH!
+💰 Thu nhập hấp dẫn: 11.000.000đ - 14.000.000đ + Thưởng xứng đáng! 
+🚀 ⏰ Thời gian làm việc: 14:00 – 01:00.
+👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
 
-  // ===========================================================================
-  // NHÓM 2: PART-TIME
-  // ===========================================================================
-  {
-    id: "PT-PV-01",
-    slug: "phuc-vu-part-time",
-    title: "Phục vụ thời vụ & Part-time (3 buổi/tuần)",
-    category: "Part-time",
-    parentMenu: "Part-time",
-    menuPlacement: "PARENT",
-    showInMenu: true,
-    badge: "30k/h, Nhận lương tuần",
-    badges: ["Sinh viên", "Lịch linh hoạt", "30k/h - 210k/ca", "Nhận lương tuần"],
-    salaryDisplay: "30.000 VNĐ/giờ (210k/buổi) - Nhận lương tuần",
-    salaryUnit: "HOUR",
-    locations: ["Gò Vấp", "Thủ Đức", "Quận 3", "Quận 10", "Phú Nhuận", "Tân Phú"],
-    ageRequirement: "18 – 25 tuổi",
-    workType: "PART_TIME",
-    workTypeDisplay: "Bán thời gian / Thời vụ 3 buổi/tuần",
-    workHours: "Ca 17h00 – 00h00 (Đăng ký tối thiểu 3 buổi/tuần)",
-    experienceDisplay: "Không yêu cầu kinh nghiệm",
-    experienceRequirements: "Không yêu cầu, sinh viên đi làm thêm được ưu tiên",
-    isActive: true,
-    contactZalo: "0981256712",
-    images: [
-      "/images/posters/phucvu30k.webp",
-      "/images/culture/phucvu-store-opening.webp",
-      "/images/culture/phucvu-full.webp",
-      "/images/culture/phucvu-team.webp",
-    ],
-    videoUrl: "/videos/jobs/phucvu.mp4",
-    videoPoster: "",
-    concisePost: {
-      headline: "TUYỂN DỤNG PHỤC VỤ THỜI VỤ 3 BUỔI/TUẦN - 30K/H NHẬN LƯƠNG TUẦN",
-      intro:
-        "Bạn là sinh viên hoặc cần tìm việc làm thêm linh động? Gia nhập ngay Tiệm Lẩu Bò Trăm Rưỡi, chỉ cần làm 3 buổi/tuần từ 17h00-00h00, 210k/buổi nhận lương đều đặn mỗi tuần!",
-      points: [
-        {
-          icon: "⏰",
-          label: "Lịch làm linh hoạt:",
-          content: "Ca 17h00 – 00h00, tự do đăng ký 3 buổi/tuần phù hợp lịch học.",
-        },
-        {
-          icon: "💵",
-          label: "Thu nhập:",
-          content: "30.000 VNĐ/giờ (210.000đ/ca 7 tiếng) - Nhận lương đều đặn theo tuần.",
-        },
-        {
-          icon: "😊",
-          label: "Môi trường năng động:",
-          content: "Đội ngũ trẻ trung, được hướng dẫn đón tiếp khách, order và bưng bê.",
-        },
-        {
-          icon: "✨",
-          label: "Đi làm ngay:",
-          content: "Phỏng vấn nhanh qua Zalo, nhận việc ngay không cần chờ đợi.",
-        },
-      ],
-      zalo: "0981256712",
-    },
-    responsibilities: [
-      "Chào đón khách hàng niềm nở, hướng dẫn khách vào bàn ngồi",
-      "Tiếp nhận gọi món (order) và bưng bê thức ăn, nước lẩu ra bàn",
-      "Dọn dẹp bàn ăn sau khi khách dùng xong và giữ vệ sinh khu vực sảnh",
-    ],
-    requirements: [
-      "Nam/Nữ từ 18 – 25 tuổi, nhanh nhẹn, vui vẻ",
-      "Có thể làm tối thiểu 3 ca/tuần (17h00 – 00h00)",
-    ],
-    benefits: [
-      "Mức lương: 30.000 VNĐ/giờ (210.000 VNĐ/buổi), nhận lương tuần",
-      "Hỗ trợ bữa ăn nhẹ/cơm ca tại quán",
-      "Có thể chuyển lên nhân viên chính thức Full-time nếu có nhu cầu",
-    ],
-    datePosted: "2026-11-01T08:00:00.000Z",
-    validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: true,
-  },
-  {
-    id: "CSKH-01",
-    slug: "cham-soc-khach-hang",
-    title: "Hỗ Trợ Trải Nghiệm Khách Hàng (CSKH)",
-    category: "Part-time",
-    parentMenu: "Part-time",
-    menuPlacement: "PARENT",
-    showInMenu: true,
-    badge: "Sinh viên, 22k - 27k/h",
-    badges: ["Sinh viên", "22k - 27k/h", "Giao tiếp thân thiện", "Lịch linh hoạt"],
-    salaryDisplay: "22.000 - 27.000 VNĐ/giờ (Part-time sinh viên)",
-    salaryUnit: "HOUR",
-    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3"],
-    ageRequirement: "18 – 25 tuổi",
-    workType: "PART_TIME",
-    workTypeDisplay: "Bán thời gian linh hoạt",
-    workHours: "Đăng ký linh hoạt theo ca 4h-6h",
-    experienceDisplay: "Không yêu cầu (Nụ cười thân thiện)",
-    experienceRequirements: "Giao tiếp vui vẻ, hoạt bát, thích chăm sóc khách hàng",
-    isActive: true,
-    contactZalo: "0981256712",
-    images: [
-      "/images/posters/cskh.webp",
-      "/images/posters/cskh-team-1.webp",
-      "/images/culture/quanly-birthday.webp",
-      "/images/culture/phucvu-store-opening.webp",
-    ],
-    videoUrl: "/videos/jobs/phucvu.mp4",
-    videoPoster: "",
-    concisePost: {
-      headline: "TUYỂN DỤNG HỖ TRỢ TRẢI NGHIỆM KHÁCH HÀNG (CSKH TIỆM)",
-      intro:
-        "Bạn là người thích giao tiếp, nụ cười rạng rỡ và muốn làm việc trong không khí ẩm thực ấm cúng? Hãy trở thành đại sứ trải nghiệm của Lẩu Bò Trăm Rưỡi!",
-      points: [
-        {
-          icon: "😊",
-          label: "Nhiệm vụ:",
-          content: "Lắng nghe cảm nhận thực khách, hỗ trợ chụp ảnh check-in, tổ chức tặng bánh kem sinh nhật.",
-        },
-        {
-          icon: "⏰",
-          label: "Thời gian:",
-          content: "Linh hoạt 4h - 6h/ca, dễ dàng sắp xếp theo lịch học.",
-        },
-        {
-          icon: "💵",
-          label: "Mức lương:",
-          content: "22.000 – 27.000 VNĐ/giờ + Tip + Bao ăn uống.",
-        },
-      ],
-      zalo: "0981256712",
-    },
-    responsibilities: [
-      "Đón tiếp và tạo cảm giác ấm cúng cho khách hàng khi bước vào tiệm",
-      "Khảo sát nhanh mức độ hài lòng về món ăn và dịch vụ của bàn ăn",
-      "Hỗ trợ các hoạt động sinh nhật, tặng quà tri ân thực khách thân thiết",
-    ],
-    requirements: [
-      "Nam/Nữ 18 – 25 tuổi, ngoại hình sáng, nụ cười tươi",
-      "Khéo léo, hoạt bát và tinh tế trong giao tiếp",
-    ],
-    benefits: [
-      "Mức lương 22k - 27k/giờ + Thưởng chuyên cần",
-      "Môi trường F&B chuyên nghiệp, rèn luyện kỹ năng dịch vụ khách hàng cao cấp",
-      "Bao ăn ca, đồng phục trẻ trung",
-    ],
-    datePosted: "2026-11-01T08:00:00.000Z",
-    validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: false,
-  },
+👉 Yêu cầu ứng viên:
+🎂 Độ tuổi: Từ 25 - 35 tuổi.
+🔪 Có kinh nghiệm ít nhất 3 năm trong công việc bếp.
+👥 Có kinh nghiệm đào tạo, dẫn dắt các nhân sự bếp mới.
+🎯 Có tinh thần trách nhiệm cao, kỷ luật thép và ham học hỏi.
+❤️ Đam mê cháy bỏng và muốn gắn bó, phát triển lâu dài với nghề bếp.
 
-  // ===========================================================================
-  // NHÓM 3: FULL-TIME
-  // ===========================================================================
-  {
-    id: "FT-PV-01",
-    slug: "phuc-vu-full-time",
-    title: "Phục vụ Full-time",
-    category: "Full-time",
-    parentMenu: "Full-time",
-    menuPlacement: "PARENT",
-    showInMenu: true,
-    badge: "27k/h + Thưởng DS, Thu nhập 8-10 triệu",
-    badges: ["18–30 tuổi", "27k/h + Thưởng DS", "Bao cơm ca", "Tip cao"],
-    salaryDisplay: "27.000 VNĐ/giờ + Thưởng doanh số (8 - 10 triệu/tháng)",
-    minSalary: 8000000,
-    maxSalary: 10000000,
-    salaryUnit: "MONTH",
-    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú", "Bình Tân"],
-    ageRequirement: "18 – 30 tuổi",
-    workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian (15h00 – 00h00 hoặc 16h00 – 01h00)",
-    workHours: "15h00 – 00h00 hoặc 16h00 – 01h00",
-    experienceDisplay: "Không yêu cầu (Ưu tiên đã làm F&B)",
-    experienceRequirements: "Không yêu cầu kinh nghiệm, có kinh nghiệm phục vụ quán ăn là lợi thế",
-    isActive: true,
-    contactZalo: "0981256712",
-    images: [
-      "/images/posters/phucvu2.webp",
-      "/images/posters/phucvu3.webp",
-      "/images/culture/phucvu-store-opening.webp",
-      "/images/culture/phucvu-full.webp",
-    ],
-    videoUrl: "/videos/jobs/phucvu.mp4",
-    videoPoster: "",
-    concisePost: {
-      headline: "NHÂN VIÊN PHỤC VỤ SẢNH FULL-TIME - THU NHẬP ỔN ĐỊNH",
-      intro:
-        "Cần tìm công việc F&B ổn định, thu nhập tốt với đầy đủ chế độ bao ăn và thưởng chuyên cần? Tiệm Lẩu Bò Trăm Rưỡi luôn chào đón bạn!",
-      points: [
-        {
-          icon: "🥘",
-          label: "Công việc chính:",
-          content:
-            "Đón tiếp khách, giới thiệu thực đơn lẩu bò Triều Châu, lên món và hỗ trợ bàn ăn.",
-        },
-        {
-          icon: "🍱",
-          label: "Chế độ:",
-          content:
-            "Bao 2 bữa cơm/ngày, cấp đồng phục, thưởng chuyên cần và tip hàng tháng.",
-        },
-        {
-          icon: "💵",
-          label: "Thu nhập:",
-          content: "27.000đ/giờ + Thưởng doanh số ~ 8 – 10 triệu/tháng.",
-        },
-        {
-          icon: "🌙",
-          label: "Ca làm việc:",
-          content: "15h00 – 00h00 hoặc 16h00 – 01h00.",
-        },
-      ],
-      zalo: "0981256712",
-    },
-    responsibilities: [
-      "Đón tiếp và phục vụ khách hàng với nụ cười thân thiện",
-      "Tiếp nhận đơn order, phối hợp nhịp nhàng với quầy bếp và bar",
-      "Giữ gìn không gian bàn ăn và sảnh tiệm luôn sạch sẽ, gọn gàng",
-    ],
-    requirements: [
-      "Tuổi từ 18 – 30, ngoại hình ưa nhìn là lợi thế",
-      "Nhanh nhẹn, vui vẻ, trung thực và có trách nhiệm",
-    ],
-    benefits: [
-      "Lương cứng + Thưởng chuyên cần + Tip: 8 – 10 triệu/tháng",
-      "Bao cơm ca mỗi ngày, cấp phát đồng phục miễn phí",
-      "Được đóng BHXH sau thời gian thử việc, thưởng lễ tết chu đáo",
-    ],
-    datePosted: "2026-11-01T08:00:00.000Z",
-    validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: false,
-  },
-  {
-    id: "PB-FT-01",
-    slug: "phu-bep-full-time",
-    title: "Phụ bếp Full-time",
-    category: "Full-time",
-    parentMenu: "Full-time",
-    menuPlacement: "PARENT",
-    showInMenu: true,
-    badge: "18–35 tuổi, Ưu tiên kinh nghiệm 3 tháng",
-    badges: ["18–35 tuổi", "Kinh nghiệm từ 3 tháng", "Bao ăn ca", "Thưởng doanh số"],
-    salaryDisplay: "8 - 11 triệu/tháng + Bao ăn ca",
-    minSalary: 8000000,
-    maxSalary: 11000000,
-    salaryUnit: "MONTH",
-    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú"],
-    ageRequirement: "18 – 35 tuổi",
-    workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian (15h00 – 00h00 hoặc 16h00 – 01h00)",
-    workHours: "15h00 – 00h00 hoặc 16h00 – 01h00",
-    experienceDisplay: "Ưu tiên có kinh nghiệm phụ bếp từ 3 tháng",
-    experienceRequirements: "Có kinh nghiệm phụ bếp tối thiểu 3 tháng",
-    isActive: true,
-    contactZalo: "0981256712",
-    images: [
-      "/images/posters/bep1.webp",
-      "/images/posters/bep3.webp",
-      "/images/culture/bep-operation.webp",
-      "/images/culture/bep-trungtam.webp",
-    ],
-    videoUrl: "/videos/jobs/phubep.mp4",
-    videoPoster: "",
-    concisePost: {
-      headline: "PHỤ BẾP CHÍNH THỨC FULL-TIME - GIA NHẬP ĐỘI NGŨ BẾP LẨU BÒ",
-      intro:
-        "Gia nhập đội ngũ bếp chuyên nghiệp tại Lẩu Bò Trăm Rưỡi, thu nhập ổn định và chế độ đãi ngộ tốt!",
-      points: [
-        {
-          icon: "🔪",
-          label: "Vận hành bếp:",
-          content:
-            "Cắt thái thịt bò tươi và đông lạnh đúng định lượng bằng máy cắt chuyên dụng.",
-        },
-        {
-          icon: "🍲",
-          label: "Nước lẩu chuẩn vị:",
-          content: "Nấu và chuẩn bị nồi lẩu thơm ngon, nóng hổi theo đơn gọi của khách.",
-        },
-        {
-          icon: "📦",
-          label: "Bảo quản kho:",
-          content:
-            "Kiểm kê và bảo quản nguyên vật liệu trong tủ lạnh đúng chuẩn nhiệt độ quy định.",
-        },
-        {
-          icon: "✨",
-          label: "Thu nhập:",
-          content: "8 – 11 triệu/tháng + Thưởng doanh số + Bao cơm trưa/tối.",
-        },
-      ],
-      zalo: "0981256712",
-    },
-    responsibilities: [
-      "Trực tiếp phụ trách cắt, thái thịt bò tươi và đông lạnh đúng định lượng bằng máy chuyên dụng",
-      "Pha chế nước lẩu và chuẩn bị nồi lẩu theo đơn đặt của khách",
-      "Bảo quản nguyên vật liệu trong tủ mát, tủ đông đúng nhiệt độ quy định",
-      "Đảm bảo tốc độ ra món nhanh và kiểm soát chất lượng món ăn trước khi ra bàn",
-    ],
-    requirements: [
-      "Tuổi từ 18 – 35, sức khỏe tốt, chịu được áp lực giờ cao điểm",
-      "Ưu tiên đã có kinh nghiệm làm phụ bếp quán lẩu/nướng từ 3 tháng trở lên",
-    ],
-    benefits: [
-      "Lương từ 8 – 11 triệu/tháng + Thưởng doanh số hàng tháng",
-      "Bao cơm tại quán, hỗ trợ phụ cấp gửi xe",
-      "Cơ hội thăng tiến lên Bếp chính và Giám sát bếp",
-    ],
-    datePosted: "2026-11-01T08:00:00.000Z",
-    validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: true,
-  },
-  {
-    id: "FT-TN-02",
-    slug: "thu-ngan",
-    title: "Thu ngân",
-    category: "Full-time",
-    parentMenu: "Full-time",
-    menuPlacement: "PARENT",
-    showInMenu: true,
-    badge: "20–30 tuổi, Môi trường máy lạnh",
-    badges: ["20–30 tuổi", "Môi trường máy lạnh", "Bao ăn ca", "Chính xác, cẩn thận"],
-    salaryDisplay: "7,5 - 9,5 triệu/tháng + Thưởng ca",
-    minSalary: 7500000,
-    maxSalary: 9500000,
-    salaryUnit: "MONTH",
-    locations: ["Gò Vấp", "Thủ Đức", "Quận 10"],
-    ageRequirement: "20 – 30 tuổi",
-    workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian (Ca 8h/ngày)",
-    workHours: "Ca làm việc 8h/ngày",
-    experienceDisplay: "Ưu tiên kinh nghiệm thu ngân F&B",
-    experienceRequirements: "Biết sử dụng phần mềm bán hàng POS hoặc quét mã QR thanh toán",
-    isActive: true,
-    contactZalo: "0981256712",
-    images: [
-      "/images/posters/cskh-team-1.webp",
-      "/images/culture/phucvu-store-opening.webp",
-      "/images/culture/phucvu-team.webp",
-      "/images/culture/chu.webp",
-    ],
-    videoUrl: "/videos/jobs/phucvu.mp4",
-    videoPoster: "",
-    concisePost: {
-      headline: "NHÂN VIÊN THU NGÂN QUẦY BAR - LẨU BÒ TRĂM RƯỠI",
-      intro:
-        "Tìm việc thu ngân nhẹ nhàng, môi trường làm việc thân thiện và thu nhập ổn định tại chuỗi Lẩu Bò Trăm Rưỡi.",
-      points: [
-        {
-          icon: "💳",
-          label: "Công việc:",
-          content:
-            "Thực hiện thanh toán tiền mặt, thẻ POS, quét mã QR và kết toán ca bán hàng.",
-        },
-        {
-          icon: "🎯",
-          label: "Yêu cầu:",
-          content:
-            "Trung thực, tỉ mỉ, niềm nở với khách hàng, ưu tiên có kinh nghiệm thu ngân POS.",
-        },
-        {
-          icon: "💵",
-          label: "Thu nhập:",
-          content: "7,5 – 9,5 triệu/tháng + Thưởng doanh thu + Bao ăn ca.",
-        },
-      ],
-      zalo: "0981256712",
-    },
-    responsibilities: [
-      "In phiếu tính tiền, thanh toán cho khách qua tiền mặt, thẻ, chuyển khoản",
-      "Đối soát tiền mặt và hóa đơn cuối ca trực",
-      "Chào hỏi khách hàng khi vào và ra về",
-    ],
-    requirements: [
-      "Nữ/Nam từ 20 – 30 tuổi, trung thực, cẩn thận và có trách nhiệm",
-      "Biết vi tính văn phòng cơ bản, ưu tiên từng làm thu ngân F&B",
-    ],
-    benefits: [
-      "Lương từ 7,5 – 9,5 triệu/tháng + Thưởng ca + Tip",
-      "Bao cơm ca, làm việc môi trường máy lạnh thoải mái",
-      "Hưởng chế độ BHXH và thưởng lễ tết theo quy định",
-    ],
-    datePosted: "2026-11-01T08:00:00.000Z",
-    validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: false,
-  },
-  {
-    id: "FT-PC-01",
-    slug: "pha-che-full-time",
-    title: "Pha chế",
-    category: "Full-time",
-    parentMenu: "Full-time",
-    menuPlacement: "PARENT",
-    showInMenu: true,
-    badge: "18–30 tuổi, Đào tạo công thức độc quyền",
-    badges: ["18–30 tuổi", "Đào tạo công thức độc quyền", "Quầy bar máy lạnh", "Bao ăn ca"],
-    salaryDisplay: "7,5 - 9,5 triệu/tháng",
-    minSalary: 7500000,
-    maxSalary: 9500000,
-    salaryUnit: "MONTH",
-    locations: ["Gò Vấp", "Thủ Đức", "Quận 10"],
-    ageRequirement: "18 – 30 tuổi",
-    workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian (Xoay ca theo lịch)",
-    workHours: "Xoay ca theo lịch vận hành",
-    experienceDisplay: "Không yêu cầu (Được đào tạo)",
-    experienceRequirements: "Không yêu cầu kinh nghiệm, được đào tạo công thức bài bản",
-    isActive: true,
-    contactZalo: "0981256712",
-    images: [
-      "/images/culture/phucvu-full.webp",
-      "/images/culture/bep-operation.webp",
-      "/images/culture/phucvu-store-opening.webp",
-      "/images/culture/phucvu-team.webp",
-    ],
-    videoUrl: "/videos/jobs/phucvu.mp4",
-    videoPoster: "",
-    concisePost: {
-      headline: "NHÂN VIÊN PHA CHẾ ĐỒ UỐNG & NƯỚC CHẤM GIA TRUYỀN",
-      intro:
-        "Công việc nhẹ nhàng, môi trường quầy bar sạch sẽ, được đào tạo công thức nước chấm chao sa tế và đồ uống độc quyền!",
-      points: [
-        {
-          icon: "🍹",
-          label: "Mô tả:",
-          content:
-            "Pha chế trà chanh, trà tắc, nước giải khát và phối chế sốt chấm chao sa tế đặc trưng.",
-        },
-        {
-          icon: "✨",
-          label: "Thu nhập:",
-          content: "7,5 – 9,5 triệu/tháng + Thưởng chuyên cần + Bao cơm ca.",
-        },
-      ],
-      zalo: "0981256712",
-    },
-    responsibilities: [
-      "Chuẩn bị các loại đồ uống: trà đá, trà tắc, bia, nước ngọt theo yêu cầu của bàn",
-      "Pha chế nước chấm đặc sản chao sa tế Triều Châu theo định lượng chuẩn",
-      "Bảo quản quầy bar, kiểm kê số lượng đồ uống tiêu thụ trong ca",
-    ],
-    requirements: [
-      "Tuổi từ 18 – 30, chăm chỉ, sạch sẽ, nhanh nhẹn",
-      "Ưu tiên ứng viên có đam mê với ngành pha chế F&B",
-    ],
-    benefits: [
-      "Lương 7,5 – 9,5 triệu/tháng + Thưởng doanh thu",
-      "Bao cơm ca, trang bị bảo hộ và đồng phục đầy đủ",
-      "Được đào tạo nghề pha chế thực tế",
-    ],
-    datePosted: "2026-11-01T08:00:00.000Z",
-    validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: false,
-  },
+👉 Bạn sẽ được học và làm chủ những gì tại Lẩu Bò Trăm Rưỡi?
+📊 Quản trị bếp chuỗi chuyên nghiệp: Kiểm soát COGs (giá vốn), chất lượng & định lượng món ăn, tối ưu tốc độ ra món, kỹ năng đào tạo và tiêu chuẩn Vệ sinh An toàn Thực phẩm (HACCP).
+🤖 AI & Data: Trải nghiệm ứng dụng trí tuệ nhân tạo và dữ liệu thực chiến trong quản lý vận hành bếp hiện đại.
+🤝 Huấn luyện đội ngũ & Năng lực lãnh đạo: Thấu hiểu tâm lý con người – Hợp tác cùng thắng – Phát huy tối đa tài năng – Làm việc hiệu quả.
 
-  // ===========================================================================
-  // NHÓM 4: TRƯỞNG, QUẢN LÝ
-  // ===========================================================================
-  {
-    id: "QL-VUNG-01",
-    slug: "quan-ly-vung",
-    title: "Quản lý Vùng / Cụm Chi Nhánh F&B",
-    category: "Trưởng, Quản lý",
-    parentMenu: "Trưởng, Quản lý",
-    menuPlacement: "PARENT",
-    showInMenu: true,
-    badge: "15 - 35 triệu + Thưởng, Hotline Zalo 0933 95 77 11",
-    badges: ["Quản lý chuỗi F&B", "15 - 35 triệu + Thưởng", "Thưởng toàn vùng", "BHXH & ESOP"],
-    salaryDisplay: "15 - 35 triệu/tháng + Thưởng",
-    minSalary: 15000000,
-    maxSalary: 35000000,
-    salaryUnit: "MONTH",
-    locations: ["Toàn hệ thống TP.HCM", "Gò Vấp", "Thủ Đức", "Quận 10", "Bình Tân"],
-    ageRequirement: "28 – 42 tuổi",
-    workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian (Cấp Quản lý Vùng)",
-    workHours: "Linh hoạt theo cụm chi nhánh phụ trách",
-    experienceDisplay: "Tối thiểu 2 năm vị trí Quản lý vùng / Area Manager F&B",
-    experienceRequirements: "Có kinh nghiệm quản lý cụm từ 3 chi nhánh F&B trở lên",
-    isActive: true,
-    contactZalo: "0933957711",
-    images: [
-      "/images/posters/quan-ly-vung.webp",
-      "/images/culture/quanly-birthday.webp",
-      "/images/culture/phucvu-store-opening.webp",
-      "/images/culture/bep-trungtam.webp",
-    ],
-    videoUrl: "/videos/jobs/quanlyvung.mp4",
-    videoPoster: "",
-    concisePost: {
-      headline: "QUẢN LÝ VÙNG (AREA MANAGER) - DẪN DẮT CỤM CHI NHÁNH LẨU BÒ TRĂM RƯỠI",
-      intro:
-        "Tìm kiếm nhà lãnh đạo vùng tài năng: Tinh thần Sởi lởi - Lăn xả - Ham học - Quyết liệt. Đồng hành mở rộng mạng lưới chi nhánh Lẩu Bò Trăm Rưỡi tại TP.HCM!",
+👉 Lộ trình thăng tiến rõ ràng, rộng mở: ⭐ Giám Sát Bếp ➡️ Trưởng Bếp Chi Nhánh ➡️ Quản Lý Bếp Vùng ➡️ Trưởng Bộ Phận Bếp Chuỗi.`,
       points: [
         {
-          icon: "📈",
-          label: "Mục tiêu chính:",
-          content:
-            "Chịu trách nhiệm toàn diện về doanh thu, P&L, tiêu chuẩn dịch vụ cho cụm chi nhánh.",
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
         },
         {
-          icon: "👥",
-          label: "Phát triển đội ngũ:",
-          content:
-            "Tuyển dụng, đào tạo và phát triển đội ngũ Quản lý tiệm & Tổ trưởng kế cận.",
+          icon: "💵",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
         },
         {
-          icon: "👑",
-          label: "Đãi ngộ:",
-          content:
-            "15 – 35 triệu/tháng + Thưởng doanh số vùng vượt chỉ tiêu + Cơ hội cổ phần.",
-        },
-        {
-          icon: "📱",
-          label: "Hotline Zalo Quản Lý:",
-          content: "0933 95 77 11 (Ưu tiên nộp CV qua Zalo)",
-        },
-      ],
-      zalo: "0933957711",
-    },
-    responsibilities: [
-      "Quản lý chỉ số P&L, kiểm soát chi phí thực phẩm và lao động của toàn vùng",
-      "Thực hiện kiểm tra định kỳ tiêu chuẩn chất lượng sản phẩm và dịch vụ tại các chi nhánh",
-      "Định hướng và phát triển đội ngũ Quản lý tiệm nòng cốt",
-    ],
-    requirements: [
-      "Từ 28 – 42 tuổi, có tối thiểu 2 năm kinh nghiệm ở vị trí tương đương tại các chuỗi F&B",
-      "Kỹ năng lãnh đạo, phân tích dữ liệu kinh doanh và giải quyết khủng hoảng xuất sắc",
-    ],
-    benefits: [
-      "Thu nhập 15 – 35 triệu/tháng + Thưởng KPI doanh số cực cao",
-      "Đầy đủ chế độ bảo hiểm, khám sức khỏe cao cấp",
-      "Cơ hội tham gia chương trình ESOP cổ phần phát triển chuỗi",
-    ],
-    datePosted: "2026-11-01T08:00:00.000Z",
-    validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: true,
-  },
-  {
-    id: "QL-TIEM-01",
-    slug: "quan-ly-tiem",
-    title: "Quản lý tiệm (Store Manager)",
-    category: "Trưởng, Quản lý",
-    parentMenu: "Trưởng, Quản lý",
-    menuPlacement: "PARENT",
-    showInMenu: true,
-    badge: "15 - 22 triệu, Thưởng KPI doanh số",
-    badges: ["Kinh nghiệm quản lý chuỗi", "15 - 22 triệu", "Thưởng KPI doanh số", "Bao ăn ca"],
-    salaryDisplay: "15 - 22 triệu/tháng + Thưởng KPI",
-    minSalary: 15000000,
-    maxSalary: 22000000,
-    salaryUnit: "MONTH",
-    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Phú Nhuận", "Tân Phú"],
-    ageRequirement: "24 – 38 tuổi",
-    workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian theo ca quản lý",
-    workHours: "Toàn thời gian theo ca vận hành tiệm",
-    experienceDisplay: "Tối thiểu 1 năm quản lý nhà hàng/F&B",
-    experienceRequirements: "Tối thiểu 1 năm quản lý nhà hàng, quán ăn quy mô từ 50 bàn trở lên",
-    isActive: true,
-    contactZalo: "0933957711",
-    images: [
-      "/images/culture/quanly-birthday.webp",
-      "/images/posters/quan-ly-vung.webp",
-      "/images/posters/pho-quan-ly.webp",
-      "/images/culture/phucvu-store-opening.webp",
-    ],
-    videoUrl: "/videos/jobs/quanly.mp4",
-    videoPoster: "",
-    concisePost: {
-      headline: "QUẢN LÝ TIỆM (STORE MANAGER) - TỰ CHỦ VẬN HÀNH CHI NHÁNH",
-      intro:
-        "Lẩu Bò Trăm Rưỡi mở rộng chuỗi liên tục tại TP.HCM. Cần tìm nhân sự quản lý có tâm và có tầm để đồng hành phát triển lâu dài!",
-      points: [
-        {
-          icon: "🏪",
-          label: "Quản trị tiệm:",
-          content:
-            "Điều hành hoạt động sảnh và bếp, tối ưu trải nghiệm khách hàng và giải quyết khiếu nại.",
-        },
-        {
-          icon: "📊",
-          label: "Kiểm soát tài chính:",
-          content:
-            "Quản lý chi phí nguyên vật liệu (COGs), kiểm soát hao hụt và doanh thu ca.",
-        },
-        {
-          icon: "✨",
-          label: "Thu nhập:",
-          content: "15 – 22 triệu/tháng (Lương cứng + Thưởng KPI doanh số chi nhánh).",
-        },
-      ],
-      zalo: "0933957711",
-    },
-    responsibilities: [
-      "Chịu trách nhiệm toàn bộ hoạt động kinh doanh và vận hành hàng ngày của chi nhánh",
-      "Quản lý lịch làm việc, chấm công và đào tạo nhân viên",
-      "Chăm sóc khách hàng VIP và xử lý sự cố phát sinh tại chỗ",
-    ],
-    requirements: [
-      "Tuổi 24 – 38, có ít nhất 1 năm kinh nghiệm quản lý nhà hàng F&B",
-      "Năng động, giao tiếp khéo léo, có tinh thần trách nhiệm cao",
-    ],
-    benefits: [
-      "Lương 15 – 22 triệu/tháng + Thưởng doanh số chi nhánh",
-      "Bao ăn tại quán, BHXH/BHYT đầy đủ",
-      "Lộ trình thăng tiến rõ ràng lên Quản lý vùng",
-    ],
-    datePosted: "2026-11-01T08:00:00.000Z",
-    validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: false,
-  },
-  {
-    id: "PQL-TIEM-01",
-    slug: "pho-quan-ly-tiem",
-    title: "Học việc Phó Quản Lý F&B",
-    category: "Trưởng, Quản lý",
-    parentMenu: "Trưởng, Quản lý",
-    menuPlacement: "PARENT",
-    showInMenu: true,
-    badge: "22–32 tuổi, Lộ trình lên Quản lý 2 tháng",
-    badges: ["22–32 tuổi", "Lộ trình 2 tháng lên Quản lý", "Kiểm soát COGs & COL", "Bao cơm ca"],
-    salaryDisplay: "10 - 14 triệu/tháng (Lộ trình 2 tháng lên Quản lý)",
-    minSalary: 10000000,
-    maxSalary: 14000000,
-    salaryUnit: "MONTH",
-    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Tân Phú"],
-    ageRequirement: "22 – 32 tuổi",
-    workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian (16h00 – 01h00)",
-    workHours: "16h00 – 01h00 mỗi ngày",
-    experienceDisplay: "Tối thiểu 6 tháng làm Tổ trưởng / Trợ lý quản lý F&B",
-    experienceRequirements: "Từng làm tổ trưởng hoặc giám sát sảnh chuỗi F&B từ 6 tháng",
-    isActive: true,
-    contactZalo: "0981256712",
-    images: [
-      "/images/posters/pho-quan-ly.webp",
-      "/images/culture/quanly-birthday.webp",
-      "/images/culture/phucvu-store-opening.webp",
-      "/images/culture/phucvu-team.webp",
-    ],
-    videoUrl: "/videos/jobs/quanly.mp4",
-    videoPoster: "",
-    concisePost: {
-      headline: "HỌC VIỆC PHÓ QUẢN LÝ F&B - BƯỚC ĐỆM THĂNG TIẾN 2 THÁNG",
-      intro:
-        "Đồng hành cùng Quản lý tiệm điều phối ca trực, học quản trị chi phí COGs/COL và chuẩn bị sẵn sàng tiếp quản vị trí Quản lý tiệm sau 2 tháng!",
-      points: [
-        {
-          icon: "📋",
-          label: "Trực ca:",
-          content:
-            "Phân công công việc nhân sự sảnh, kiểm soát chuẩn bị quầy gia vị và bàn ăn.",
-        },
-        {
-          icon: "📈",
-          label: "Lộ trình:",
-          content:
-            "Được đào tạo nghiệp vụ quản trị chuỗi để thăng cấp Quản lý tiệm trong 2 tháng.",
-        },
-        {
-          icon: "✨",
-          label: "Thu nhập:",
-          content: "10 – 14 triệu/tháng + Thưởng chỉ tiêu chi nhánh.",
-        },
-        {
-          icon: "🌙",
-          label: "Ca làm việc:",
-          content: "16h00 – 01h00 mỗi ngày.",
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
         },
       ],
       zalo: "0981256712",
     },
     responsibilities: [
-      "Hỗ trợ Quản lý tiệm điều phối nhân sự và vận hành sảnh trong ca trực",
-      "Kiểm tra chất lượng phục vụ, hỗ trợ các bàn ăn trong giờ cao điểm",
-      "Tiếp nhận và giải quyết bước đầu các phản hồi của khách hàng",
+      "Quản trị bếp chuỗi chuyên nghiệp: Kiểm soát COGs (giá vốn), chất lượng & định lượng món ăn, tối ưu tốc độ ra món, kỹ năng đào tạo và tiêu chuẩn Vệ sinh An toàn Thực phẩm (HACCP)",
+      "Trải nghiệm ứng dụng trí tuệ nhân tạo (AI) và dữ liệu thực chiến trong quản lý vận hành bếp hiện đại",
+      "Huấn luyện đội ngũ & Năng lực lãnh đạo: Thấu hiểu tâm lý con người – Hợp tác cùng thắng – Phát huy tối đa tài năng – Làm việc hiệu quả",
     ],
     requirements: [
-      "Tuổi từ 22 – 32, tác phong nhanh nhẹn, chu đáo",
-      "Có ít nhất 6 tháng kinh nghiệm tổ trưởng/giám sát ca trong ngành F&B",
+      "Độ tuổi: Từ 25 - 35 tuổi",
+      "Có kinh nghiệm ít nhất 3 năm trong công việc bếp",
+      "Có kinh nghiệm đào tạo, dẫn dắt các nhân sự bếp mới",
+      "Có tinh thần trách nhiệm cao, kỷ luật thép và ham học hỏi",
+      "Đam mê cháy bỏng và muốn gắn bó, phát triển lâu dài với nghề bếp",
     ],
     benefits: [
-      "Lương 10 – 14 triệu/tháng + Thưởng hiệu quả làm việc",
-      "Bao cơm ca, cấp phát đồng phục, chế độ BHXH đầy đủ",
-      "Cơ hội thăng tiến lên Quản lý tiệm chính thức sau 2 tháng",
+      "Thu nhập hấp dẫn: 11.000.000đ - 14.000.000đ + Thưởng xứng đáng!",
+      "Thời gian làm việc: 14:00 – 01:00",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Được đào tạo bài bản: Quản trị bếp chuỗi chuyên nghiệp, ứng dụng AI & Data thực chiến và phát triển năng lực lãnh đạo",
+      "Lộ trình thăng tiến rõ ràng, rộng mở: ⭐ Giám Sát Bếp ➡️ Trưởng Bếp Chi Nhánh ➡️ Quản Lý Bếp Vùng ➡️ Trưởng Bộ Phận Bếp Chuỗi",
     ],
-    datePosted: "2026-11-01T08:00:00.000Z",
+    datePosted: "2026-11-23T08:00:00.000Z",
     validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: false,
+    isUrgent: true,
   },
   {
-    id: "BT-01",
-    slug: "bep-truong",
-    title: "Trưởng Bộ Phận Bếp Chuỗi F&B / Bếp Trưởng Vùng",
+    id: "GD-BEP-01",
+    slug: "giam-doc-bep",
+    title: "Giám đốc bếp",
     category: "Trưởng, Quản lý",
     parentMenu: "Trưởng, Quản lý",
     menuPlacement: "PARENT",
     showInMenu: true,
-    badge: "25 - 40 triệu + Thưởng, Quản lý >= 10 chi nhánh",
-    badges: ["Quản lý >= 10 chi nhánh", "25 - 40 triệu + Thưởng", "Kỹ thuật bò đỉnh cao", "Zalo 0933 95 77 11"],
+    badge: "35–45 tuổi, 25–40 triệu/tháng + Thưởng",
+    badges: [
+      "35–45 tuổi",
+      "25 – 40 triệu + Thưởng",
+      "Quản lý từ 10 chi nhánh",
+      "Chuyên sâu về Bò",
+    ],
     salaryDisplay: "25 - 40 triệu/tháng + Thưởng",
     minSalary: 25000000,
     maxSalary: 40000000,
     salaryUnit: "MONTH",
-    locations: ["Toàn hệ thống TP.HCM", "Gò Vấp", "Thủ Đức", "Quận 10", "Bình Tân"],
-    ageRequirement: "28 – 45 tuổi",
+    locations: ["TP. Hồ Chí Minh", "Toàn hệ thống chuỗi"],
+    ageRequirement: "35 – 45 tuổi",
     workType: "FULL_TIME",
-    workTypeDisplay: "Toàn thời gian (Cấp Bếp Trưởng Vùng)",
-    workHours: "Toàn thời gian theo điều phối chuỗi",
-    experienceDisplay: "Tối thiểu 3 năm Bếp trưởng, từng quản lý chuỗi >= 10 chi nhánh",
-    experienceRequirements: "Kinh nghiệm quản lý bếp chuỗi >= 10 chi nhánh F&B, kiểm soát COGs",
+    workTypeDisplay: "Toàn thời gian (14h00 – 24h00)",
+    workHours: "14h00 – 24h00",
+    experienceDisplay: "Đã quản lý bếp từ 10 chi nhánh & chuyên sâu về bò",
+    experienceRequirements: "Kinh nghiệm thực chiến: Đã từng giữ vai trò Bếp Trưởng Điều Hành / Giám Đốc Bếp cho các chuỗi nhà hàng F&B quy mô từ 10 chi nhánh trở lên. Hiểu sâu sắc về thịt bò: Có chuyên môn sâu về phân loại, bảo quản, pha lóc và chế biến thịt bò tươi/nóng.",
     isActive: true,
-    contactZalo: "0933957711",
+    contactZalo: "0981256712",
     images: [
-      "/images/posters/bep-truong-vung.webp",
-      "/images/culture/bep-operation.webp",
-      "/images/posters/giamsat1.webp",
-      "/images/culture/bep-govap.webp",
+      "/images/posters/giamdocbep1.webp",
     ],
-    videoUrl: "/videos/culture/potato-wok.mp4",
-    videoPoster: "",
     concisePost: {
-      headline: "TRƯỞNG BỘ PHẬN BẾP CHUỖI F&B / BẾP TRƯỞNG VÙNG - THU NHẬP 25-40 TRIỆU",
-      intro:
-        "Lẩu Bò Trăm Rưỡi tìm kiếm Trưởng Bộ Phận Bếp Chuỗi: Giữ vững linh hồn hương vị Lẩu Bò Triều Châu, chuẩn hóa quy trình và quản trị hệ thống bếp trên toàn bộ chuỗi 12+ chi nhánh!",
+      headline: "🔥 [HỆ THỐNG TIỆM LẨU BÒ TRĂM RƯỠI TÌM KIẾM THỦ LĨNH BẾP XUẤT SẮC] 🔥",
+      intro: `🔥 [HỆ THỐNG TIỆM LẨU BÒ TRĂM RƯỠI TÌM KIẾM THỦ LĨNH BẾP XUẤT SẮC] 🔥
+🌟 VỊ TRÍ TUYỂN DỤNG: GIÁM ĐỐC BẾP (ĐIỀU HÀNH BẾP CHUỖI F&B)
+Hệ thống Tiệm Lẩu Bò Trăm Rưỡi đang trên đà phát triển thần tốc với mục tiêu mở rộng mạnh mẽ. Chúng tôi tìm kiếm một Giám Đốc Bếp có Tâm – có Tầm – có Tài để đồng hành xây dựng chuẩn mực ẩm thực đỉnh cao cho toàn hệ thống!
+
+💰 THU NHẬP: 25–40 TRIỆU/THÁNG + THƯỞNG THEO KẾT QUẢ PHÁT TRIỂN HỆ THỐNG
+⏰ Thời gian làm việc: 14h00 – 24h00
+🎂 Độ tuổi: 35 – 45 tuổi
+👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
+
+💎 YÊU CẦU ỨNG VIÊN:
+🎂 Độ tuổi: 35 – 45 tuổi.
+🎯 Kinh nghiệm thực chiến: Đã từng giữ vai trò Bếp Trưởng Điều Hành / Giám Đốc Bếp cho các chuỗi nhà hàng F&B quy mô từ 10 chi nhánh trở lên.
+🥩 Hiểu sâu sắc về thịt bò: Có chuyên môn sâu về phân loại, bảo quản, pha lóc và chế biến thịt bò tươi/nóng.
+📊 Quản trị số liệu & Chi phí: Nắm vững phương pháp tính định lượng, kiểm soát và tối ưu COGS, hạn chế hao hụt nguyên liệu ở mức tối thiểu.
+⚙️ Tư duy quy trình: Có năng lực tự đóng gói quy trình vận hành bếp chuẩn (SOP), dễ hiểu, dễ chuyển giao, dễ nhân bản cho toàn chuỗi.
+👥 Năng lực lãnh đạo: Kỹ năng đào tạo, truyền cảm hứng và dẫn dắt đội ngũ nhân sự bếp từ 50–100 người; kỷ luật thép nhưng quản trị bằng sự thấu hiểu.
+
+🎯 BẠN SẼ NẮM GIỮ TRÁCH NHIỆM GÌ?
+1️⃣ Quản trị chất lượng món ăn: Đảm bảo hương vị, chất lượng và thẩm mỹ món ăn 100% đồng nhất trên toàn hệ thống 15+ chi nhánh.
+2️⃣ Kiểm soát chi phí (COGS): Phối hợp phòng Thu mua và Vận hành để tối ưu giá vốn, kiểm soát hao hụt và tồn kho nguyên liệu hiệu quả.
+3️⃣ Chuẩn hóa & Đào tạo: Xây dựng tiêu chuẩn vận hành bếp, trực tiếp huấn luyện đội ngũ Bếp Trưởng Chi Nhánh và Giám Sát Bếp.
+4️⃣ Nghiên cứu & Phát triển (R&D): Sáng tạo món ăn mới, nâng cấp menu theo mùa để gia tăng trải nghiệm cho khách hàng.
+5️⃣ An toàn thực phẩm: Kiểm soát 100% tiêu chuẩn VSATTP và PCCC tại tất cả các bếp chi nhánh.
+
+🎁 QUYỀN LỢI & ĐÃI NGỘ XỨNG TẦM:
+💵 Thu nhập 25.000.000 – 40.000.000 VNĐ/tháng (Lương cứng + Thưởng hiệu quả chuỗi).
+🍚 Không bao ăn, Không bao ở
+💵 Tiền Tip tự giữ
+💸 Cho phép ứng lương
+📈 Cơ hội tham gia chính sách cổ phần thưởng / ESOP khi hệ thống đạt các mốc tăng trưởng.
+🏢 Môi trường làm việc năng động, tôn trọng năng lực chuyên môn, trao quyền thực chiến tối đa.
+🚀 Đồng hành cùng Ban Lãnh Đạo định hình chiến lược phát triển ẩm thực của chuỗi lẩu bò hàng đầu.`,
       points: [
         {
-          icon: "🍲",
-          label: "Quản trị chuỗi bếp:",
-          content:
-            "Quản lý và chuẩn hóa chất lượng món ăn trên toàn hệ thống >= 10 chi nhánh.",
-        },
-        {
-          icon: "📊",
-          label: "Kiểm soát COGs:",
-          content:
-            "Tối ưu chi phí nguyên vật liệu, xây dựng định mức và đào tạo đội ngũ Bếp trưởng tiệm.",
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
         },
         {
           icon: "💵",
-          label: "Thu nhập xứng tầm:",
-          content:
-            "25 – 40 triệu/tháng + Thưởng hiệu quả kinh doanh chuỗi.",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
         },
         {
-          icon: "📱",
-          label: "Zalo trao đổi trực tiếp:",
-          content: "0933 95 77 11 (Ưu tiên gửi Profile/CV qua Zalo).",
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
         },
       ],
-      zalo: "0933957711",
+      zalo: "0981256712",
     },
     responsibilities: [
-      "Quản trị toàn diện chất lượng và định lượng món ăn của toàn bộ chuỗi chi nhánh",
-      "Xây dựng và chuẩn hóa quy trình sơ chế, bảo quản thịt bò và nước dùng lẩu",
-      "Đào tạo và kiểm tra định kỳ tay nghề của Giám sát Bếp và Bếp trưởng từng chi nhánh",
+      "Quản trị chất lượng món ăn: Đảm bảo hương vị, chất lượng và thẩm mỹ món ăn 100% đồng nhất trên toàn hệ thống 15+ chi nhánh",
+      "Kiểm soát chi phí (COGS): Phối hợp phòng Thu mua và Vận hành để tối ưu giá vốn, kiểm soát hao hụt và tồn kho nguyên liệu hiệu quả",
+      "Chuẩn hóa & Đào tạo: Xây dựng tiêu chuẩn vận hành bếp, trực tiếp huấn luyện đội ngũ Bếp Trưởng Chi Nhánh và Giám Sát Bếp",
+      "Nghiên cứu & Phát triển (R&D): Sáng tạo món ăn mới, nâng cấp menu theo mùa để gia tăng trải nghiệm cho khách hàng",
+      "An toàn thực phẩm: Kiểm soát 100% tiêu chuẩn VSATTP và PCCC tại tất cả các bếp chi nhánh",
     ],
     requirements: [
-      "Nam/Nữ từ 28 – 45 tuổi, có kinh nghiệm Bếp trưởng chuỗi từ 3 năm trở lên",
-      "Từng quản lý hệ thống từ 10 chi nhánh F&B trở lên",
-      "Am hiểu sâu sắc về an toàn vệ sinh thực phẩm, HACCP và kiểm soát COGs",
+      "Độ tuổi: 35 – 45 tuổi",
+      "Kinh nghiệm thực chiến: Đã từng giữ vai trò Bếp Trưởng Điều Hành / Giám Đốc Bếp cho các chuỗi nhà hàng F&B quy mô từ 10 chi nhánh trở lên",
+      "Hiểu sâu sắc về thịt bò: Có chuyên môn sâu về phân loại, bảo quản, pha lóc và chế biến thịt bò tươi/nóng",
+      "Quản trị số liệu & Chi phí: Nắm vững phương pháp tính định lượng, kiểm soát và tối ưu COGS, hạn chế hao hụt",
+      "Tư duy quy trình: Có năng lực tự đóng gói quy trình vận hành bếp chuẩn (SOP), dễ chuyển giao, nhân bản",
+      "Năng lực lãnh đạo: Kỹ năng đào tạo, truyền cảm hứng và dẫn dắt đội ngũ nhân sự bếp từ 50–100 người",
     ],
     benefits: [
-      "Mức lương 25 – 40 triệu/tháng + Thưởng doanh thu toàn chuỗi",
-      "Chế độ bảo hiểm cao cấp, phụ cấp công tác và đãi ngộ quản lý cấp cao",
-      "Cơ hội đồng hành chiến lược mở rộng chuỗi quy mô lớn",
+      "Thu nhập xứng tầm: 25.000.000 – 40.000.000 VNĐ/tháng (Lương cứng + Thưởng hiệu quả chuỗi)",
+      "Thời gian làm việc: 14h00 – 24h00",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Cơ hội tham gia chính sách cổ phần thưởng / ESOP khi hệ thống đạt các mốc tăng trưởng",
+      "Môi trường làm việc năng động, tôn trọng năng lực chuyên môn, trao quyền thực chiến tối đa",
     ],
-    datePosted: "2026-11-01T08:00:00.000Z",
+    datePosted: "2026-11-23T08:00:00.000Z",
+    validThrough: "2027-12-31T23:59:59.000Z",
+    isUrgent: true,
+  },
+  {
+    id: "QL-01",
+    slug: "quan-ly",
+    title: "Quản lý",
+    category: "Trưởng, Quản lý",
+    parentMenu: "Trưởng, Quản lý",
+    menuPlacement: "PARENT",
+    showInMenu: true,
+    badge: "24–38 tuổi, 10–18 triệu/tháng + Thưởng 3P",
+    badges: [
+      "24–38 tuổi",
+      "10 – 18 triệu + Thưởng 3P",
+      "Kinh nghiệm Quản lý F&B",
+      "Lãnh đạo đội ngũ",
+    ],
+    salaryDisplay: "10 - 18 triệu/tháng + Thưởng 3P",
+    minSalary: 10000000,
+    maxSalary: 18000000,
+    salaryUnit: "MONTH",
+    locations: ["Quận 3", "Gò Vấp", "Thủ Đức", "Quận 10", "Tân Phú", "Bình Tân"],
+    ageRequirement: "24 – 38 tuổi",
+    workType: "FULL_TIME",
+    workTypeDisplay: "Toàn thời gian (Thương lượng)",
+    workHours: "Thương lượng",
+    experienceDisplay: "Kinh nghiệm F&B / Trợ lý / Quản lý ca",
+    experienceRequirements: "Có kinh nghiệm ít nhất 1 năm ở vị trí Quản lý, Trợ lý Quản lý hoặc Quản lý ca trong ngành F&B / Nhà hàng.",
+    isActive: true,
+    contactZalo: "0981256712",
+    images: [
+      "/images/posters/quanly1.webp",
+    ],
+    concisePost: {
+      headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG QUẢN LÝ CỬA HÀNG] 🔥",
+      intro: `🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG QUẢN LÝ CỬA HÀNG] 🔥
+Hệ thống Tiệm Lẩu Bò Trăm Rưỡi tiếp tục mở rộng quy mô và chào đón các nhân tố Quản Lý xuất sắc về dẫn dắt đội ngũ tại các chi nhánh!
+
+💰 Thu nhập hấp dẫn: 10.000.000 – 18.000.000 VNĐ/tháng + Thưởng chuẩn 3P (Theo doanh thu & KPI vận hành).
+⏰ Thời gian làm việc: Thương lượng
+🎂 Độ tuổi: 24 – 38 tuổi.
+👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
+
+👉 Trách nhiệm chính:
+- Điều hành toàn bộ hoạt động thường nhật tại cửa hàng (Sảnh - Thu ngân - Bếp).
+- Quản trị chi phí, doanh thu, kiểm soát thất thoát và tối ưu hóa lợi nhuận cửa hàng.
+- Huấn luyện, đào tạo, tạo động lực và giữ lửa cho đội ngũ nhân viên chi nhánh.
+- Xử lý các tình huống phát sinh và mang lại trải nghiệm ẩm thực trọn vẹn nhất cho thực khách.`,
+      points: [
+        {
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
+        },
+        {
+          icon: "💵",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
+        },
+        {
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
+        },
+      ],
+      zalo: "0981256712",
+    },
+    responsibilities: [
+      "Điều hành toàn bộ hoạt động thường nhật tại cửa hàng (Sảnh - Thu ngân - Bếp)",
+      "Quản trị chi phí, doanh thu, kiểm soát thất thoát và tối ưu hóa lợi nhuận cửa hàng",
+      "Huấn luyện, đào tạo, tạo động lực và giữ lửa cho đội ngũ nhân viên chi nhánh",
+      "Xử lý các tình huống phát sinh và mang lại trải nghiệm ẩm thực trọn vẹn nhất cho thực khách",
+    ],
+    requirements: [
+      "Độ tuổi: 24 – 38 tuổi",
+      "Có kinh nghiệm ít nhất 1 năm ở vị trí Quản lý, Trợ lý Quản lý hoặc Quản lý ca trong ngành F&B",
+      "Kỹ năng giao tiếp, giải quyết tình huống khéo léo và tinh thần trách nhiệm cao",
+    ],
+    benefits: [
+      "Thu nhập: 10.000.000 – 18.000.000 VNĐ/tháng + Thưởng chuẩn 3P",
+      "Thời gian làm việc: Thương lượng",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Được trao quyền điều hành và cơ hội thăng tiến lên Quản Lý Vùng",
+    ],
+    datePosted: "2026-11-23T08:00:00.000Z",
+    validThrough: "2027-12-31T23:59:59.000Z",
+    isUrgent: true,
+  },
+  {
+    id: "QL-VUNG-01",
+    slug: "quan-ly-vung",
+    title: "Quản lý vùng",
+    category: "Trưởng, Quản lý",
+    parentMenu: "Trưởng, Quản lý",
+    menuPlacement: "PARENT",
+    showInMenu: true,
+    badge: "28–40 tuổi, 15–35 triệu/tháng + Thưởng",
+    badges: [
+      "28–40 tuổi",
+      "15 – 35 triệu + Thưởng",
+      "Quản lý cụm 3–5 cửa hàng",
+      "Chiến lược F&B",
+    ],
+    salaryDisplay: "15 - 35 triệu/tháng + Thưởng",
+    minSalary: 15000000,
+    maxSalary: 35000000,
+    salaryUnit: "MONTH",
+    locations: ["Toàn hệ thống TP.HCM", "Cụm chi nhánh chỉ định"],
+    ageRequirement: "28 – 40 tuổi",
+    workType: "FULL_TIME",
+    workTypeDisplay: "Toàn thời gian (16h00 – 01h00)",
+    workHours: "16h00 – 01h00 (Nghỉ 2 buổi/tháng)",
+    experienceDisplay: "Đã từng quản lý cụm 3–5 cửa hàng F&B",
+    experienceRequirements: "Có kinh nghiệm thực chiến quản lý cụm từ 3–5 cửa hàng F&B trở lên, nắm chắc quản trị P&L chuỗi.",
+    isActive: true,
+    contactZalo: "0981256712",
+    images: [],
+    concisePost: {
+      headline: "🔥 [TUYỂN DỤNG QUẢN LÝ VÙNG CHUỖI F&B LẨU BÒ TRĂM RƯỠI] 🔥",
+      intro: `🔥 [TUYỂN DỤNG QUẢN LÝ VÙNG CHUỖI F&B LẨU BÒ TRĂM RƯỠI] 🔥
+Hệ thống Tiệm Lẩu Bò Trăm Rưỡi mở rộng cụm chi nhánh cần tìm kiếm những thủ lĩnh dày dạn kinh nghiệm thực chiến!
+
+💰 Thu nhập: 15 – 35 củ / tháng + Thưởng khích lệ 🌟
+⏰ Thời gian: 16h00 – 01h00 (Nghỉ 2 buổi/tháng linh hoạt)
+🎂 Độ tuổi: 28 – 40 tuổi
+👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
+
+👉 Bạn nắm giữ:
+- Quản lý vận hành toàn diện cụm 3–5 nhà hàng trong khu vực phân công.
+- Đảm bảo các chỉ số P&L, doanh số, chi phí nhân sự và chất lượng phục vụ đồng nhất.
+- Đào tạo, phát triển các Quản Lý Cửa Hàng và Tổ Trưởng kế cận.
+- Đại diện hệ thống xử lý các vấn đề đối ngoại và cơ quan chức năng khi cần thiết.`,
+      points: [
+        {
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
+        },
+        {
+          icon: "💵",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
+        },
+        {
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
+        },
+      ],
+      zalo: "0981256712",
+    },
+    responsibilities: [
+      "Quản lý vận hành toàn diện cụm 3–5 nhà hàng trong khu vực phân công",
+      "Đảm bảo các chỉ số P&L, doanh số, chi phí nhân sự và chất lượng phục vụ đồng nhất",
+      "Đào tạo, phát triển các Quản Lý Cửa Hàng và Tổ Trưởng kế cận",
+      "Đại diện hệ thống xử lý các vấn đề đối ngoại và cơ quan chức năng khi cần thiết",
+    ],
+    requirements: [
+      "Độ tuổi: 28 – 40 tuổi",
+      "Có kinh nghiệm quản lý cụm 3–5 nhà hàng F&B từ 2 năm trở lên",
+      "Tư duy số liệu, chiến lược kinh doanh và khả năng dẫn dắt đội ngũ mạnh mẽ",
+    ],
+    benefits: [
+      "Thu nhập: 15.000.000 – 35.000.000 VNĐ/tháng + Thưởng kết quả kinh doanh",
+      "Thời gian: 16h00 – 01h00 (Nghỉ 2 buổi/tháng)",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Cơ hội gắn bó lâu dài cùng lộ trình cổ phần hóa / ESOP hấp dẫn",
+    ],
+    datePosted: "2026-11-23T08:00:00.000Z",
     validThrough: "2027-12-31T23:59:59.000Z",
     isUrgent: true,
   },
@@ -1135,74 +413,1000 @@ export const MOCK_JOBS_DATA: JobItem[] = [
     parentMenu: "Trưởng, Quản lý",
     menuPlacement: "PARENT",
     showInMenu: true,
-    badge: "9 - 13 triệu, Thưởng KPI & Tip",
-    badges: ["20–30 tuổi", "9 - 13 triệu + Tip & Thưởng", "Lộ trình lên Quản lý", "Bao ăn ca"],
-    salaryDisplay: "9 - 13 triệu/tháng + Tip & Thưởng",
-    minSalary: 9000000,
-    maxSalary: 13000000,
+    badge: "20–30 tuổi, 7–8 triệu/tháng + Thưởng",
+    badges: [
+      "20–30 tuổi",
+      "7 – 8 triệu + Thưởng",
+      "Học việc từ số 0",
+      "Lộ trình lên Quản lý",
+    ],
+    salaryDisplay: "7 - 8 triệu/tháng + Thưởng khích lệ",
+    minSalary: 7000000,
+    maxSalary: 8000000,
     salaryUnit: "MONTH",
-    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú"],
+    locations: ["Quận 3", "Gò Vấp", "Thủ Đức", "Quận 10", "Tân Phú", "Bình Tân"],
     ageRequirement: "20 – 30 tuổi",
     workType: "FULL_TIME",
     workTypeDisplay: "Toàn thời gian (16h00 – 01h00)",
-    workHours: "16h00 – 01h00 mỗi ngày",
-    experienceDisplay: "Ưu tiên có kinh nghiệm phục vụ/tổ phó từ 6 tháng",
-    experienceRequirements: "Có kinh nghiệm phục vụ hoặc tổ phó sảnh từ 6 tháng",
+    workHours: "16h00 – 01h00 (Nghỉ 2 buổi/tháng)",
+    experienceDisplay: "Học việc từ số 0 hoặc đã có kinh nghiệm F&B",
+    experienceRequirements: "Không yêu cầu bằng cấp cao, ưu tiên bạn có tố chất bao quát, nhanh nhẹn, tinh thần làm chủ công việc.",
     isActive: true,
     contactZalo: "0981256712",
     images: [
-      "/images/posters/laubotramruoi-totruong-1.webp",
-      "/images/posters/totruong-poster-2.webp",
-      "/images/posters/hocviectotruong1.webp",
-      "/images/culture/phucvu-store-opening.webp",
+      "/images/posters/totruong1.webp",
+      "/images/posters/totruong2.webp",
+      "/images/posters/totruong3.webp",
+      "/images/posters/totruong4.webp",
     ],
-    videoUrl: "/videos/jobs/totruong.mp4",
-    videoPoster: "",
     concisePost: {
-      headline: "TỔ TRƯỞNG SẢNH - ĐIỀU PHỐI VẬN HÀNH BÀN ĂN CHUYÊN NGHIỆP",
-      intro:
-        "Dẫn dắt đội ngũ phục vụ sảnh, đảm bảo bàn tiệc luôn sạch sẽ và phục vụ khách hàng chu đáo nhất!",
+      headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG TỔ TRƯỞNG CA] 🔥",
+      intro: `🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG TỔ TRƯỞNG CA] 🔥
+Bạn muốn bước chân vào con đường quản lý chuyên nghiệp trong ngành F&B? Hãy bắt đầu ngay với vị trí Tổ Trưởng tại Lẩu Bò Trăm Rưỡi!
+
+💰 Thu nhập: 7 – 8 củ/tháng + Thưởng khích lệ 🌟
+⏰ Thời gian: 16h00 – 01h00 (Nghỉ 2 buổi/tháng)
+🎂 Độ tuổi: 20 – 30 tuổi
+👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
+
+👉 Bạn sẽ làm:
+- Hỗ trợ Quản Lý điều phối hoạt động ca trực (phân ca, sắp xếp bàn ghế, điều động nhân sự).
+- Giám sát chất lượng phục vụ, kiểm tra vệ sinh an toàn và công tác chuẩn bị trước giờ mở bán.
+- Hướng dẫn và kèm cặp các bạn nhân viên mới trong ca làm việc.`,
       points: [
         {
-          icon: "🔹",
-          label: "Vị trí:",
-          content: "Tổ trưởng sảnh / Quản lý ca trực tiếp tại chi nhánh.",
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
         },
         {
-          icon: "✨",
-          label: "Lương thưởng:",
-          content: "9 – 13 triệu/tháng + Tip chia đều + Thưởng KPI.",
+          icon: "💵",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
         },
         {
-          icon: "🌙",
-          label: "Ca làm việc:",
-          content: "16h00 – 01h00 mỗi ngày.",
-        },
-        {
-          icon: "📈",
-          label: "Lộ trình:",
-          content:
-            "Xét thăng cấp lên Phó quản lý tiệm sau 3 tháng hoàn thành tốt chỉ tiêu.",
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
         },
       ],
       zalo: "0981256712",
     },
     responsibilities: [
-      "Quản lý ca trực sảnh, phân công bàn và giám sát nhân viên phục vụ",
-      "Kiểm tra việc set up bàn, chén dĩa và vệ sinh trước giờ đón khách",
-      "Hỗ trợ giải đáp thắc mắc và chăm sóc khách hàng trong suốt bữa ăn",
+      "Hỗ trợ Quản Lý điều phối hoạt động ca trực (phân ca, sắp xếp bàn ghế, điều động nhân sự)",
+      "Giám sát chất lượng phục vụ, kiểm tra vệ sinh an toàn và công tác chuẩn bị trước giờ mở bán",
+      "Hướng dẫn và kèm cặp các bạn nhân viên mới trong ca làm việc",
     ],
     requirements: [
-      "Từ 20 – 30 tuổi, giao tiếp niềm nở, khả năng quan sát tốt",
-      "Có từ 6 tháng kinh nghiệm phục vụ hoặc tổ phó trong ngành nhà hàng",
+      "Độ tuổi: 20 – 30 tuổi",
+      "Nhanh nhẹn, có trách nhiệm, khả năng bao quát tốt",
+      "Được đào tạo từ số 0 nếu chưa có kinh nghiệm",
     ],
     benefits: [
-      "Thu nhập từ 9 – 13 triệu/tháng + Tip hàng ngày",
-      "Bao cơm ca, thưởng chuyên cần và thưởng chi nhánh",
-      "Được đào tạo để thăng tiến lên Phó quản lý tiệm",
+      "Thu nhập: 7.000.000 – 8.000.000 VNĐ/tháng + Thưởng khích lệ",
+      "Thời gian: 16h00 – 01h00 (Nghỉ 2 buổi/tháng)",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Được kèm cặp trực tiếp để lên Quản Lý Ca / Phó Quản Lý sau 3–6 tháng",
     ],
-    datePosted: "2026-11-01T08:00:00.000Z",
+    datePosted: "2026-11-23T08:00:00.000Z",
     validThrough: "2027-12-31T23:59:59.000Z",
-    isUrgent: false,
+    isUrgent: true,
+  },
+
+  // ===========================================================================
+  // NHÓM 2: HỌC NGHỀ CÓ LƯƠNG
+  // ===========================================================================
+  {
+    id: "HV-BEP-01",
+    slug: "hoc-viec-bep",
+    title: "Học việc bếp",
+    category: "Học nghề có lương",
+    parentMenu: "Học nghề có lương",
+    menuPlacement: "PARENT",
+    showInMenu: true,
+    badge: "18–30 tuổi, 7,5–11 triệu/tháng",
+    badges: [
+      "18–30 tuổi",
+      "7,5 – 11 triệu/tháng",
+      "Đào tạo từ số 0",
+      "Học nghề miễn phí",
+    ],
+    salaryDisplay: "7,5 - 11 triệu/tháng",
+    minSalary: 7500000,
+    maxSalary: 11000000,
+    salaryUnit: "MONTH",
+    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú"],
+    ageRequirement: "18 – 30 tuổi",
+    workType: "FULL_TIME",
+    workTypeDisplay: "Toàn thời gian (14h00 – 24h00)",
+    workHours: "14h00 – 24h00 mỗi ngày",
+    experienceDisplay: "Không yêu cầu (Đào tạo thực chiến từ A-Z)",
+    experienceRequirements: "Không yêu cầu bằng cấp hay kinh nghiệm, chỉ cần siêng năng, chịu khó và đam mê học nghề bếp.",
+    isActive: true,
+    contactZalo: "0981256712",
+    images: [
+      "/images/posters/hocnghebep.webp",
+      "/images/jobs/hoc-viec-bep-1.webp",
+      "/images/jobs/hoc-viec-bep-2.webp",
+      "/images/jobs/hoc-viec-bep-3.webp",
+    ],
+    videoUrl: "/videos/jobs/bep-training.mp4",
+    concisePost: {
+      headline: "🔥 [HỌC NGHỀ BẾP MIỄN PHÍ - VẪN CÓ LƯƠNG ĐỦ TẠI LẨU BÒ TRĂM RƯỠI] 🔥",
+      intro: `🔥 [HỌC NGHỀ BẾP MIỄN PHÍ - VẪN CÓ LƯƠNG ĐỦ TẠI LẨU BÒ TRĂM RƯỠI] 🔥
+Bạn muốn có một cái nghề vững chắc, thu nhập ổn định và cơ hội thăng tiến rõ ràng nhưng chưa biết bắt đầu từ đâu? Tiệm Lẩu Bò Trăm Rưỡi mở rộng đào tạo học viên bếp!
+
+💰 Thu nhập khởi điểm: 7.500.000 – 11.000.000 VNĐ/tháng ngay trong thời gian học nghề!
+✨ Đánh giá tăng lương sau 1 tuần đầu nhiệt tình, cố gắng.
+⏰ Ca làm việc cố định: 14h00 – 24h00 mỗi ngày.
+🎂 Độ tuổi: 18 – 30 tuổi.
+👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
+
+👉 Bạn sẽ được đào tạo:
+- Kỹ năng dùng dao, thớt chuẩn mực, pha lóc và xử lý thịt bò tươi đúng cách.
+- Nấu nước lẩu gia truyền đậm đà, chuẩn vị Triều Châu độc quyền.
+- Quy trình kiểm soát chất lượng, định lượng món và tiêu chuẩn VSATTP.`,
+      points: [
+        {
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
+        },
+        {
+          icon: "💵",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
+        },
+        {
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
+        },
+      ],
+      zalo: "0981256712",
+    },
+    responsibilities: [
+      "Học và thực hành trực tiếp các công việc bếp dưới sự hướng dẫn của Bếp Trưởng",
+      "Chuẩn bị nguyên liệu, sơ chế rau củ, thịt bò và các loại gia vị lẩu",
+      "Đảm bảo vệ sinh khu vực bếp luôn gọn gàng, ngăn nắp và đạt chuẩn an toàn vệ sinh thực phẩm",
+    ],
+    requirements: [
+      "Độ tuổi: 18 – 30 tuổi",
+      "Không yêu cầu kinh nghiệm, được đào tạo từ số 0",
+      "Chăm chỉ, chịu khó, có tinh thần cầu tiến và yêu thích nghề bếp",
+    ],
+    benefits: [
+      "Thu nhập: 7.500.000 – 11.000.000 VNĐ/tháng",
+      "Thời gian: 14h00 – 24h00",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Học nghề thực chiến miễn phí 100%, có cơ hội lên Phụ Bếp chính và Bếp Trưởng Chi Nhánh",
+    ],
+    datePosted: "2026-11-23T08:00:00.000Z",
+    validThrough: "2027-12-31T23:59:59.000Z",
+    isUrgent: true,
+  },
+  {
+    id: "HV-PQL-01",
+    slug: "hoc-viec-pho-quan-ly",
+    title: "Học việc phó quản lý",
+    category: "Học nghề có lương",
+    parentMenu: "Học nghề có lương",
+    menuPlacement: "PARENT",
+    showInMenu: true,
+    badge: "20–35 tuổi, 10–14 triệu/tháng + Thưởng",
+    badges: [
+      "20–35 tuổi",
+      "10 – 14 triệu + Thưởng",
+      "Đào tạo Quản trị F&B",
+      "Lộ trình thăng tiến",
+    ],
+    salaryDisplay: "10 - 14 triệu/tháng + Thưởng",
+    minSalary: 10000000,
+    maxSalary: 14000000,
+    salaryUnit: "MONTH",
+    locations: ["Quận 3", "Gò Vấp", "Thủ Đức", "Quận 10", "Tân Phú", "Bình Tân"],
+    ageRequirement: "20 – 35 tuổi",
+    workType: "FULL_TIME",
+    workTypeDisplay: "Toàn thời gian (16h00 – 01h00)",
+    workHours: "16h00 – 01h00",
+    experienceDisplay: "Đã có kinh nghiệm Tổ trưởng, Giám sát hoặc Quản lý ca F&B",
+    experienceRequirements: "Có nền tảng làm việc trong ngành F&B, mong muốn được đào tạo bài bản để trở thành Phó Quản Lý / Quản Lý thực thụ.",
+    isActive: true,
+    contactZalo: "0981256712",
+    images: [
+      "/images/posters/HVphoquanly1.webp",
+      "/images/posters/HVphoquanly2.webp",
+      "/images/posters/HVphoquanly3.webp",
+    ],
+    concisePost: {
+      headline: "🔥 [CHƯƠNG TRÌNH ĐÀO TẠO PHÓ QUẢN LÝ TIỆM LẨU BÒ TRĂM RƯỠI] 🔥",
+      intro: `🔥 [CHƯƠNG TRÌNH ĐÀO TẠO PHÓ QUẢN LÝ TIỆM LẨU BÒ TRĂM RƯỠI] 🔥
+Cơ hội nâng tầm sự nghiệp quản lý F&B với mức lương hấp dẫn ngay trong thời gian học việc!
+
+💰 Thu nhập: 10 – 14 củ/tháng + Thưởng xứng đáng theo năng lực.
+⏰ Thời gian: 16h00 – 01h00
+🎂 Độ tuổi: 20 – 35 tuổi
+👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
+
+👉 Lộ trình đào tạo:
+- Quản trị vận hành ca: Điều phối nhân sự, xử lý tình huống phát sinh, nâng cao trải nghiệm khách hàng.
+- Quản trị số liệu: Báo cáo doanh thu, kiểm soát thất thoát, quản lý kho hàng và hàng tồn.
+- Năng lực lãnh đạo: Huấn luyện, truyền cảm hứng và xây dựng văn hóa đội ngũ vững mạnh.`,
+      points: [
+        {
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
+        },
+        {
+          icon: "💵",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
+        },
+        {
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
+        },
+      ],
+      zalo: "0981256712",
+    },
+    responsibilities: [
+      "Tham gia học tập và hỗ trợ Quản Lý vận hành ca làm việc hàng ngày",
+      "Theo dõi, kiểm tra tiêu chuẩn chất lượng dịch vụ và quy trình an toàn tại cửa hàng",
+      "Thực hiện các báo cáo số liệu vận hành và phối hợp tổ chức đào tạo nhân sự mới",
+    ],
+    requirements: [
+      "Độ tuổi: 20 – 35 tuổi",
+      "Có kinh nghiệm F&B (từng làm Tổ Trưởng, Giám Sát Ca hoặc tương đương)",
+      "Tư duy tích cực, ham học hỏi và có chí hướng phát triển sự nghiệp lâu dài",
+    ],
+    benefits: [
+      "Thu nhập: 10.000.000 – 14.000.000 VNĐ/tháng + Thưởng",
+      "Thời gian: 16h00 – 01h00",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Lộ trình bổ nhiệm chính thức lên Phó Quản Lý Tiệm chỉ sau 1–3 tháng",
+    ],
+    datePosted: "2026-11-23T08:00:00.000Z",
+    validThrough: "2027-12-31T23:59:59.000Z",
+    isUrgent: true,
+  },
+
+  // ===========================================================================
+  // NHÓM 3: 6 VỊ TRÍ ĐỒNG BỘ THÔNG TIN (PHỤC VỤ, PHỤ BẾP, TIẾP THỰC, CSKH, THU NGÂN, PHA CHẾ)
+  // ===========================================================================
+  {
+    id: "PB-01",
+    slug: "phu-bep",
+    title: "Phụ bếp",
+    category: "Full-time",
+    parentMenu: "Full-time",
+    menuPlacement: "PARENT",
+    showInMenu: true,
+    badge: "16–25 tuổi, 8–10 triệu/tháng | 27k–35k/1 giờ",
+    badges: [
+      "16 – 25 tuổi",
+      "8 – 10 triệu/tháng",
+      "27k – 35k/1 giờ",
+      "Đào tạo từ số 0",
+    ],
+    salaryDisplay: "8 - 10 triệu/tháng | 27k - 35k/1 giờ",
+    minSalary: 8000000,
+    maxSalary: 10000000,
+    salaryUnit: "MONTH",
+    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú", "Bình Tân"],
+    ageRequirement: "16 – 25 tuổi",
+    workType: "FULL_TIME",
+    workTypeDisplay: "Full-time / Part-time / Thời vụ",
+    workHours: "15h00 – 00h00 hoặc 16h00 – 01h00",
+    experienceDisplay: "Không yêu cầu kinh nghiệm (Đào tạo từ số 0)",
+    experienceRequirements: "Không yêu cầu kinh nghiệm (Đào tạo từ số 0)",
+    isActive: true,
+    contactZalo: "0981256712",
+    images: [
+      "/images/culture/bep-operation.webp",
+    ],
+    videoUrl: "/videos/jobs/phubep.mp4",
+    concisePost: {
+      headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHỤ BẾP] 🔥",
+      intro: `🔥 TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHỤ BẾP 🔥
+👉 THÔNG TIN TUYỂN DỤNG CHÍNH THỨC:
+- 16 tuổi - 25 tuổi
+- ko yêu cầu kinh nghiệm (đào tạo từ số 0)
+- full time/part time/thời vụ
+- 15h00 – 00h00 hoặc 16h00 – 01h00
+- full time : 8 - 10 triệu/tháng
+- part time/thời vụ: 27k - 35k/1 giờ
+👉 Chế độ đãi ngộ:
+- Không bao ăn, Không bao ở
+- Tiền Tip tự giữ
+- Cho phép ứng lương`,
+      points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "Full-time: 8 - 10 triệu/tháng\nPart-time / Thời vụ: 27k - 35k/1 giờ",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "15h00 – 00h00 hoặc 16h00 – 01h00 (Hỗ trợ Full-time / Part-time / Thời vụ linh hoạt)",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "16 tuổi – 25 tuổi\nKhông yêu cầu kinh nghiệm (đào tạo từ số 0)",
+        },
+        {
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
+        },
+        {
+          icon: "💵",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
+        },
+        {
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
+        },
+        {
+          icon: "📍",
+          label: "Chi nhánh làm việc:",
+          content: "Toàn bộ hệ thống 15 chi nhánh Lẩu Bò Trăm Rưỡi tại TP.HCM",
+        },
+      ],
+      zalo: "0981256712",
+    },
+    responsibilities: [
+      "Sơ chế nguyên liệu thịt bò, rau củ theo định lượng và công thức chuẩn",
+      "Chuẩn bị nồi lẩu, các đĩa đồ nhúng theo đúng order của khách",
+      "Hỗ trợ Bếp Trưởng giữ gìn vệ sinh, gọn gàng khu vực bếp",
+    ],
+    requirements: [
+      "Độ tuổi: 16 tuổi - 25 tuổi",
+      "Không yêu cầu kinh nghiệm (đào tạo từ số 0)",
+      "Hình thức: Full-time / Part-time / Thời vụ",
+      "Thời gian làm việc: 15h00 – 00h00 hoặc 16h00 – 01h00",
+    ],
+    benefits: [
+      "Thu nhập: Full-time: 8 - 10 triệu/tháng | Part-time / Thời vụ: 27k - 35k/1 giờ",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Không yêu cầu kinh nghiệm (đào tạo từ số 0)",
+    ],
+    datePosted: "2026-11-23T08:00:00.000Z",
+    validThrough: "2027-12-31T23:59:59.000Z",
+    isUrgent: true,
+  },
+  {
+    id: "FT-TN-02",
+    slug: "thu-ngan",
+    title: "Thu ngân",
+    category: "Full-time",
+    parentMenu: "Full-time",
+    menuPlacement: "PARENT",
+    showInMenu: true,
+    badge: "16–25 tuổi, 8–10 triệu/tháng | 27k–35k/1 giờ",
+    badges: [
+      "16 – 25 tuổi",
+      "8 – 10 triệu/tháng",
+      "27k – 35k/1 giờ",
+      "Đào tạo từ số 0",
+    ],
+    salaryDisplay: "8 - 10 triệu/tháng | 27k - 35k/1 giờ",
+    minSalary: 8000000,
+    maxSalary: 10000000,
+    salaryUnit: "MONTH",
+    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú", "Bình Tân"],
+    ageRequirement: "16 – 25 tuổi",
+    workType: "FULL_TIME",
+    workTypeDisplay: "Full-time / Part-time / Thời vụ",
+    workHours: "15h00 – 00h00 hoặc 16h00 – 01h00",
+    experienceDisplay: "Không yêu cầu kinh nghiệm (Đào tạo từ số 0)",
+    experienceRequirements: "Không yêu cầu kinh nghiệm (Đào tạo từ số 0)",
+    isActive: true,
+    contactZalo: "0981256712",
+    images: [
+      "/images/posters/cskh-team-1.webp",
+      "/images/culture/phucvu-store-opening.webp",
+      "/images/culture/phucvu-team.webp",
+      "/images/culture/chu.webp",
+    ],
+    videoUrl: "/videos/jobs/phucvu.mp4",
+    concisePost: {
+      headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG THU NGÂN] 🔥",
+      intro: `🔥 TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG THU NGÂN 🔥
+👉 THÔNG TIN TUYỂN DỤNG CHÍNH THỨC:
+- 16 tuổi - 25 tuổi
+- ko yêu cầu kinh nghiệm (đào tạo từ số 0)
+- full time/part time/thời vụ
+- 15h00 – 00h00 hoặc 16h00 – 01h00
+- full time : 8 - 10 triệu/tháng
+- part time/thời vụ: 27k - 35k/1 giờ
+👉 Chế độ đãi ngộ:
+- Không bao ăn, Không bao ở
+- Tiền Tip tự giữ
+- Cho phép ứng lương`,
+      points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "Full-time: 8 - 10 triệu/tháng\nPart-time / Thời vụ: 27k - 35k/1 giờ",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "15h00 – 00h00 hoặc 16h00 – 01h00 (Hỗ trợ Full-time / Part-time / Thời vụ linh hoạt)",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "16 tuổi – 25 tuổi\nKhông yêu cầu kinh nghiệm (đào tạo từ số 0)",
+        },
+        {
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
+        },
+        {
+          icon: "💵",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
+        },
+        {
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
+        },
+        {
+          icon: "📍",
+          label: "Chi nhánh làm việc:",
+          content: "Toàn bộ hệ thống 15 chi nhánh Lẩu Bò Trăm Rưỡi tại TP.HCM",
+        },
+      ],
+      zalo: "0981256712",
+    },
+    responsibilities: [
+      "Thực hiện thanh toán tiền mặt, quẹt thẻ POS và quét mã QR cho khách",
+      "In bill chính xác và bàn giao tiền mặt ca trực rõ ràng",
+      "Hỗ trợ giải đáp các thắc mắc của khách về hóa đơn và chương trình ưu đãi",
+    ],
+    requirements: [
+      "Độ tuổi: 16 tuổi - 25 tuổi",
+      "Không yêu cầu kinh nghiệm (đào tạo từ số 0)",
+      "Hình thức: Full-time / Part-time / Thời vụ",
+      "Thời gian làm việc: 15h00 – 00h00 hoặc 16h00 – 01h00",
+    ],
+    benefits: [
+      "Thu nhập: Full-time: 8 - 10 triệu/tháng | Part-time / Thời vụ: 27k - 35k/1 giờ",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Không yêu cầu kinh nghiệm (đào tạo từ số 0)",
+    ],
+    datePosted: "2026-11-23T08:00:00.000Z",
+    validThrough: "2027-12-31T23:59:59.000Z",
+    isUrgent: true,
+  },
+  {
+    id: "FT-PC-01",
+    slug: "pha-che-full-time",
+    title: "Pha chế",
+    category: "Full-time",
+    parentMenu: "Full-time",
+    menuPlacement: "PARENT",
+    showInMenu: true,
+    badge: "16–25 tuổi, 8–10 triệu/tháng | 27k–35k/1 giờ",
+    badges: [
+      "16 – 25 tuổi",
+      "8 – 10 triệu/tháng",
+      "27k – 35k/1 giờ",
+      "Đào tạo từ số 0",
+    ],
+    salaryDisplay: "8 - 10 triệu/tháng | 27k - 35k/1 giờ",
+    minSalary: 8000000,
+    maxSalary: 10000000,
+    salaryUnit: "MONTH",
+    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú", "Bình Tân"],
+    ageRequirement: "16 – 25 tuổi",
+    workType: "FULL_TIME",
+    workTypeDisplay: "Full-time / Part-time / Thời vụ",
+    workHours: "15h00 – 00h00 hoặc 16h00 – 01h00",
+    experienceDisplay: "Không yêu cầu kinh nghiệm (Đào tạo từ số 0)",
+    experienceRequirements: "Không yêu cầu kinh nghiệm (Đào tạo từ số 0)",
+    isActive: true,
+    contactZalo: "0981256712",
+    images: [
+      "/images/culture/phucvu-full.webp",
+      "/images/culture/bep-operation.webp",
+      "/images/culture/phucvu-store-opening.webp",
+      "/images/culture/phucvu-team.webp",
+    ],
+    videoUrl: "/videos/jobs/phucvu.mp4",
+    concisePost: {
+      headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHA CHẾ] 🔥",
+      intro: `🔥 TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHA CHẾ 🔥
+👉 THÔNG TIN TUYỂN DỤNG CHÍNH THỨC:
+- 16 tuổi - 25 tuổi
+- ko yêu cầu kinh nghiệm (đào tạo từ số 0)
+- full time/part time/thời vụ
+- 15h00 – 00h00 hoặc 16h00 – 01h00
+- full time : 8 - 10 triệu/tháng
+- part time/thời vụ: 27k - 35k/1 giờ
+👉 Chế độ đãi ngộ:
+- Không bao ăn, Không bao ở
+- Tiền Tip tự giữ
+- Cho phép ứng lương`,
+      points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "Full-time: 8 - 10 triệu/tháng\nPart-time / Thời vụ: 27k - 35k/1 giờ",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "15h00 – 00h00 hoặc 16h00 – 01h00 (Hỗ trợ Full-time / Part-time / Thời vụ linh hoạt)",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "16 tuổi – 25 tuổi\nKhông yêu cầu kinh nghiệm (đào tạo từ số 0)",
+        },
+        {
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
+        },
+        {
+          icon: "💵",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
+        },
+        {
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
+        },
+        {
+          icon: "📍",
+          label: "Chi nhánh làm việc:",
+          content: "Toàn bộ hệ thống 15 chi nhánh Lẩu Bò Trăm Rưỡi tại TP.HCM",
+        },
+      ],
+      zalo: "0981256712",
+    },
+    responsibilities: [
+      "Pha chế đồ uống, trà, nước giải khát theo đúng công thức độc quyền của tiệm",
+      "Quản lý nguyên vật liệu quầy bar và bảo quản đồ uống sạch sẽ, an toàn",
+      "Phối hợp cùng nhân viên tiếp thực để ra đồ nhanh chóng",
+    ],
+    requirements: [
+      "Độ tuổi: 16 tuổi - 25 tuổi",
+      "Không yêu cầu kinh nghiệm (đào tạo từ số 0)",
+      "Hình thức: Full-time / Part-time / Thời vụ",
+      "Thời gian làm việc: 15h00 – 00h00 hoặc 16h00 – 01h00",
+    ],
+    benefits: [
+      "Thu nhập: Full-time: 8 - 10 triệu/tháng | Part-time / Thời vụ: 27k - 35k/1 giờ",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Không yêu cầu kinh nghiệm (đào tạo từ số 0)",
+    ],
+    datePosted: "2026-11-23T08:00:00.000Z",
+    validThrough: "2027-12-31T23:59:59.000Z",
+    isUrgent: true,
+  },
+  {
+    id: "PV-BAN-01",
+    slug: "phuc-vu-ban",
+    title: "Phục vụ bàn",
+    category: "Part-time",
+    parentMenu: "Part-time",
+    menuPlacement: "PARENT",
+    showInMenu: true,
+    badge: "16–25 tuổi, 8–10 triệu/tháng | 27k–35k/1 giờ",
+    badges: [
+      "16 – 25 tuổi",
+      "8 – 10 triệu/tháng",
+      "27k – 35k/1 giờ",
+      "Đào tạo từ số 0",
+    ],
+    salaryDisplay: "8 - 10 triệu/tháng | 27k - 35k/1 giờ",
+    minSalary: 8000000,
+    maxSalary: 10000000,
+    salaryUnit: "MONTH",
+    locations: ["Quận 3 (CMT8)", "Quận 9 (Đỗ Xuân Hợp)", "Gò Vấp (Quang Trung)", "Thủ Đức", "Tân Phú", "Bình Tân"],
+    ageRequirement: "16 – 25 tuổi",
+    workType: "PART_TIME",
+    workTypeDisplay: "Full-time / Part-time / Thời vụ",
+    workHours: "15h00 – 00h00 hoặc 16h00 – 01h00",
+    experienceDisplay: "Không yêu cầu kinh nghiệm (Đào tạo từ số 0)",
+    experienceRequirements: "Không yêu cầu kinh nghiệm (Đào tạo từ số 0)",
+    isActive: true,
+    contactZalo: "0981256712",
+    images: [
+      "/images/posters/phucvuban1.webp",
+      "/images/posters/phucvuban2.webp",
+      "/images/posters/phucvuban3.webp",
+    ],
+    videoUrl: "/videos/jobs/phucvu.mp4",
+    concisePost: {
+      headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHỤC VỤ BÀN] 🔥",
+      intro: `🔥 TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHỤC VỤ BÀN 🔥
+👉 THÔNG TIN TUYỂN DỤNG CHÍNH THỨC:
+- 16 tuổi - 25 tuổi
+- ko yêu cầu kinh nghiệm (đào tạo từ số 0)
+- full time/part time/thời vụ
+- 15h00 – 00h00 hoặc 16h00 – 01h00
+- full time : 8 - 10 triệu/tháng
+- part time/thời vụ: 27k - 35k/1 giờ
+👉 Chế độ đãi ngộ:
+- Không bao ăn, Không bao ở
+- Tiền Tip tự giữ
+- Cho phép ứng lương`,
+      points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "Full-time: 8 - 10 triệu/tháng\nPart-time / Thời vụ: 27k - 35k/1 giờ",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "15h00 – 00h00 hoặc 16h00 – 01h00 (Hỗ trợ Full-time / Part-time / Thời vụ linh hoạt)",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "16 tuổi – 25 tuổi\nKhông yêu cầu kinh nghiệm (đào tạo từ số 0)",
+        },
+        {
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
+        },
+        {
+          icon: "💵",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
+        },
+        {
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
+        },
+        {
+          icon: "📍",
+          label: "Chi nhánh làm việc:",
+          content: "Toàn bộ hệ thống 15 chi nhánh Lẩu Bò Trăm Rưỡi tại TP.HCM",
+        },
+      ],
+      zalo: "0981256712",
+    },
+    responsibilities: [
+      "Đón tiếp khách hàng, giới thiệu món và lấy order món ăn chu đáo",
+      "Phục vụ món ăn lên bàn cho khách, châm nước lẩu và hỗ trợ thực khách trong bữa ăn",
+      "Dọn dẹp bàn ăn sau khi khách dùng xong, giữ gìn không gian bàn ăn luôn sạch đẹp",
+    ],
+    requirements: [
+      "Độ tuổi: 16 tuổi - 25 tuổi",
+      "Không yêu cầu kinh nghiệm (đào tạo từ số 0)",
+      "Hình thức: Full-time / Part-time / Thời vụ",
+      "Thời gian làm việc: 15h00 – 00h00 hoặc 16h00 – 01h00",
+    ],
+    benefits: [
+      "Thu nhập: Full-time: 8 - 10 triệu/tháng | Part-time / Thời vụ: 27k - 35k/1 giờ",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Không yêu cầu kinh nghiệm (đào tạo từ số 0)",
+    ],
+    datePosted: "2026-11-23T08:00:00.000Z",
+    validThrough: "2027-12-31T23:59:59.000Z",
+    isUrgent: true,
+  },
+  {
+    id: "CSKH-01",
+    slug: "cham-soc-khach-hang",
+    title: "Lễ tân, chăm sóc khách hàng",
+    category: "Full-time",
+    parentMenu: "Full-time",
+    menuPlacement: "PARENT",
+    showInMenu: true,
+    badge: "16–25 tuổi, 8–10 triệu/tháng | 27k–35k/1 giờ",
+    badges: [
+      "16 – 25 tuổi",
+      "8 – 10 triệu/tháng",
+      "27k – 35k/1 giờ",
+      "Đào tạo từ số 0",
+    ],
+    salaryDisplay: "8 - 10 triệu/tháng | 27k - 35k/1 giờ",
+    minSalary: 8000000,
+    maxSalary: 10000000,
+    salaryUnit: "MONTH",
+    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú", "Bình Tân"],
+    ageRequirement: "16 – 25 tuổi",
+    workType: "FULL_TIME",
+    workTypeDisplay: "Full-time / Part-time / Thời vụ",
+    workHours: "15h00 – 00h00 hoặc 16h00 – 01h00",
+    experienceDisplay: "Không yêu cầu kinh nghiệm (Đào tạo từ số 0)",
+    experienceRequirements: "Không yêu cầu kinh nghiệm (Đào tạo từ số 0)",
+    isActive: true,
+    contactZalo: "0981256712",
+    images: [
+      "/images/posters/cskh1.webp",
+      "/images/posters/cskh2.webp",
+    ],
+    concisePost: {
+      headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG LỄ TÂN, CHĂM SÓC KHÁCH HÀNG] 🔥",
+      intro: `🔥 TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG LỄ TÂN, CHĂM SÓC KHÁCH HÀNG 🔥
+👉 THÔNG TIN TUYỂN DỤNG CHÍNH THỨC:
+- 16 tuổi - 25 tuổi
+- ko yêu cầu kinh nghiệm (đào tạo từ số 0)
+- full time/part time/thời vụ
+- 15h00 – 00h00 hoặc 16h00 – 01h00
+- full time : 8 - 10 triệu/tháng
+- part time/thời vụ: 27k - 35k/1 giờ
+👉 Chế độ đãi ngộ:
+- Không bao ăn, Không bao ở
+- Tiền Tip tự giữ
+- Cho phép ứng lương`,
+      points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "Full-time: 8 - 10 triệu/tháng\nPart-time / Thời vụ: 27k - 35k/1 giờ",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "15h00 – 00h00 hoặc 16h00 – 01h00 (Hỗ trợ Full-time / Part-time / Thời vụ linh hoạt)",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "16 tuổi – 25 tuổi\nKhông yêu cầu kinh nghiệm (đào tạo từ số 0)",
+        },
+        {
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
+        },
+        {
+          icon: "💵",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
+        },
+        {
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
+        },
+        {
+          icon: "📍",
+          label: "Chi nhánh làm việc:",
+          content: "Toàn bộ hệ thống 15 chi nhánh Lẩu Bò Trăm Rưỡi tại TP.HCM",
+        },
+      ],
+      zalo: "0981256712",
+    },
+    responsibilities: [
+      "Đón tiếp thực khách ngay cửa với nụ cười thân thiện, tươi tắn",
+      "Hướng dẫn khách vào bàn ngồi ưng ý, sắp xếp chỗ ngồi hợp lý giờ cao điểm",
+      "Lắng nghe và ghi nhận các góp ý, phản hồi của thực khách để cải thiện dịch vụ",
+    ],
+    requirements: [
+      "Độ tuổi: 16 tuổi - 25 tuổi",
+      "Không yêu cầu kinh nghiệm (đào tạo từ số 0)",
+      "Hình thức: Full-time / Part-time / Thời vụ",
+      "Thời gian làm việc: 15h00 – 00h00 hoặc 16h00 – 01h00",
+    ],
+    benefits: [
+      "Thu nhập: Full-time: 8 - 10 triệu/tháng | Part-time / Thời vụ: 27k - 35k/1 giờ",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Không yêu cầu kinh nghiệm (đào tạo từ số 0)",
+    ],
+    datePosted: "2026-11-23T08:00:00.000Z",
+    validThrough: "2027-12-31T23:59:59.000Z",
+    isUrgent: true,
+  },
+
+  // ===========================================================================
+  // NHÓM 4: CÁC VỊ TRÍ KHÁC (TẠP VỤ RỬA CHÉN & THỜI VỤ)
+  // ===========================================================================
+  {
+    id: "FT-TVRC-01",
+    slug: "tap-vu-rua-chen",
+    title: "Tạp vụ, rửa chén",
+    category: "Full-time",
+    parentMenu: "Full-time",
+    menuPlacement: "PARENT",
+    showInMenu: true,
+    badge: "Ca ngày 09h00–18h00, Khởi điểm 8 triệu/tháng",
+    badges: [
+      "Ca ngày 09h00 – 18h00",
+      "Khởi điểm 8 triệu/tháng",
+      "Nghỉ 2 buổi/tháng",
+      "Định kỳ 3 tháng tăng đãi ngộ",
+    ],
+    salaryDisplay: "8 triệu/tháng",
+    minSalary: 8000000,
+    maxSalary: 8000000,
+    salaryUnit: "MONTH",
+    locations: ["Gò Vấp", "Thủ Đức", "Quận 10", "Quận 3", "Tân Phú", "Bình Tân"],
+    ageRequirement: "Không giới hạn độ tuổi",
+    workType: "FULL_TIME",
+    workTypeDisplay: "Toàn thời gian (09h00 – 18h00)",
+    workHours: "09h00 – 18h00 (Nghỉ trưa 1 tiếng thoải mái)",
+    experienceDisplay: "Không yêu cầu kinh nghiệm",
+    experienceRequirements: "Không yêu cầu bằng cấp hay kinh nghiệm, chỉ cần chăm chỉ, trung thực và có trách nhiệm với công việc.",
+    isActive: true,
+    contactZalo: "0981256712",
+    images: [
+      "/images/posters/ruachen1.webp",
+    ],
+    concisePost: {
+      headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG TẠP VỤ, RỬA CHÉN] 🔥",
+      intro: `🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG TẠP VỤ, RỬA CHÉN] 🔥
+Hệ thống Tiệm Lẩu Bò Trăm Rưỡi tuyển dụng nhân sự Tạp vụ, Rửa chén ca ngày với công việc ổn định, gắn bó lâu dài.
+
+💰 Mức lương khởi điểm: 8.000.000 VNĐ/tháng.
+⏰ Giờ làm việc: 09h00 – 18h00 (Được nghỉ trưa 1 tiếng thoải mái).
+📅 Nghỉ 2 buổi/tháng. Định kỳ 3 tháng xét tăng đãi ngộ.
+🎂 Không giới hạn độ tuổi.
+👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương`,
+      points: [
+        {
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
+        },
+        {
+          icon: "💵",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
+        },
+        {
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
+        },
+      ],
+      zalo: "0981256712",
+    },
+    responsibilities: [
+      "Vệ sinh chén dĩa, nồi lẩu, dụng cụ bếp sạch sẽ theo quy trình máy và bồn rửa",
+      "Giữ gìn vệ sinh khu vực bếp và khuôn viên quán ngăn nắp",
+      "Phân loại rác thải và dọn dẹp cuối ca",
+    ],
+    requirements: [
+      "Không giới hạn độ tuổi",
+      "Không yêu cầu kinh nghiệm",
+      "Chăm chỉ, thật thà, có sức khỏe tốt",
+    ],
+    benefits: [
+      "Thu nhập: 8.000.000 VNĐ/tháng",
+      "Thời gian: 09h00 – 18h00 (Nghỉ trưa 1 tiếng, nghỉ 2 buổi/tháng)",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Định kỳ 3 tháng xét tăng đãi ngộ",
+    ],
+    datePosted: "2026-11-23T08:00:00.000Z",
+    validThrough: "2027-12-31T23:59:59.000Z",
+    isUrgent: true,
+  },
+  {
+    id: "TV-3B-01",
+    slug: "thoi-vu-3-buoi",
+    title: "Thời vụ 3 buổi",
+    category: "Part-time, Thời vụ",
+    parentMenu: "Part-time",
+    menuPlacement: "PARENT",
+    showInMenu: true,
+    badge: "16–25 tuổi, 27k–35k/1 giờ",
+    badges: [
+      "16 – 25 tuổi",
+      "27k – 35k/1 giờ",
+      "Đào tạo từ số 0",
+      "Nhận lương tuần",
+    ],
+    salaryDisplay: "27k - 35k/1 giờ",
+    minSalary: 27000,
+    maxSalary: 35000,
+    salaryUnit: "HOUR",
+    locations: ["Toàn hệ thống TP.HCM", "Gò Vấp", "Thủ Đức", "Quận 10", "Tân Phú", "Bình Tân"],
+    ageRequirement: "16 – 25 tuổi",
+    workType: "TEMPORARY",
+    workTypeDisplay: "Thời vụ (17h00 – 24h00, tối thiểu 3 buổi/tuần)",
+    workHours: "17h00 – 24h00 (Đăng ký lịch rảnh từ 3 buổi/tuần)",
+    experienceDisplay: "Không yêu cầu (Đào tạo từ số 0)",
+    experienceRequirements: "Không yêu cầu kinh nghiệm, đào tạo thực chiến 30 phút là bắt nhịp làm được ngay.",
+    isActive: true,
+    contactZalo: "0981256712",
+    images: [
+      "/images/posters/thoivu3buoi1.webp",
+    ],
+    concisePost: {
+      headline: "🔥 [VIỆC LÀM THỜI VỤ SIÊU LINH ĐỘNG TẠI TIỆM LẨU BÒ TRĂM RƯỠI] 🔥",
+      intro: `🔥 [VIỆC LÀM THỜI VỤ SIÊU LINH ĐỘNG TẠI TIỆM LẨU BÒ TRĂM RƯỠI] 🔥
+Bạn cần tìm công việc kiếm thêm thu nhập ngắn hạn, lịch làm linh hoạt, nhận lương tuần? Đăng ký ngay thời vụ tại Lẩu Bò Trăm Rưỡi!
+
+💰 Mức lương hấp dẫn: 27k - 35k/1 giờ (Nhận lương tuần).
+⏰ Thời gian: 17h00 – 24h00 (Đăng ký lịch rảnh từ 3 buổi/tuần).
+🎂 Độ tuổi: 16 – 25 tuổi.
+👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
+
+👉 Công việc:
+- Hỗ trợ các công việc đơn giản như dọn bàn, tiếp thực, phục vụ thực khách tại quán.
+- Đào tạo 30 phút là làm được ngay, môi trường trẻ trung, thân thiện.`,
+      points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "27k - 35k/1 giờ (Nhận lương tuần)",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "17h00 – 24h00 (Đăng ký lịch rảnh từ 3 buổi/tuần)",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "16 – 25 tuổi. Không yêu cầu kinh nghiệm (đào tạo từ số 0)",
+        },
+        {
+          icon: "🍚",
+          label: "Chế độ ăn ở:",
+          content: "Không bao ăn, Không bao ở",
+        },
+        {
+          icon: "💵",
+          label: "Tiền Tip:",
+          content: "Tiền Tip tự giữ",
+        },
+        {
+          icon: "💸",
+          label: "Ứng lương:",
+          content: "Cho phép ứng lương",
+        },
+      ],
+      zalo: "0981256712",
+    },
+    responsibilities: [
+      "Hỗ trợ các công việc đơn giản như dọn bàn, tiếp thực, phục vụ thực khách tại quán",
+      "Tiếp ứng hỗ trợ đội ngũ chi nhánh trong các khung giờ cao điểm",
+    ],
+    requirements: [
+      "Độ tuổi: 16 – 25 tuổi",
+      "Không yêu cầu kinh nghiệm (đào tạo 30 phút là làm được ngay)",
+      "Đăng ký lịch làm từ 3 buổi/tuần",
+    ],
+    benefits: [
+      "Thu nhập: 27k - 35k/1 giờ (Nhận lương tuần)",
+      "Thời gian: 17h00 – 24h00 (Linh động từ 3 buổi/tuần)",
+      "Không bao ăn, Không bao ở",
+      "Tiền Tip tự giữ",
+      "Cho phép ứng lương",
+      "Môi trường năng động, vui vẻ, thân thiện",
+    ],
+    datePosted: "2026-11-23T08:00:00.000Z",
+    validThrough: "2027-12-31T23:59:59.000Z",
+    isUrgent: true,
   },
 ];

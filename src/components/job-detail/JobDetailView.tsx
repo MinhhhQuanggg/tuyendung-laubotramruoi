@@ -79,8 +79,8 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
               <h1 className="text-[24px] sm:text-[28px] lg:text-[26px] xl:text-[30px] font-black leading-tight text-gray-900">
                 {job.title}
               </h1>
-              <div className="mt-2.5 flex items-center text-[17px] sm:text-[19px] text-gray-600">
-                <span className="flex items-center gap-1.5 font-bold text-brand-900">
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-2 text-[14px] sm:text-[16px] font-bold text-brand-900 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200/80 shadow-xs">
                   💰 {job.salaryDisplay}
                 </span>
               </div>

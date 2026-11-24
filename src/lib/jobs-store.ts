@@ -113,18 +113,108 @@ export async function getJobByIdOrSlug(idOrSlug: string): Promise<JobItem | null
   if (found) return found;
 
   // 2. Alias fallback cho một số slug tương đương
+  if (lower === "bep-truong" || lower === "bep-truong-vung" || lower === "giam-doc-bep") {
+    return (
+      jobs.find(
+        (j) => j.slug === "giam-doc-bep" || j.slug === "bep-truong"
+      ) || null
+    );
+  }
+  if (lower === "hoc-viec" || lower === "hoc-viec-bep" || lower === "hoc-nghe-bep") {
+    return jobs.find((j) => j.slug === "hoc-viec-bep") || null;
+  }
+  if (
+    lower === "hoc-viec-pho-quan-ly" ||
+    lower === "pho-quan-ly" ||
+    lower === "hv-pho-quan-ly" ||
+    lower === "hoc-viec-pql"
+  ) {
+    return jobs.find((j) => j.slug === "hoc-viec-pho-quan-ly") || null;
+  }
+  if (lower === "le-tan" || lower === "cskh" || lower === "cham-soc-khach-hang") {
+    return jobs.find((j) => j.slug === "cham-soc-khach-hang") || null;
+  }
+  if (
+    lower === "phu-bep" ||
+    lower === "phu-bep-full-time" ||
+    lower === "tiep-thuc-phu-bep" ||
+    lower === "tiep-thuc"
+  ) {
+    return jobs.find((j) => j.slug === "phu-bep" || j.slug === "phu-bep-full-time") || null;
+  }
+  if (
+    lower === "quan-ly-vung" ||
+    lower === "ql-vung" ||
+    lower === "quan-ly-cum" ||
+    lower === "area-manager"
+  ) {
+    return jobs.find((j) => j.slug === "quan-ly-vung") || null;
+  }
+  if (
+    lower === "quan-ly" ||
+    lower === "quan-ly-tiem" ||
+    lower === "store-manager" ||
+    lower === "dieu-hanh-tro-ly"
+  ) {
+    return (
+      jobs.find(
+        (j) => j.slug === "quan-ly" || j.slug === "quan-ly-tiem"
+      ) || null
+    );
+  }
   if (lower === "lai-xe" || lower === "tai-xe") {
     return jobs.find((j) => j.slug === "tai-xe" || j.slug === "lai-xe") || null;
+  }
+  if (
+    lower === "to-truong" ||
+    lower === "to-truong-sanh" ||
+    lower === "hoc-viec-to-truong" ||
+    lower === "ca-truong"
+  ) {
+    return (
+      jobs.find(
+        (j) => j.slug === "to-truong" || j.slug === "hoc-viec-to-truong"
+      ) || null
+    );
+  }
+  if (
+    lower === "thoi-vu-3-buoi" ||
+    lower === "thoi-vu" ||
+    lower === "phuc-vu-part-time" ||
+    lower === "part-time-thoi-vu"
+  ) {
+    return (
+      jobs.find(
+        (j) =>
+          j.slug === "thoi-vu-3-buoi" ||
+          j.slug === "phuc-vu-part-time" ||
+          j.slug === "part-time-thoi-vu"
+      ) || null
+    );
   }
   if (lower === "thu-ngan-full-time" || lower === "thu-ngan") {
     return jobs.find((j) => j.slug === "thu-ngan" || j.slug === "thu-ngan-full-time") || null;
   }
-  if (lower === "part-time-thoi-vu" || lower === "phuc-vu-part-time") {
+  if (
+    lower === "part-time-thoi-vu" ||
+    lower === "phuc-vu-part-time" ||
+    lower === "phuc-vu-full-time" ||
+    lower === "phuc-vu" ||
+    lower === "phuc-vu-ban"
+  ) {
     return (
       jobs.find(
-        (j) => j.slug === "phuc-vu-part-time" || j.slug === "part-time-thoi-vu"
+        (j) =>
+          j.slug === "phuc-vu-ban" ||
+          j.slug === "phuc-vu" ||
+          j.slug === "phuc-vu-part-time" ||
+          j.slug === "part-time-thoi-vu"
       ) || null
     );
+  }
+
+  if (lower === "tiep-thuc" || lower === "tiep-thuc-part-time") {
+    return jobs.find((j) => j.slug === "phuc-vu-ban") || null;
   }
 
   return null;

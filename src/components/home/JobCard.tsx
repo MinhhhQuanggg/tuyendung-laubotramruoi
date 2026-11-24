@@ -12,8 +12,19 @@ interface JobCardProps {
  * Ở thẻ công việc: Chỉ giữ số lương + đơn vị (/tháng hoặc /giờ),
  * loại bỏ phần chữ phía sau dấu cộng (+) và các ghi chú trong ngoặc
  */
-function formatCardSalary(salary?: string): string {
+export function formatCardSalary(salary?: string): string {
   if (!salary) return "";
+
+  // Nếu lương có nhiều hình thức (Full-time | Part-time)
+  if (salary.includes("|")) {
+    const parts = salary.split("|").map((p) => {
+      let cleaned = p.split(/[+＋]/)[0];
+      cleaned = cleaned.replace(/\([^)]*\)/g, "");
+      cleaned = cleaned.replace(/\s*-\s*Nhận lương tuần/i, "");
+      return cleaned.trim();
+    });
+    return parts.join(" | ");
+  }
 
   // Ưu tiên trích xuất định dạng khoảng lương theo tháng dạng: "X - Y triệu/tháng" hoặc "X triệu/tháng"
   const monthMatch = salary.match(/(\d+[\d,.]*(?:\s*-\s*\d+[\d,.]*)?\s*triệu\/tháng)/i);
@@ -70,8 +81,17 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
             <Link href={getJobUrl(job)}>{job.title}</Link>
           </h3>
           {salaryText && (
-            <span className="self-start w-fit shrink-0 text-[14px] sm:text-[16px] font-bold text-brand-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/80 whitespace-nowrap sm:mt-0.5">
-              {salaryText}
+            <span className="self-start w-fit shrink-0 text-[13px] sm:text-[15px] font-bold text-brand-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/80 sm:mt-0.5">
+              {salaryText.includes("|") ? (
+                <span className="flex flex-col sm:items-end text-left sm:text-right leading-tight gap-0.5">
+                  <span>{salaryText.split("|")[0].trim()}</span>
+                  <span className="text-[12px] font-semibold text-amber-800">
+                    {salaryText.split("|")[1].trim()}
+                  </span>
+                </span>
+              ) : (
+                <span className="whitespace-nowrap">{salaryText}</span>
+              )}
             </span>
           )}
         </div>
@@ -79,29 +99,47 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
         {/* Thông tin: Ca làm & Yêu cầu */}
         <div className="space-y-3 text-[17px] sm:text-[19px] text-gray-700 mb-6 leading-relaxed">
           {/* ⏰ Ca làm */}
-          <div className="flex items-start sm:items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 mt-0.5">
               <Clock className="w-4 h-4 text-blue-700" />
             </div>
             {(() => {
-              const rawHours = (job.workHours || job.workTypeDisplay || "").replace(/24h00/g, "00h00");
+              let rawHours = (job.workHours || job.workTypeDisplay || "").replace(/24h00/g, "00h00");
+              rawHours = rawHours.replace(/\s*\(Đăng ký linh hoạt, nghỉ 1 ngày\/tuần\)/gi, "").trim();
+
+              if (rawHours.includes("\n") || rawHours.includes("|")) {
+                const lines = rawHours
+                  .split(/[\n|]/)
+                  .map((s) => s.trim())
+                  .filter(Boolean);
+
+                return (
+                  <span className="line-clamp-2 leading-snug sm:leading-relaxed break-words block">
+                    <span>
+                      <b>Ca làm:</b> {lines[0]}
+                    </span>
+                    {lines.slice(1).map((line, idx) => (
+                      <span key={idx} className="block">
+                        {line}
+                      </span>
+                    ))}
+                  </span>
+                );
+              }
+
               const match = rawHours.match(/^(.*?)\s+(hoặc)\s+(.*)$/i);
 
               if (match) {
                 const [, shift1, conjunction, shift2] = match;
                 return (
-                  <span className="line-clamp-2 sm:truncate leading-snug sm:leading-relaxed break-words">
-                    <b>Ca làm:</b> {shift1} {conjunction}
-                    <br className="sm:hidden" />
-                    <span className="sm:inline sm:ml-1 whitespace-nowrap sm:whitespace-normal">
-                      {shift2}
-                    </span>
+                  <span className="line-clamp-2 leading-snug sm:leading-relaxed break-words">
+                    <b>Ca làm:</b> {shift1} {conjunction} {shift2}
                   </span>
                 );
               }
 
               return (
-                <span className="line-clamp-2 sm:truncate leading-snug sm:leading-relaxed break-words">
+                <span className="line-clamp-2 leading-snug sm:leading-relaxed break-words">
                   <b>Ca làm:</b> {rawHours}
                 </span>
               );

@@ -23,6 +23,8 @@ import { Branch } from "@/types/branch";
 import { JobItem } from "@/types/job";
 import { ALL_BRANCHES, REGION_METADATA, getBranchRegionKey } from "@/data/branches";
 import { MOCK_JOBS_DATA } from "@/data/mock-jobs";
+import ZaloGroupQrCard from "@/components/common/ZaloGroupQrCard";
+import { getZaloGroupByRegion } from "@/data/zalo-groups";
 
 const ALLOWED_CV_EXTENSIONS = ["pdf", "doc", "docx", "png", "jpg", "jpeg", "webp"];
 
@@ -32,6 +34,17 @@ const ALLOWED_CV_EXTENSIONS = ["pdf", "doc", "docx", "png", "jpg", "jpeg", "webp
  */
 export function formatModalSalary(salary?: string): string {
   if (!salary) return "Thoả thuận hấp dẫn";
+
+  // Nếu lương có nhiều hình thức (Full-time | Part-time)
+  if (salary.includes("|")) {
+    const parts = salary.split("|").map((p) => {
+      let cleaned = p.split(/[+＋]/)[0];
+      cleaned = cleaned.replace(/\([^)]*\)/g, "");
+      cleaned = cleaned.replace(/\s*-\s*Nhận lương tuần/i, "");
+      return cleaned.trim();
+    });
+    return parts.join(" | ");
+  }
 
   // Ưu tiên trích xuất định dạng khoảng lương theo tháng dạng: "X - Y triệu/tháng" hoặc "X triệu/tháng"
   const monthMatch = salary.match(/(\d+[\d,.]*(?:\s*-\s*\d+[\d,.]*)?\s*triệu\/tháng)/i);
@@ -276,6 +289,13 @@ export default function QuickApplyModal({
 
     return null;
   }, [branchesList, formData.appliedRegion]);
+
+  // Nhóm Zalo tương ứng với khu vực / cụm quận chi nhánh đang ứng tuyển
+  const matchingZaloGroup = useMemo(() => {
+    return getZaloGroupByRegion(
+      formData.appliedRegion || selectedBranch?.address || selectedBranch?.district
+    );
+  }, [formData.appliedRegion, selectedBranch]);
 
   // Phân chia danh sách chi nhánh theo 5 cụm quận (Quận Đông • Quận Trung Tâm 2 • Quận Bắc • Quận Trung Tâm • Quận Tây)
   const regionGroups = useMemo(() => {
@@ -640,9 +660,15 @@ export default function QuickApplyModal({
                   </div>
                 )}
               </div>
+
+              {/* KHỐI QR CODE & THAM GIA NHÓM ZALO TUYỂN DỤNG THEO VỊ TRÍ */}
+              <div className="my-4 text-left">
+                <ZaloGroupQrCard group={matchingZaloGroup} variant="full" />
+              </div>
+
               <button
                 onClick={handleResetAndClose}
-                className="w-full py-2.5 md:py-3.5 bg-brand-800 hover:bg-brand-900 text-white font-semibold rounded-xl transition cursor-pointer text-sm md:text-base"
+                className="w-full py-2.5 md:py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition cursor-pointer text-sm md:text-base border border-gray-300"
               >
                 Đóng cửa sổ
               </button>

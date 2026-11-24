@@ -57,7 +57,7 @@ export const ALL_BRANCHES: Branch[] = [
     district: "Biên Hòa",
     city: "Đồng Nai",
     phone: "0981256712",
-    region: "qdong",
+    region: "bienhoa",
     lat: 10.9525,
     lng: 106.8282,
     isActive: true,
@@ -224,7 +224,9 @@ export interface RegionMeta {
 }
 
 /**
- * 6 Cụm Quận chuẩn theo định hướng quản trị F&B của Tiệm Lẩu Bò Trăm Rưỡi
+ * 6 Cụm Quận chuẩn theo định hướng quản trị F&B của Tiệm Lẩu Bò Trăm Rưỡi:
+ * Hàng trên (3 cụm): Quận Đông | Quận Trung Tâm | Quận Trung Tâm 2
+ * Hàng dưới (3 cụm): Quận Bắc | Quận Tây | Biên Hòa - Đồng Nai
  */
 export const REGION_METADATA: RegionMeta[] = [
   {
@@ -232,9 +234,18 @@ export const REGION_METADATA: RegionMeta[] = [
     code: "Quận Đông",
     name: "Quận Đông",
     title: "Quận Đông",
-    subtitle: "Q2 • Q9 • Thủ Đức • Biên Hòa",
-    description: "Hệ thống tiệm tại Quận 2, Quận 9, TP. Thủ Đức & Biên Hòa (Ưu tiên Nguyễn Duy Trinh)",
-    districts: ["Quận 2", "Quận 9", "Thủ Đức", "TP. Thủ Đức", "Biên Hòa", "Đồng Nai"],
+    subtitle: "Q2 • Q9 • TP. Thủ Đức",
+    description: "Hệ thống tiệm tại Quận 2, Quận 9, TP. Thủ Đức (Ưu tiên Nguyễn Duy Trinh)",
+    districts: ["Quận 2", "Quận 9", "Thủ Đức", "TP. Thủ Đức"],
+  },
+  {
+    key: "qtt",
+    code: "Quận Trung Tâm",
+    name: "Quận Trung Tâm",
+    title: "Quận Trung Tâm",
+    subtitle: "Q1 • Q3 • Q4 • Q5 • Q10",
+    description: "Các chi nhánh trung tâm sôi động tại Quận 1, Quận 3, Quận 10",
+    districts: ["Quận 1", "Quận 3", "Quận 4", "Quận 5", "Quận 10"],
   },
   {
     key: "qtt2",
@@ -255,15 +266,6 @@ export const REGION_METADATA: RegionMeta[] = [
     districts: ["Quận 12", "Gò Vấp", "Hóc Môn"],
   },
   {
-    key: "qtt",
-    code: "Quận Trung Tâm",
-    name: "Quận Trung Tâm",
-    title: "Quận Trung Tâm",
-    subtitle: "Q1 • Q3 • Q4 • Q5 • Q10",
-    description: "Các chi nhánh trung tâm sôi động tại Quận 1, Quận 3, Quận 10",
-    districts: ["Quận 1", "Quận 3", "Quận 4", "Quận 5", "Quận 10"],
-  },
-  {
     key: "qtay",
     code: "Quận Tây",
     name: "Quận Tây",
@@ -271,6 +273,15 @@ export const REGION_METADATA: RegionMeta[] = [
     subtitle: "Q6 • Q8 • Bình Tân • Bình Chánh",
     description: "Hệ thống tiệm tại Bình Tân, Bình Chánh, Quận 6, Quận 8",
     districts: ["Quận 6", "Quận 8", "Bình Tân", "Bình Chánh"],
+  },
+  {
+    key: "bienhoa",
+    code: "Biên Hòa - Đồng Nai",
+    name: "Biên Hòa - Đồng Nai",
+    title: "Biên Hòa - Đồng Nai",
+    subtitle: "Biên Hòa • Đồng Nai",
+    description: "Chi nhánh tại TP. Biên Hòa, tỉnh Đồng Nai",
+    districts: ["Biên Hòa", "Đồng Nai"],
   },
 ];
 
@@ -281,18 +292,38 @@ export function getBranchRegionKey(b: Branch): RegionType {
   const d = (b.district || "").toLowerCase();
   const r = (b.region || "").toLowerCase();
 
-  // Quận Đông: Q2, Q9, Thủ Đức, Biên Hòa, Đồng Nai
+  // Biên Hòa / Đồng Nai
+  if (
+    r === "bienhoa" ||
+    r === "dongnai" ||
+    d.includes("biên hòa") ||
+    d.includes("đồng nai") ||
+    b.city === "Đồng Nai"
+  ) {
+    return "bienhoa";
+  }
+
+  // Quận Đông: Q2, Q9, Thủ Đức
   if (
     r === "qdong" ||
     r === "thu-duc-khu-dong" ||
     d.includes("thủ đức") ||
     d.includes("quận 2") ||
-    d.includes("quận 9") ||
-    d.includes("biên hòa") ||
-    d.includes("đồng nai") ||
-    b.city === "Đồng Nai"
+    d.includes("quận 9")
   ) {
     return "qdong";
+  }
+
+  // QTT: Q1, Q3, Q4, Q5, Q10
+  if (
+    r === "qtt" ||
+    d.includes("quận 1") ||
+    d.includes("quận 3") ||
+    d.includes("quận 4") ||
+    d.includes("quận 5") ||
+    d.includes("quận 10")
+  ) {
+    return "qtt";
   }
 
   // QTT2: Tân Bình, Tân Phú, Bình Thạnh, Phú Nhuận
@@ -315,18 +346,6 @@ export function getBranchRegionKey(b: Branch): RegionType {
     (r === "go-vap-phu-nhuan" && !d.includes("phú nhuận") && !d.includes("bình thạnh"))
   ) {
     return "qbac";
-  }
-
-  // QTT: Q1, Q3, Q4, Q5, Q10
-  if (
-    r === "qtt" ||
-    d.includes("quận 1") ||
-    d.includes("quận 3") ||
-    d.includes("quận 4") ||
-    d.includes("quận 5") ||
-    d.includes("quận 10")
-  ) {
-    return "qtt";
   }
 
   // QTây: Q6, Q8, Bình Tân, Bình Chánh
@@ -353,12 +372,9 @@ export function getBranchRegionKey(b: Branch): RegionType {
 }
 
 /**
- * Danh sách cụm chi nhánh với thứ tự ưu tiên:
- * 1. Quận Đông (Nguyễn Duy Trinh lên hàng đầu bên trái)
- * 2. Quận Trung Tâm 2 (Tân Bình, T.Phú, B.Thạnh, PN)
- * 3. Quận Bắc (Q12, Gò Vấp, Hóc Môn)
- * 4. Quận Trung Tâm (Q1, Q3, Q4, Q5, Q10)
- * 5. Quận Tây (Q6, Q8, Bình Tân, Bình Chánh)
+ * Danh sách cụm chi nhánh với thứ tự ưu tiên (3 trên, 3 dưới):
+ * Hàng 1 (3 trên): Quận Đông | Quận Trung Tâm | Quận Trung Tâm 2
+ * Hàng 2 (3 dưới): Quận Bắc | Quận Tây | Biên Hòa - Đồng Nai
  */
 export const BRANCH_GROUPS: BranchGroup[] = REGION_METADATA.map((meta) => {
   const branches = ALL_BRANCHES.filter((b) => getBranchRegionKey(b) === meta.key);

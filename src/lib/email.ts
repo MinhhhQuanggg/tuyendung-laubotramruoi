@@ -2,6 +2,7 @@ import nodemailer from "nodemailer";
 import { CandidateApplication } from "@/types/job";
 import { siteConfig } from "@/config/site";
 import { MOCK_JOBS_DATA } from "@/data/mock-jobs";
+import { getZaloGroupByRegion } from "@/data/zalo-groups";
 
 export interface EmailSendResult {
   success: boolean;
@@ -85,6 +86,8 @@ function buildConfirmationEmailHtml(candidate: CandidateApplication): string {
   const region = candidate.appliedRegion || candidate.address || "Gần nhà nhất (HR tự xếp)";
   const branch = candidate.preferredBranch || "Gần nhà nhất (HR tự xếp)";
   const salaryDisplay = resolveSalaryDisplay(candidate);
+  const zaloGroup = getZaloGroupByRegion(candidate.appliedRegion || candidate.preferredBranch || candidate.address);
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(zaloGroup.zaloUrl)}`;
 
   return `
 <!DOCTYPE html>
@@ -195,6 +198,40 @@ function buildConfirmationEmailHtml(candidate: CandidateApplication): string {
                 </tr>
               </table>
 
+              <!-- Zalo Group Section with QR Code -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #EFF6FF 0%, #FEF3C7 100%); border: 2px solid #93C5FD; border-radius: 14px; margin: 20px 0 24px; overflow: hidden;">
+                <tr>
+                  <td style="padding: 20px; text-align: center;">
+                    <div style="display: inline-block; background-color: #0068FF; color: #FFFFFF; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px;">
+                      Nhóm Zalo Ứng Tuyển
+                    </div>
+                    <div style="font-size: 17px; font-weight: 800; color: #1E3A8A; margin-bottom: 4px;">
+                      ${zaloGroup.groupName}
+                    </div>
+                    <p style="font-size: 12.5px; color: #4B5563; margin: 0 0 14px; line-height: 1.4;">
+                      ${zaloGroup.description}
+                    </p>
+
+                    <!-- QR Code Image -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto 12px;">
+                      <tr>
+                        <td align="center" style="background-color: #FFFFFF; padding: 8px; border-radius: 12px; border: 1px solid #BFDBFE; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+                          <img src="${qrCodeUrl}" alt="QR Code Nhóm Zalo" width="150" height="150" style="display: block; border-radius: 8px;" />
+                        </td>
+                      </tr>
+                    </table>
+
+                    <p style="font-size: 12.5px; color: #374151; margin: 0 0 14px; font-weight: 500;">
+                      📱 Quét mã QR bằng ứng dụng Zalo hoặc bấm nút dưới đây để vào nhóm ngay:
+                    </p>
+
+                    <a href="${zaloGroup.zaloUrl}" target="_blank" style="display: inline-block; background: linear-gradient(to right, #0068FF, #0052CC); color: #FFFFFF; font-weight: 800; font-size: 14px; text-decoration: none; padding: 12px 28px; border-radius: 25px; box-shadow: 0 4px 12px rgba(0,104,255,0.3);">
+                      👉 BẤM VÀO ĐÂY ĐỂ THAM GIA NHÓM ZALO
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
               <!-- Two-Way Communication -->
               <p style="font-size: 14.5px; color: #4B5563; margin: 0 0 20px; line-height: 1.6;">
                 💡 <strong>Trao đổi hai chiều:</strong> Bạn hoàn toàn có thể <strong>reply trực tiếp email này</strong> (được chuyển thẳng đến hòm thư <a href="mailto:${hrEmail}" style="color: #8B1E1E; font-weight: 600;">${hrEmail}</a>) hoặc bấm nhắn tin qua Zalo dưới đây nếu có bất kỳ thắc mắc nào về ca làm, địa chỉ hay quyền lợi.
@@ -218,10 +255,10 @@ function buildConfirmationEmailHtml(candidate: CandidateApplication): string {
           <tr>
             <td style="background-color: #1F2937; color: #9CA3AF; padding: 24px; text-align: center; font-size: 12.5px; border-top: 1px solid #374151;">
               <p style="margin: 0 0 6px; color: #F3F4F6; font-weight: 700; font-size: 14px;">
-                HỆ THỐNG TIỆM LẨU BÒ TRĂM RƯỠI — LẨU BÒ TRIỀU CHÂU
+                HỆ THỐNG TIỆM LẨU BÒ TRĂM RƯỠI
               </p>
               <p style="margin: 0 0 8px;">
-                Hơn 13 chi nhánh trải rộng khắp TP. Hồ Chí Minh
+                Hệ thống 15 chi nhánh trải rộng khắp TP. Hồ Chí Minh & Đồng Nai
               </p>
               <p style="margin: 0 0 8px;">
                 📞 Hotline Tuyển dụng: <strong style="color: #FCD34D;">${hrPhone}</strong> (Mr. Kiên HR) • ✉️ Email: <strong style="color: #FCD34D;">${hrEmail}</strong>
