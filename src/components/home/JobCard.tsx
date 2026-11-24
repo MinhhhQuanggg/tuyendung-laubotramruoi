@@ -2,6 +2,7 @@ import Link from "next/link";
 import { JobItem } from "@/types/job";
 import { Clock, Calendar, ArrowRight, Flame } from "lucide-react";
 import { getJobUrl } from "@/lib/job-url";
+import { trackJobClick, trackApplyButtonClick } from "@/lib/analytics";
 
 interface JobCardProps {
   job: JobItem;
@@ -169,7 +170,10 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
       <div className="pt-4 border-t border-gray-100 flex items-center justify-end gap-2">
         {onApplyClick && (
           <button
-            onClick={() => onApplyClick(job)}
+            onClick={() => {
+              trackApplyButtonClick("job_card", job.title);
+              onApplyClick(job);
+            }}
             className="hidden sm:inline-flex px-3.5 py-1.5 rounded-xl text-sm sm:text-base font-semibold bg-amber-400 hover:bg-amber-500 text-brand-950 transition"
           >
             Nộp nhanh
@@ -177,6 +181,7 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
         )}
         <Link
           href={getJobUrl(job)}
+          onClick={() => trackJobClick(job.title, job.id)}
           className="inline-flex items-center gap-1.5 text-sm sm:text-base font-bold text-brand-800 group-hover:text-brand-900 hover:underline"
         >
           <span>Chi tiết</span>

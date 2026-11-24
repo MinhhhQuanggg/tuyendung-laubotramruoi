@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { JobItem } from "@/types/job";
 import StickyJobSidebar from "@/components/job-detail/StickyJobSidebar";
 import { JobDetailImages, JobDetailVideo } from "@/components/job-detail/JobDetailMedia";
 import { ChevronRight } from "lucide-react";
+import { trackJobView } from "@/lib/analytics";
 
 interface JobDetailViewProps {
   job: JobItem;
@@ -12,6 +14,12 @@ interface JobDetailViewProps {
 }
 
 export default function JobDetailView({ job, isAdmin = false }: JobDetailViewProps) {
+  useEffect(() => {
+    if (job?.title && !isAdmin) {
+      trackJobView(job.title, job.id);
+    }
+  }, [job?.title, job?.id, isAdmin]);
+
   const hasImages = Boolean(
     job.images && job.images.filter((src) => Boolean(src && src.trim())).length > 0
   );
