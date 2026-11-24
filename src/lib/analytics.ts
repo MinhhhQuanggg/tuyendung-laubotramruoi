@@ -1,3 +1,5 @@
+"use client";
+
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 // Hàm bắn event chung vào Google Analytics
