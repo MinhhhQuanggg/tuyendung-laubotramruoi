@@ -13,7 +13,6 @@ import {
   BadgeAlert,
   HelpCircle,
   Phone,
-  Mail,
   MapPin,
   CheckCircle2,
   Sparkles,
@@ -22,7 +21,7 @@ import {
 export const metadata: Metadata = {
   title: "Điều Khoản Sử Dụng Cổng Tuyển Dụng | Lẩu Bò Trăm Rưỡi",
   description:
-    "Quy định và điều khoản sử dụng cổng thông tin tuyển dụng Lẩu Bò Trăm Rưỡi - Lẩu Bò Triều Châu. Cam kết tuyển dụng miễn phí 100%.",
+    "Quy định và điều khoản sử dụng cổng thông tin tuyển dụng Lẩu Bò Trăm Rưỡi. Cam kết tuyển dụng miễn phí 100%.",
 };
 
 export default function TermsOfUsePage() {
@@ -44,17 +43,9 @@ export default function TermsOfUsePage() {
             <span>Quy chế sử dụng & Quyền lợi ứng viên</span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white mb-3">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
             ĐIỀU KHOẢN SỬ DỤNG CỔNG TUYỂN DỤNG
           </h1>
-          <p className="text-sm sm:text-base text-amber-100/85 max-w-3xl leading-relaxed">
-            Quy định chung dành cho người tìm việc, ứng viên khi truy cập và ứng tuyển tại Hệ thống Chuỗi F&B Lẩu Bò Trăm Rưỡi - Lẩu Bò Triều Châu.
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-amber-200/70">
-            <span>Phiên bản: 2.0 (Áp dụng từ năm 2026)</span>
-            <span>•</span>
-            <span>Cập nhật lần cuối: Tháng 10/2026</span>
-          </div>
         </div>
       </section>
 
@@ -88,10 +79,10 @@ export default function TermsOfUsePage() {
                 <Link href={siteConfig.url} className="text-brand-700 font-semibold underline hover:text-brand-900">
                   https://tuyendung.laubotramruoi.vn
                 </Link>{" "}
-                (&ldquo;Website&rdquo;) thuộc quyền sở hữu và vận hành bởi <strong>{siteConfig.companyName}</strong> (Hệ thống Chuỗi F&B Lẩu Bò Trăm Rưỡi - Lẩu Bò Triều Châu).
+                (&ldquo;Website&rdquo;) thuộc quyền sở hữu và vận hành bởi <strong>{siteConfig.companyName}</strong> (Hệ thống Chuỗi F&B Lẩu Bò Trăm Rưỡi).
               </p>
               <p className="text-justify">
-                Website được xây dựng nhằm cung cấp thông tin việc làm chính thức, minh bạch về các vị trí tuyển dụng (Học việc bếp Triều Châu, Phụ bếp, Thu ngân, Phục vụ bàn, Tiếp thực, Bảo vệ...), chế độ đãi ngộ và tiếp nhận hồ sơ ứng tuyển của người lao động tại 13 chi nhánh nhà hàng ở TP. Hồ Chí Minh và Đồng Nai.
+                Website được xây dựng nhằm cung cấp thông tin việc làm chính thức, minh bạch về các vị trí tuyển dụng (Học việc bếp, Phụ bếp, Thu ngân, Phục vụ bàn, Tiếp thực, Bảo vệ...), chế độ đãi ngộ và tiếp nhận hồ sơ ứng tuyển của người lao động tại 15 chi nhánh nhà hàng ở TP. Hồ Chí Minh và Đồng Nai.
               </p>
               <p className="text-justify">
                 Việc người sử dụng (ứng viên) truy cập, tìm kiếm việc làm hoặc nộp đơn ứng tuyển trên Website đồng nghĩa với việc bạn đã đọc kỹ, hiểu rõ và đồng ý tuân thủ toàn bộ các nội dung của Điều khoản sử dụng này. Trường hợp không đồng ý, vui lòng ngừng truy cập và sử dụng dịch vụ trên Website.
@@ -108,9 +99,9 @@ export default function TermsOfUsePage() {
                 Ứng viên được phép sử dụng Website cho các mục đích hợp pháp, bao gồm:
               </p>
               <ul className="list-disc pl-6 space-y-1.5 text-gray-700 text-justify">
-                <li>Tra cứu thông tin tuyển dụng, mô tả công việc, mức lương, quyền lợi tại 13 chi nhánh Lẩu Bò Trăm Rưỡi;</li>
+                <li>Tra cứu thông tin tuyển dụng, mô tả công việc, mức lương, quyền lợi tại 15 chi nhánh Lẩu Bò Trăm Rưỡi;</li>
                 <li>Nộp hồ sơ ứng tuyển trực tuyến qua form đăng ký nhanh hoặc liên hệ Hotline/Zalo;</li>
-                <li>Tìm hiểu lộ trình đào tạo nghề bếp Triều Châu miễn phí và chế độ thăng tiến trong hệ thống;</li>
+                <li>Tìm hiểu lộ trình đào tạo nghề bếp miễn phí và chế độ thăng tiến trong hệ thống;</li>
                 <li>Liên hệ với Ban Nhân Sự để được hướng dẫn lịch phỏng vấn và nhận việc.</li>
               </ul>
               <p className="text-justify font-medium text-gray-900 pt-2">
@@ -241,8 +232,8 @@ export default function TermsOfUsePage() {
                 Toàn bộ nội dung hiển thị trên Website, bao gồm nhưng không giới hạn:
               </p>
               <ul className="list-disc pl-6 space-y-1.5 text-gray-700 text-justify">
-                <li>Nhãn hiệu thương mại: &ldquo;Lẩu Bò Trăm Rưỡi&rdquo;, &ldquo;Lẩu Bò Triều Châu&rdquo;, logo và slogan nhận diện;</li>
-                <li>Toàn bộ hình ảnh món ăn, không gian 13 chi nhánh, video đào tạo bếp thực chiến;</li>
+                <li>Nhãn hiệu thương mại: &ldquo;Lẩu Bò Trăm Rưỡi&rdquo;, logo và slogan nhận diện;</li>
+                <li>Toàn bộ hình ảnh món ăn, không gian 15 chi nhánh, video đào tạo bếp thực chiến;</li>
                 <li>Nội dung bài viết tuyển dụng, văn hóa doanh nghiệp và quy trình làm việc;</li>
                 <li>Giao diện thiết kế website và mã nguồn độc quyền của {siteConfig.companyName}.</li>
               </ul>
@@ -284,25 +275,11 @@ export default function TermsOfUsePage() {
               </ul>
             </section>
 
-            {/* Mục 9: Luật áp dụng và giải quyết tranh chấp */}
-            <section className="space-y-3">
-              <div className="flex items-center gap-2.5 text-brand-900 font-bold text-lg sm:text-xl border-b border-gray-100 pb-3">
-                <Scale className="w-6 h-6 text-brand-800" />
-                <h2>9. Luật áp dụng và giải quyết tranh chấp</h2>
-              </div>
-              <p className="text-justify">
-                Điều khoản sử dụng này được giải thích và điều chỉnh bởi pháp luật Nước Cộng hòa Xã hội Chủ nghĩa Việt Nam.
-              </p>
-              <p className="text-justify">
-                Mọi tranh chấp hoặc bất đồng phát sinh liên quan đến việc sử dụng Cổng tuyển dụng trước hết sẽ được ưu tiên giải quyết thông qua thương lượng, hòa giải trên tinh thần thiện chí giữa các bên. Trường hợp không thể thương lượng thành công, tranh chấp sẽ được chuyển đến Cơ quan Tòa án có thẩm quyền tại TP. Hồ Chí Minh giải quyết theo quy định.
-              </p>
-            </section>
-
-            {/* Mục 10: Thông tin liên hệ chính thức */}
+            {/* Mục 9: Thông tin liên hệ chính thức */}
             <section className="space-y-3">
               <div className="flex items-center gap-2.5 text-brand-900 font-bold text-lg sm:text-xl border-b border-gray-100 pb-3">
                 <HelpCircle className="w-6 h-6 text-brand-800" />
-                <h2>10. Kênh liên hệ chính thức</h2>
+                <h2>9. Kênh liên hệ chính thức</h2>
               </div>
               <p className="text-justify">
                 Mọi thắc mắc về điều khoản sử dụng hoặc phản ánh dấu hiệu lừa đảo tuyển dụng, xin vui lòng liên hệ ngay với Ban Nhân Sự:
@@ -313,7 +290,7 @@ export default function TermsOfUsePage() {
                     <tr className="bg-gray-50/70">
                       <td className="px-4 py-3 font-semibold text-gray-900 w-1/3">Đơn vị chủ quản</td>
                       <td className="px-4 py-3 text-gray-700 font-medium">
-                        Hệ thống Tiệm Lẩu Bò Trăm Rưỡi - Lẩu Bò Triều Châu
+                        Hệ thống Tiệm Lẩu Bò Trăm Rưỡi
                       </td>
                     </tr>
                     <tr className="bg-gray-50/70">
@@ -326,14 +303,10 @@ export default function TermsOfUsePage() {
                       </td>
                     </tr>
                     <tr>
-                      <td className="px-4 py-3 font-semibold text-gray-900">Email Tuyển dụng</td>
+                      <td className="px-4 py-3 font-semibold text-gray-900">Fanpage Tuyển dụng</td>
                       <td className="px-4 py-3 text-gray-700">
-                        <a href="mailto:tuyendung@laubotramruoi.vn" className="text-brand-700 underline font-medium">
-                          tuyendung@laubotramruoi.vn
-                        </a>{" "}
-                        /{" "}
-                        <a href="mailto:hr@laubotramruoi.vn" className="text-brand-700 underline font-medium">
-                          hr@laubotramruoi.vn
+                        <a href={siteConfig.socials.facebookFanpage} target="_blank" rel="noopener noreferrer" className="text-brand-700 underline font-medium">
+                          Tiệm Lẩu Bò Trăm Rưỡi
                         </a>
                       </td>
                     </tr>
@@ -361,7 +334,7 @@ export default function TermsOfUsePage() {
             {/* Footer Sign-off */}
             <div className="pt-6 border-t border-gray-200/80 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-3">
               <div>
-                Tuyển Dụng Lẩu Bò Trăm Rưỡi • Chuỗi F&B Lẩu Bò Trăm Rưỡi - Lẩu Bò Triều Châu.
+                Tuyển Dụng Lẩu Bò Trăm Rưỡi • Chuỗi F&B Lẩu Bò Trăm Rưỡi.
               </div>
               <Link
                 href="/chinh-sach-bao-mat"

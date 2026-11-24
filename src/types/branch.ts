@@ -5,6 +5,7 @@ export type RegionType =
   | "qtt"
   | "qtay"
   | "qnam"
+  | "bienhoa"
   | "thu-duc-khu-dong"
   | "go-vap-phu-nhuan"
   | "trung-tam";

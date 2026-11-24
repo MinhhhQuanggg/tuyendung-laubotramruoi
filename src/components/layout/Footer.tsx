@@ -31,11 +31,9 @@ export default function Footer() {
     };
   }, []);
 
-  // Phân chia danh sách chi nhánh theo các cụm quận:
-  // Cột 1: Quận Đông (Ưu tiên Nguyễn Duy Trinh lên hàng đầu bên trái)
-  // Cột 2: Quận Trung Tâm 2 (Tân Bình, Tân Phú, Bình Thạnh, Phú Nhuận)
-  // Cột 3: Quận Bắc (Q12, Gò Vấp, Hóc Môn)
-  // Cột 4: Quận Trung Tâm (Q1, Q3, Q4, Q5, Q10) và Quận Tây (ở ngay dưới cột Quận Trung Tâm)
+  // Phân chia danh sách chi nhánh theo 6 cụm (3 trên, 3 dưới):
+  // Hàng 1 (3 trên): Quận Đông | Quận Trung Tâm | Quận Trung Tâm 2
+  // Hàng 2 (3 dưới): Quận Bắc | Quận Tây | Biên Hòa - Đồng Nai
   const regionColumns = useMemo(() => {
     return REGION_METADATA.map((meta) => {
       const colBranches = branches.filter((b) => getBranchRegionKey(b) === meta.key);
@@ -54,12 +52,6 @@ export default function Footer() {
     });
   }, [branches]);
 
-  const colDong = regionColumns.find((c) => c.key === "qdong");
-  const colTT2 = regionColumns.find((c) => c.key === "qtt2");
-  const colBac = regionColumns.find((c) => c.key === "qbac");
-  const colTT = regionColumns.find((c) => c.key === "qtt");
-  const colTay = regionColumns.find((c) => c.key === "qtay");
-
   // Render card cụm chi nhánh
   const renderRegionCard = (col: (typeof regionColumns)[0]) => (
     <div key={col.key} className="space-y-3">
@@ -71,9 +63,6 @@ export default function Footer() {
             {col.title}
           </h4>
         </div>
-        <span className="shrink-0 ml-2 text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-amber-300">
-          {col.count} tiệm
-        </span>
       </div>
 
       {/* Danh Sách Chi Nhánh Trong Cụm */}
@@ -86,18 +75,13 @@ export default function Footer() {
             )}`}
             target="_blank"
             rel="noopener noreferrer"
-            title={`Mở chỉ đường Google Maps tới CN ${b.cnNumber} (${b.name})`}
+            title={`Mở chỉ đường Google Maps tới ${b.name}`}
             className={`group flex items-start gap-2.5 py-1.5 px-2 rounded-lg hover:bg-white/[0.06] transition-all duration-150 text-left cursor-pointer ${
               b.address.toLowerCase().includes("nguyễn duy trinh")
                 ? "bg-amber-400/[0.08] border border-amber-400/20"
                 : ""
             }`}
           >
-            {/* Badge CN + số thứ tự đồng bộ với ghim trên Google Maps */}
-            <span className="shrink-0 px-2 py-0.5 mt-0.5 rounded-md bg-amber-400 text-brand-950 font-black text-xs shadow-sm group-hover:scale-105 transition-transform">
-              CN {b.cnNumber}
-            </span>
-
             {/* Tên & Địa chỉ chi nhánh */}
             <div className="min-w-0 flex-1">
               <div className="text-white text-xs sm:text-sm font-bold group-hover:text-amber-300 transition-colors flex items-center justify-between gap-1">
@@ -131,39 +115,15 @@ export default function Footer() {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8 flex-1 flex flex-col justify-between w-full relative z-10 space-y-6">
-        {/* PHẦN TRÊN: DANH SÁCH ĐỊA CHỈ CHI NHÁNH CHIA 4 CỘT: QUẬN ĐÔNG | QUẬN TRUNG TÂM 2 | QUẬN BẮC | QUẬN TRUNG TÂM (CỘT QUẬN TÂY Ở DƯỚI) */}
+        {/* PHẦN TRÊN: DANH SÁCH ĐỊA CHỈ CHI NHÁNH CHIA 3 TRÊN, 3 DƯỚI: (QUẬN ĐÔNG | QUẬN TRUNG TÂM | QUẬN TRUNG TÂM 2) - (QUẬN BẮC | QUẬN TÂY | BIÊN HÒA) */}
         <div className="pb-6 border-b border-brand-900/80">
-          {/* GRID 4 CỘT: QUẬN ĐÔNG | QUẬN TRUNG TÂM 2 | QUẬN BẮC | QUẬN TRUNG TÂM (CỘT QUẬN TÂY Ở DƯỚI) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 lg:gap-x-7 gap-y-7">
-            {/* Cột 1: Quận Đông (Nguyễn Duy Trinh lên hàng đầu bên trái) */}
-            {colDong && renderRegionCard(colDong)}
-
-            {/* Cột 2: Quận Trung Tâm 2 */}
-            {colTT2 && renderRegionCard(colTT2)}
-
-            {/* Cột 3: Quận Bắc */}
-            {colBac && renderRegionCard(colBac)}
-
-            {/* Cột 4: Quận Trung Tâm (trên) & Quận Tây (ở dưới cột Quận Trung Tâm) */}
-            <div className="space-y-6">
-              {colTT && renderRegionCard(colTT)}
-              {colTay && renderRegionCard(colTay)}
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 lg:gap-x-8 gap-y-7">
+            {regionColumns.map((col) => renderRegionCard(col))}
           </div>
         </div>
 
         {/* PHẦN GIỮA: BẢN ĐỒ GOOGLE MAPS TƯƠNG TÁC THỰC CHIẾN HỆ THỐNG CHI NHÁNH */}
-        <div className="space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <span className="text-xs font-semibold text-gray-400 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-amber-400" />
-              Bản đồ định vị Google Maps hệ thống chi nhánh
-            </span>
-            <span className="text-[11px] text-amber-200/80 bg-amber-950/40 border border-amber-800/40 px-2.5 py-1 rounded-full w-fit">
-              💡 Bấm vào từng ghim đỏ để xem địa chỉ và mở chỉ đường trực tiếp
-            </span>
-          </div>
-
+        <div>
           <BranchMap branches={branches} />
         </div>
 

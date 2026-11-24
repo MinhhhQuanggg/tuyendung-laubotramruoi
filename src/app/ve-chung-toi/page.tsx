@@ -119,14 +119,6 @@ export default function AboutPage() {
                   >
                     TikTok: @tiemlaubotramruoi
                   </a>
-                  <a
-                    href={siteConfig.socials.recruitmentPage}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-brand-900 text-sm font-semibold border border-red-200 transition"
-                  >
-                    Fanpage Tuyển Dụng Học Việc Bếp
-                  </a>
                 </div>
               </div>
 

@@ -11,20 +11,19 @@ import { getCategorySlug, getJobUrl, isJobActiveOnPath } from "@/lib/job-url";
 // Thứ tự hiển thị menu con chuẩn (Ưu tiên Giám sát Bếp Chi Nhánh lên đầu)
 const ORDERED_SLUGS = [
   "giam-sat-bep",
+  "giam-doc-bep",
+  "quan-ly-vung",
+  "quan-ly",
+  "to-truong",
   "hoc-viec-bep",
-  "phu-bep-hoc-nghe",
-  "hoc-viec-to-truong",
-  "phuc-vu-part-time",
+  "hoc-viec-pho-quan-ly",
+  "phuc-vu-ban",
+  "phu-bep",
   "cham-soc-khach-hang",
-  "phuc-vu-full-time",
-  "phu-bep-full-time",
+  "thoi-vu-3-buoi",
   "thu-ngan",
   "pha-che-full-time",
-  "quan-ly-vung",
-  "quan-ly-tiem",
-  "pho-quan-ly-tiem",
-  "bep-truong",
-  "to-truong",
+  "tap-vu-rua-chen",
 ];
 
 interface HeaderSubItem {
@@ -217,7 +216,7 @@ export default function Header() {
     createParentMenuItem("Part-time", partTimeSubItems),
     createParentMenuItem("Full-time", fullTimeSubItems),
     createParentMenuItem("Trưởng, Quản lý", quanLySubItems),
-  ];
+  ].filter((item) => item.hasDropdown || (item.slug && item.href !== "/#danh-sach-viec-lam"));
 
   const chiNhanhMenuItem: HeaderMenuItem = {
     title: "Hệ thống Chi nhánh",

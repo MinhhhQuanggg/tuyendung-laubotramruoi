@@ -65,8 +65,8 @@ export function JobDetailImages({ images }: JobDetailImagesProps) {
 
   return (
     <>
-      {/* 2 CỘT ẢNH THỰC TẾ: TỈ LỆ DỌC 3:4, KHUNG THUMBNAIL NHỎ GỌN (~50% SO VỚI TRƯỚC) */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
+      {/* CỘT ẢNH THỰC TẾ: TỈ LỆ DỌC 3:4 (1 ảnh hiển thị full đẹp, từ 2 ảnh trở lên chia 2 cột) */}
+      <div className={`grid ${displayImages.length === 1 ? "grid-cols-1 max-w-[280px] sm:max-w-[320px] mx-auto w-full" : "grid-cols-2"} gap-2 sm:gap-2.5`}>
         {displayImages.map((src, idx) => (
           <div
             key={idx}
@@ -228,7 +228,14 @@ export function JobDetailVideo({
     : `${currentVideo}#t=0.001`;
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const modalVideoRef = useRef<HTMLVideoElement>(null);
   const [extractedPoster, setExtractedPoster] = useState<string | null>(null);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Tự động trích xuất ảnh đầu tiên từ video làm ảnh thumbnail
   useEffect(() => {
@@ -274,6 +281,87 @@ export function JobDetailVideo({
     }
   };
 
+  // Mở modal zoom video vừa vặn khung hình (như xem ảnh)
+  const handleOpenZoom = () => {
+    const currentTime = videoRef.current?.currentTime || 0;
+    const isPlaying = videoRef.current && !videoRef.current.paused;
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
+    setIsZoomed(true);
+    setTimeout(() => {
+      if (modalVideoRef.current) {
+        modalVideoRef.current.currentTime = currentTime;
+        if (isPlaying) {
+          modalVideoRef.current.play().catch(() => {});
+        }
+      }
+    }, 60);
+  };
+
+  // Đóng modal zoom và đồng bộ lại thời gian phát cho video bên ngoài
+  const handleCloseZoom = () => {
+    const currentTime = modalVideoRef.current?.currentTime || 0;
+    const isPlaying = modalVideoRef.current && !modalVideoRef.current.paused;
+    if (modalVideoRef.current) {
+      modalVideoRef.current.pause();
+    }
+    setIsZoomed(false);
+    if (videoRef.current) {
+      videoRef.current.currentTime = currentTime;
+      if (isPlaying) {
+        videoRef.current.play().catch(() => {});
+      }
+    }
+  };
+
+  // Bắt sự kiện khi người dùng bấm nút fullscreen mặc định trên thanh điều khiển video
+  // Chuyển hướng sang mở Custom Zoom Modal đẹp mắt, vừa vặn khung hình thay vì tràn viền méo mó
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleFullscreenChange = () => {
+      if (
+        document.fullscreenElement === video ||
+        (document as any).webkitFullscreenElement === video
+      ) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        } else if ((document as any).webkitExitFullscreen) {
+          (document as any).webkitExitFullscreen();
+        }
+        handleOpenZoom();
+      }
+    };
+
+    video.addEventListener("fullscreenchange", handleFullscreenChange);
+    video.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+
+    return () => {
+      video.removeEventListener("fullscreenchange", handleFullscreenChange);
+      video.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+    };
+  }, [currentVideo]);
+
+  // Khóa cuộn trang và hỗ trợ phím Escape để đóng modal zoom
+  useEffect(() => {
+    if (!isZoomed) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleCloseZoom();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isZoomed]);
+
   // Chỉ dùng videoPoster nếu là thumbnail tùy chỉnh thực sự (không dùng ảnh placeholder món ăn/tiệm)
   const isDefaultJobPhoto =
     videoPoster &&
@@ -283,22 +371,93 @@ export function JobDetailVideo({
   const activePoster = extractedPoster || validProvidedPoster || undefined;
 
   return (
-    <div className="relative rounded-2xl overflow-hidden bg-black aspect-[3/4] shadow-sm group border border-gray-100">
-      <video
-        ref={videoRef}
-        controls
-        playsInline
-        preload="metadata"
-        poster={activePoster}
-        onLoadedData={handleLoadedData}
-        onSeeked={handleLoadedData}
-        className="w-full h-full object-cover"
-        key={currentVideo}
-      >
-        <source src={videoSrcWithFragment} type="video/mp4" />
-        Trình duyệt của bạn không hỗ trợ thẻ video.
-      </video>
-    </div>
+    <>
+      <div className="relative rounded-2xl overflow-hidden bg-black aspect-[3/4] shadow-sm group border border-gray-100">
+        <video
+          ref={videoRef}
+          controls
+          playsInline
+          preload="metadata"
+          poster={activePoster}
+          onLoadedData={handleLoadedData}
+          onSeeked={handleLoadedData}
+          className="w-full h-full object-cover"
+          key={currentVideo}
+        >
+          <source src={videoSrcWithFragment} type="video/mp4" />
+          Trình duyệt của bạn không hỗ trợ thẻ video.
+        </video>
+
+        {/* Nút Phóng to Video chuyên dụng (Mở modal vừa vặn khung hình như xem ảnh) */}
+        <button
+          type="button"
+          onClick={handleOpenZoom}
+          className="absolute top-2.5 right-2.5 z-10 px-2.5 py-1.5 rounded-full bg-black/70 hover:bg-black text-white text-xs font-medium backdrop-blur-md border border-white/25 shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5 cursor-pointer"
+          title="Phóng to video (Vừa vặn toàn bộ khung hình)"
+          aria-label="Phóng to video"
+        >
+          <Maximize2 className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline text-[11px]">Phóng to</span>
+        </button>
+      </div>
+
+      {/* MODAL ZOOM VIDEO BẰNG REACT PORTAL - VỪA VẶN 100% KHUNG HÌNH, KHÔNG BỊ TRÀN VIỀN */}
+      {isZoomed && mounted &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/92 backdrop-blur-md p-2 sm:p-4 select-none animate-in fade-in duration-200"
+            onClick={handleCloseZoom}
+          >
+            {/* Nút đóng modal góc trên bên phải màn hình */}
+            <button
+              onClick={handleCloseZoom}
+              className="fixed top-3 right-3 sm:top-5 sm:right-5 z-[100000] w-11 h-11 rounded-full bg-black/80 hover:bg-black text-white flex items-center justify-center border border-white/30 shadow-2xl transition hover:scale-110 active:scale-95 cursor-pointer"
+              aria-label="Đóng"
+            >
+              <X className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+
+            {/* Logo web gắn ở góc trên bên trái trong modal (ẩn trên mobile/ipad) */}
+            <div className="hidden lg:block fixed top-3 left-3 sm:top-5 sm:left-5 z-[100000] pointer-events-none select-none opacity-80 drop-shadow-[0_4px_14px_rgba(0,0,0,0.85)]">
+              <div className="relative w-11 h-11 sm:w-14 sm:h-14">
+                <Image
+                  src="/images/logo/logo-brand.webp"
+                  alt="Logo Lẩu Bò Trăm Rưỡi"
+                  fill
+                  sizes="56px"
+                  priority
+                  className="object-contain"
+                />
+              </div>
+            </div>
+
+            {/* Khung hiển thị video: Giữ trọn vẹn 100% khung hình video (object-contain), không bị cắt viền hay tràn mép */}
+            <div
+              className="relative w-full max-w-5xl h-[80vh] sm:h-[86vh] max-h-[88vh] flex items-center justify-center p-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <video
+                ref={modalVideoRef}
+                controls
+                playsInline
+                autoPlay
+                poster={activePoster}
+                className="max-w-full max-h-full w-auto h-auto object-contain rounded-xl sm:rounded-2xl shadow-2xl drop-shadow-2xl border border-white/10 bg-black"
+                key={`${currentVideo}-modal`}
+              >
+                <source src={videoSrcWithFragment} type="video/mp4" />
+                Trình duyệt của bạn không hỗ trợ thẻ video.
+              </video>
+            </div>
+
+            {/* Gợi ý đóng */}
+            <div className="fixed bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-[100000] px-4 py-1.5 rounded-full bg-black/75 backdrop-blur-md text-white text-xs sm:text-sm font-medium tracking-wide border border-white/20 shadow-xl">
+              Nhấn phím Esc hoặc bấm ra ngoài để thu nhỏ
+            </div>
+          </div>,
+          document.body
+        )}
+    </>
   );
 }
 

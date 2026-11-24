@@ -2,6 +2,7 @@ import Link from "next/link";
 import { JobItem } from "@/types/job";
 import { ArrowRight, MapPin } from "lucide-react";
 import { getJobUrl } from "@/lib/job-url";
+import { formatCardSalary } from "@/components/home/JobCard";
 
 interface RelatedJobsProps {
   relatedJobs: JobItem[];
@@ -26,11 +27,11 @@ export default function RelatedJobs({ relatedJobs }: RelatedJobsProps) {
               <Link href={getJobUrl(job)}>{job.title}</Link>
             </h4>
 
-            <div className="mt-2.5 flex items-center justify-between text-[14px] sm:text-[15px]">
-              <span className="font-semibold text-brand-900">
-                {job.salaryDisplay}
+            <div className="mt-2.5 flex items-center justify-between text-[14px] sm:text-[15px] gap-2">
+              <span className="inline-block text-[12px] sm:text-[13px] font-bold text-brand-900 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/80">
+                {formatCardSalary(job.salaryDisplay) || job.salaryDisplay}
               </span>
-              <span className="text-gray-500 flex items-center gap-1">
+              <span className="text-gray-500 flex items-center gap-1 text-xs sm:text-sm shrink-0">
                 <MapPin className="w-3.5 h-3.5" />
                 {job.locations[0]}
               </span>
