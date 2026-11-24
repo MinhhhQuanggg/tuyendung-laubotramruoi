@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { JobItem } from "@/types/job";
 import { Clock, Calendar, ArrowRight, Flame } from "lucide-react";
