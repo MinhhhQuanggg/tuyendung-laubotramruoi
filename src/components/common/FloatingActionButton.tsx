@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { ChevronUp, UserPlus } from "lucide-react";
 import QuickApplyModal from "./QuickApplyModal";
-import { trackApplyButtonClick } from "@/lib/analytics";
 
 export default function FloatingActionButton() {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -43,7 +42,9 @@ export default function FloatingActionButton() {
         {/* Nút tròn Join Us / Ứng tuyển nổi bám cạnh màn hình */}
         <button
           onClick={() => {
-            trackApplyButtonClick("floating_fab");
+            if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
+              (window as any).gtag("event", "click_apply_button", { button_location: "floating_fab" });
+            }
             setIsModalOpen(true);
           }}
           className="group relative flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-tr from-brand-900 to-brand-700 text-white shadow-2xl shadow-brand-900/40 hover:scale-105 active:scale-95 transition-all duration-300"

@@ -25,7 +25,6 @@ import { ALL_BRANCHES, REGION_METADATA, getBranchRegionKey } from "@/data/branch
 import { MOCK_JOBS_DATA } from "@/data/mock-jobs";
 import ZaloGroupQrCard from "@/components/common/ZaloGroupQrCard";
 import { getZaloGroupByRegion } from "@/data/zalo-groups";
-import { trackApplySuccess } from "@/lib/analytics";
 
 const ALLOWED_CV_EXTENSIONS = ["pdf", "doc", "docx", "png", "jpg", "jpeg", "webp"];
 
@@ -548,7 +547,12 @@ export default function QuickApplyModal({
       }
 
       setSuccess(true);
-      trackApplySuccess(formData.positionTitle, formData.appliedRegion);
+      if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
+        (window as any).gtag("event", "generate_lead", {
+          position: formData.positionTitle,
+          region: formData.appliedRegion,
+        });
+      }
     } catch (err: unknown) {
       setErrorMsg((err as Error).message || "Đã xảy ra sự cố kết nối");
     } finally {
