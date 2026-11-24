@@ -6,7 +6,6 @@ import { JobItem } from "@/types/job";
 import StickyJobSidebar from "@/components/job-detail/StickyJobSidebar";
 import { JobDetailImages, JobDetailVideo } from "@/components/job-detail/JobDetailMedia";
 import { ChevronRight } from "lucide-react";
-import { trackJobView } from "@/lib/analytics";
 
 interface JobDetailViewProps {
   job: JobItem;
@@ -15,8 +14,12 @@ interface JobDetailViewProps {
 
 export default function JobDetailView({ job, isAdmin = false }: JobDetailViewProps) {
   useEffect(() => {
-    if (job?.title && !isAdmin) {
-      trackJobView(job.title, job.id);
+    if (job?.title && !isAdmin && typeof window !== "undefined" && typeof (window as any).gtag === "function") {
+      (window as any).gtag("event", "view_item", {
+        content_type: "job",
+        item_id: job.id || job.title,
+        item_name: job.title,
+      });
     }
   }, [job?.title, job?.id, isAdmin]);
 

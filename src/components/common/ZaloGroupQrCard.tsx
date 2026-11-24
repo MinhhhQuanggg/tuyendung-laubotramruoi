@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { MessageCircle, ExternalLink, QrCode as QrIcon, Check, Copy, MapPin } from "lucide-react";
 import { ZaloGroupInfo, ZALO_REGION_GROUPS, getZaloGroupByRegion } from "@/data/zalo-groups";
-import { trackZaloJoin } from "@/lib/analytics";
 
 interface ZaloGroupQrCardProps {
   group?: ZaloGroupInfo;
@@ -285,7 +284,11 @@ export default function ZaloGroupQrCard({
         href={selectedGroup.zaloUrl}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() => trackZaloJoin(selectedGroup.groupName, selectedGroup.shortName)}
+        onClick={() => {
+          if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
+            (window as any).gtag("event", "join_zalo_group", { group_name: selectedGroup.groupName, region: selectedGroup.shortName });
+          }
+        }}
         className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 active:scale-98 text-white font-black text-sm sm:text-base shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
       >
         <MessageCircle className="w-5 h-5 shrink-0" />
