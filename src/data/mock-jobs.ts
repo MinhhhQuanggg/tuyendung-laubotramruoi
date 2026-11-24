@@ -926,13 +926,7 @@ Cơ hội nâng tầm sự nghiệp quản lý F&B với mức lương hấp d�
     experienceRequirements: "Không yêu cầu kinh nghiệm (Đào tạo từ số 0)",
     isActive: true,
     contactZalo: "0981256712",
-    images: [
-      "/images/culture/phucvu-full.webp",
-      "/images/culture/bep-operation.webp",
-      "/images/culture/phucvu-store-opening.webp",
-      "/images/culture/phucvu-team.webp",
-    ],
-    videoUrl: "/videos/jobs/phucvu.mp4",
+    images: [],
     concisePost: {
       headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHA CHẾ] 🔥",
       intro: `🔥 TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHA CHẾ 🔥
