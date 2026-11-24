@@ -129,7 +129,7 @@ export default function Footer() {
 
         {/* PHẦN DƯỚI: BẢN QUYỀN, VỀ CHÚNG TÔI, CHÍNH SÁCH & MẠNG XÃ HỘI */}
         <div className="pt-4 border-t border-brand-900/60 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-400">
-          <p className="text-center md:text-left">
+          <p className="text-center md:text-left" suppressHydrationWarning>
             © {new Date().getFullYear()} {siteConfig.name}. Tất cả các quyền được bảo lưu.
           </p>
 
