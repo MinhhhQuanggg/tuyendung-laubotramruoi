@@ -5,7 +5,7 @@ import Link from "next/link";
 import { JobItem } from "@/types/job";
 import StickyJobSidebar from "@/components/job-detail/StickyJobSidebar";
 import { JobDetailImages, JobDetailVideo } from "@/components/job-detail/JobDetailMedia";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Clock } from "lucide-react";
 
 interface JobDetailViewProps {
   job: JobItem;
@@ -31,7 +31,7 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
     <>
       {/* Header Banner với Breadcrumb - Gradient Option A */}
       <section className="relative bg-gradient-to-r from-[#8E1B24] via-[#5c1015] to-[#3A0910] text-white py-3.5 sm:py-4 overflow-hidden border-b border-[#C9963F]/30 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-wrap items-center justify-between gap-3">
+        <div className="w-[94%] xl:w-[92%] 2xl:w-[90%] max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-wrap items-center justify-between gap-3">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-xs text-amber-200/80">
             <Link href="/" className="hover:text-white transition">
@@ -47,12 +47,12 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
         </div>
       </section>
 
-      {/* Bố cục: 3 cột khi có ảnh, 2 cột cân đối thoáng rộng khi không có ảnh */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
-        <div className={`grid grid-cols-1 ${hasImages ? "lg:grid-cols-12" : "lg:grid-cols-12 max-w-5xl mx-auto"} gap-6 xl:gap-8 items-start`}>
+      {/* Bố cục: 3 cột khi có ảnh (tỷ lệ % widthFactor: 0.2 - 0.6 - 0.2), 2 cột cân đối thoáng rộng khi không có ảnh */}
+      <div className="w-[94%] xl:w-[92%] 2xl:w-[90%] max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+        <div className={`grid grid-cols-1 ${hasImages ? "lg:grid-cols-10" : "lg:grid-cols-10 max-w-[1400px] mx-auto"} gap-6 xl:gap-8 items-start`}>
           
-          {/* CỘT 1 (BÊN TRÁI): Logo thương hiệu & Video thực tế */}
-          <div className={`order-2 lg:order-1 ${hasImages ? "lg:col-span-3 lg:col-start-1" : "lg:col-span-4 lg:col-start-1"} lg:row-start-1 lg:sticky lg:top-6 self-start space-y-4 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1`}>
+          {/* CỘT 1 (BÊN TRÁI ~20%): Logo thương hiệu & Video thực tế */}
+          <div className={`order-2 lg:order-1 ${hasImages ? "lg:col-span-2" : "lg:col-span-3"} lg:row-start-1 lg:sticky lg:top-6 self-start space-y-4 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1`}>
             {/* Logo thương hiệu */}
             <StickyJobSidebar job={job} />
 
@@ -63,8 +63,8 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
             />
           </div>
 
-          {/* CỘT 2: Bảng mô tả công việc & FAQ */}
-          <div className={`order-1 lg:order-2 ${hasImages ? "lg:col-span-5 lg:col-start-4" : "lg:col-span-8 lg:col-start-5"} lg:row-start-1 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100`}>
+          {/* CỘT 2: Bảng mô tả công việc & FAQ (~60% khi có ảnh) */}
+          <div className={`order-1 lg:order-2 ${hasImages ? "lg:col-span-6" : "lg:col-span-7"} lg:row-start-1 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100`}>
             {/* Badge & Tên vị trí */}
             <div className="border-b border-gray-100 pb-5 mb-6">
               {/* Pill Badges phân loại đưa lên trên tiêu đề thẻ: hiển thị từ Độ tuổi & Kinh nghiệm */}
@@ -94,11 +94,33 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
               <h1 className="text-[24px] sm:text-[28px] lg:text-[26px] xl:text-[30px] font-black leading-tight text-gray-900">
                 {job.title}
               </h1>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-2 text-[14px] sm:text-[16px] font-bold text-brand-900 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200/80 shadow-xs">
-                  💰 {job.salaryDisplay}
-                </span>
-              </div>
+
+              {/* Thanh Lương & Ca làm việc theo mẫu chuẩn sếp gửi (image2.png) */}
+              {(() => {
+                let rawHours = (job.workHours || job.workTypeDisplay || "").replace(/24h00/g, "00h00");
+                rawHours = rawHours.replace(/\\n/g, " - ").replace(/\n/g, " - ");
+                rawHours = rawHours.replace(/\s*\(Đăng ký linh hoạt, nghỉ 1 ngày\/tuần\)/gi, "").trim();
+
+                return (
+                  <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FFFDF7] border border-[#F3E2B8] rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+                    {/* Vế trái: $ Mức lương in đậm đỏ đô chuẩn thương hiệu */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#C9963F] font-bold text-[18px] sm:text-[20px] select-none">$</span>
+                      <span className="text-[16px] sm:text-[18px] font-bold text-brand-900 tracking-tight">
+                        {job.salaryDisplay}
+                      </span>
+                    </div>
+
+                    {/* Vế phải: Icon Clock xanh + Thời gian ca làm việc */}
+                    {rawHours && (
+                      <div className="flex items-center gap-2 text-slate-700 text-[14px] sm:text-[15px] font-medium shrink-0">
+                        <Clock className="w-4 h-4 text-blue-600 shrink-0" />
+                        <span>{rawHours}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Nội dung tuyển dụng ngắn gọn trực quan theo mẫu bài post thực tế */}
@@ -110,11 +132,9 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
                 </p>
 
                 <div className="space-y-3.5 pt-1">
-                  {/* Danh sách các gạch đầu dòng ngắn gọn với Icon / Emoji chuẩn mẫu */}
+                  {/* Danh sách các gạch đầu dòng ngắn gọn với Icon / Emoji chuẩn mẫu, ưu tiên lương lên đầu */}
                   {job.concisePost.points &&
-                    job.concisePost.points
-                      .filter((point) => !job.concisePost?.intro?.includes(point.content))
-                      .map((point, i) => (
+                    job.concisePost.points.map((point, i) => (
                         <div
                           key={i}
                           className="flex items-start gap-3 text-[16px] sm:text-[17px] text-gray-800 leading-relaxed"
@@ -149,9 +169,9 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
             )}
           </div>
 
-          {/* CỘT 3 (BÊN PHẢI): 2 Cột ảnh thực tế dạng thumbnail thu nhỏ 50%, chỉ hiển thị khi có ảnh */}
+          {/* CỘT 3 (BÊN PHẢI ~20%): Ảnh thực tế dạng thumbnail thu nhỏ */}
           {hasImages && (
-            <div className="order-3 lg:order-3 lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:sticky lg:top-6 self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1">
+            <div className="order-3 lg:order-3 lg:col-span-2 lg:row-start-1 lg:sticky lg:top-6 self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1">
               <JobDetailImages images={job.images} />
             </div>
           )}

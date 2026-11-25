@@ -58,24 +58,27 @@ export const MOCK_JOBS_DATA: JobItem[] = [
       headline: "🔥 [CƠ HỘI VÀNG CHO BẠN ĐẦU BẾP ĐAM MÊ THĂNG TIẾN TRONG NGÀNH] 🔥",
       intro: `🔥 [CƠ HỘI VÀNG CHO BẠN ĐẦU BẾP ĐAM MÊ THĂNG TIẾN TRONG NGÀNH] 🔥
 🍲 Tiệm Lẩu Bò Trăm Rưỡi đang tìm kiếm và đào tạo những "thủ lĩnh" tương lai cho vị trí: GIÁM SÁT BẾP CHI NHÁNH!
-💰 Thu nhập hấp dẫn: 11.000.000đ - 14.000.000đ + Thưởng xứng đáng! 
-🚀 ⏰ Thời gian làm việc: 14:00 – 01:00.
-👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
-
-👉 Yêu cầu ứng viên:
-🎂 Độ tuổi: Từ 25 - 35 tuổi.
-🔪 Có kinh nghiệm ít nhất 3 năm trong công việc bếp.
-👥 Có kinh nghiệm đào tạo, dẫn dắt các nhân sự bếp mới.
-🎯 Có tinh thần trách nhiệm cao, kỷ luật thép và ham học hỏi.
-❤️ Đam mê cháy bỏng và muốn gắn bó, phát triển lâu dài với nghề bếp.
 
 👉 Bạn sẽ được học và làm chủ những gì tại Lẩu Bò Trăm Rưỡi?
 📊 Quản trị bếp chuỗi chuyên nghiệp: Kiểm soát COGs (giá vốn), chất lượng & định lượng món ăn, tối ưu tốc độ ra món, kỹ năng đào tạo và tiêu chuẩn Vệ sinh An toàn Thực phẩm (HACCP).
 🤖 AI & Data: Trải nghiệm ứng dụng trí tuệ nhân tạo và dữ liệu thực chiến trong quản lý vận hành bếp hiện đại.
-🤝 Huấn luyện đội ngũ & Năng lực lãnh đạo: Thấu hiểu tâm lý con người – Hợp tác cùng thắng – Phát huy tối đa tài năng – Làm việc hiệu quả.
-
-👉 Lộ trình thăng tiến rõ ràng, rộng mở: ⭐ Giám Sát Bếp ➡️ Trưởng Bếp Chi Nhánh ➡️ Quản Lý Bếp Vùng ➡️ Trưởng Bộ Phận Bếp Chuỗi.`,
+🤝 Huấn luyện đội ngũ & Năng lực lãnh đạo: Thấu hiểu tâm lý con người – Hợp tác cùng thắng – Phát huy tối đa tài năng – Làm việc hiệu quả.`,
       points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "11 – 14 triệu/tháng + Thưởng xứng đáng theo năng lực",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "14h00 – 01h00",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "25 – 35 tuổi | Kinh nghiệm từ 3 năm trở lên trong công việc bếp, có kỹ năng đào tạo nhân sự",
+        },
         {
           icon: "🍚",
           label: "Chế độ ăn ở:",
@@ -90,6 +93,11 @@ export const MOCK_JOBS_DATA: JobItem[] = [
           icon: "💸",
           label: "Ứng lương:",
           content: "Cho phép ứng lương",
+        },
+        {
+          icon: "⭐",
+          label: "Lộ trình thăng tiến:",
+          content: "Giám Sát Bếp ➡️ Trưởng Bếp Chi Nhánh ➡️ Quản Lý Bếp Vùng ➡️ Trưởng Bộ Phận Bếp Chuỗi",
         },
       ],
       zalo: "0981256712",
@@ -156,35 +164,28 @@ export const MOCK_JOBS_DATA: JobItem[] = [
 🌟 VỊ TRÍ TUYỂN DỤNG: GIÁM ĐỐC BẾP (ĐIỀU HÀNH BẾP CHUỖI F&B)
 Hệ thống Tiệm Lẩu Bò Trăm Rưỡi đang trên đà phát triển thần tốc với mục tiêu mở rộng mạnh mẽ. Chúng tôi tìm kiếm một Giám Đốc Bếp có Tâm – có Tầm – có Tài để đồng hành xây dựng chuẩn mực ẩm thực đỉnh cao cho toàn hệ thống!
 
-💰 THU NHẬP: 25–40 TRIỆU/THÁNG + THƯỞNG THEO KẾT QUẢ PHÁT TRIỂN HỆ THỐNG
-⏰ Thời gian làm việc: 14h00 – 24h00
-🎂 Độ tuổi: 35 – 45 tuổi
-👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
-
-💎 YÊU CẦU ỨNG VIÊN:
-🎂 Độ tuổi: 35 – 45 tuổi.
-🎯 Kinh nghiệm thực chiến: Đã từng giữ vai trò Bếp Trưởng Điều Hành / Giám Đốc Bếp cho các chuỗi nhà hàng F&B quy mô từ 10 chi nhánh trở lên.
-🥩 Hiểu sâu sắc về thịt bò: Có chuyên môn sâu về phân loại, bảo quản, pha lóc và chế biến thịt bò tươi/nóng.
-📊 Quản trị số liệu & Chi phí: Nắm vững phương pháp tính định lượng, kiểm soát và tối ưu COGS, hạn chế hao hụt nguyên liệu ở mức tối thiểu.
-⚙️ Tư duy quy trình: Có năng lực tự đóng gói quy trình vận hành bếp chuẩn (SOP), dễ hiểu, dễ chuyển giao, dễ nhân bản cho toàn chuỗi.
-👥 Năng lực lãnh đạo: Kỹ năng đào tạo, truyền cảm hứng và dẫn dắt đội ngũ nhân sự bếp từ 50–100 người; kỷ luật thép nhưng quản trị bằng sự thấu hiểu.
-
-🎯 BẠN SẼ NẮM GIỮ TRÁCH NHIỆM GÌ?
+🎯 BẠN SẼ NẮM GIỮ TRÁCH NHIỆM:
 1️⃣ Quản trị chất lượng món ăn: Đảm bảo hương vị, chất lượng và thẩm mỹ món ăn 100% đồng nhất trên toàn hệ thống 15+ chi nhánh.
 2️⃣ Kiểm soát chi phí (COGS): Phối hợp phòng Thu mua và Vận hành để tối ưu giá vốn, kiểm soát hao hụt và tồn kho nguyên liệu hiệu quả.
 3️⃣ Chuẩn hóa & Đào tạo: Xây dựng tiêu chuẩn vận hành bếp, trực tiếp huấn luyện đội ngũ Bếp Trưởng Chi Nhánh và Giám Sát Bếp.
 4️⃣ Nghiên cứu & Phát triển (R&D): Sáng tạo món ăn mới, nâng cấp menu theo mùa để gia tăng trải nghiệm cho khách hàng.
-5️⃣ An toàn thực phẩm: Kiểm soát 100% tiêu chuẩn VSATTP và PCCC tại tất cả các bếp chi nhánh.
-
-🎁 QUYỀN LỢI & ĐÃI NGỘ XỨNG TẦM:
-💵 Thu nhập 25.000.000 – 40.000.000 VNĐ/tháng (Lương cứng + Thưởng hiệu quả chuỗi).
-🍚 Không bao ăn, Không bao ở
-💵 Tiền Tip tự giữ
-💸 Cho phép ứng lương
-📈 Cơ hội tham gia chính sách cổ phần thưởng / ESOP khi hệ thống đạt các mốc tăng trưởng.
-🏢 Môi trường làm việc năng động, tôn trọng năng lực chuyên môn, trao quyền thực chiến tối đa.
-🚀 Đồng hành cùng Ban Lãnh Đạo định hình chiến lược phát triển ẩm thực của chuỗi lẩu bò hàng đầu.`,
+5️⃣ An toàn thực phẩm: Kiểm soát 100% tiêu chuẩn VSATTP và PCCC tại tất cả các bếp chi nhánh.`,
       points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "25 – 40 triệu/tháng + Thưởng theo kết quả phát triển hệ thống (Có chính sách ESOP)",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "14h00 – 00h00",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "35 – 45 tuổi | Đã từng giữ vai trò Bếp Trưởng Điều Hành / Giám Đốc Bếp chuỗi F&B từ 10 chi nhánh trở lên",
+        },
         {
           icon: "🍚",
           label: "Chế độ ăn ở:",
@@ -199,6 +200,11 @@ Hệ thống Tiệm Lẩu Bò Trăm Rưỡi đang trên đà phát triển thầ
           icon: "💸",
           label: "Ứng lương:",
           content: "Cho phép ứng lương",
+        },
+        {
+          icon: "🚀",
+          label: "Cơ hội đồng hành:",
+          content: "Đồng hành cùng Ban Lãnh Đạo định hình chiến lược phát triển ẩm thực của chuỗi lẩu bò hàng đầu",
         },
       ],
       zalo: "0981256712",
@@ -267,17 +273,27 @@ Hệ thống Tiệm Lẩu Bò Trăm Rưỡi đang trên đà phát triển thầ
       intro: `🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG QUẢN LÝ CỬA HÀNG] 🔥
 Hệ thống Tiệm Lẩu Bò Trăm Rưỡi tiếp tục mở rộng quy mô và chào đón các nhân tố Quản Lý xuất sắc về dẫn dắt đội ngũ tại các chi nhánh!
 
-💰 Thu nhập hấp dẫn: 10.000.000 – 18.000.000 VNĐ/tháng + Thưởng chuẩn 3P (Theo doanh thu & KPI vận hành).
-⏰ Thời gian làm việc: Thương lượng
-🎂 Độ tuổi: 24 – 38 tuổi.
-👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
-
 👉 Trách nhiệm chính:
 - Điều hành toàn bộ hoạt động thường nhật tại cửa hàng (Sảnh - Thu ngân - Bếp).
 - Quản trị chi phí, doanh thu, kiểm soát thất thoát và tối ưu hóa lợi nhuận cửa hàng.
 - Huấn luyện, đào tạo, tạo động lực và giữ lửa cho đội ngũ nhân viên chi nhánh.
 - Xử lý các tình huống phát sinh và mang lại trải nghiệm ẩm thực trọn vẹn nhất cho thực khách.`,
       points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "10 – 18 triệu/tháng + Thưởng chuẩn 3P (Theo doanh thu & KPI vận hành)",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "Thương lượng theo ca vận hành",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "24 – 38 tuổi | Có kinh nghiệm quản lý nhà hàng F&B tối thiểu 1 năm",
+        },
         {
           icon: "🍚",
           label: "Chế độ ăn ở:",
@@ -353,17 +369,27 @@ Hệ thống Tiệm Lẩu Bò Trăm Rưỡi tiếp tục mở rộng quy mô và
       intro: `🔥 [TUYỂN DỤNG QUẢN LÝ VÙNG CHUỖI F&B LẨU BÒ TRĂM RƯỠI] 🔥
 Hệ thống Tiệm Lẩu Bò Trăm Rưỡi mở rộng cụm chi nhánh cần tìm kiếm những thủ lĩnh dày dạn kinh nghiệm thực chiến!
 
-💰 Thu nhập: 15 – 35 củ / tháng + Thưởng khích lệ 🌟
-⏰ Thời gian: 16h00 – 01h00 (Nghỉ 2 buổi/tháng linh hoạt)
-🎂 Độ tuổi: 28 – 40 tuổi
-👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
-
 👉 Bạn nắm giữ:
 - Quản lý vận hành toàn diện cụm 3–5 nhà hàng trong khu vực phân công.
 - Đảm bảo các chỉ số P&L, doanh số, chi phí nhân sự và chất lượng phục vụ đồng nhất.
 - Đào tạo, phát triển các Quản Lý Cửa Hàng và Tổ Trưởng kế cận.
 - Đại diện hệ thống xử lý các vấn đề đối ngoại và cơ quan chức năng khi cần thiết.`,
       points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "15 – 35 triệu/tháng + Thưởng khích lệ theo hiệu quả cụm",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "16h00 – 01h00 (Nghỉ 2 buổi/tháng linh hoạt)",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "28 – 40 tuổi | Đã từng quản lý cụm 3–5 cửa hàng F&B, nắm chắc quản trị P&L chuỗi",
+        },
         {
           icon: "🍚",
           label: "Chế độ ăn ở:",
@@ -444,16 +470,26 @@ Hệ thống Tiệm Lẩu Bò Trăm Rưỡi mở rộng cụm chi nhánh cần t
       intro: `🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG TỔ TRƯỞNG CA] 🔥
 Bạn muốn bước chân vào con đường quản lý chuyên nghiệp trong ngành F&B? Hãy bắt đầu ngay với vị trí Tổ Trưởng tại Lẩu Bò Trăm Rưỡi!
 
-💰 Thu nhập: 7 – 8 củ/tháng + Thưởng khích lệ 🌟
-⏰ Thời gian: 16h00 – 01h00 (Nghỉ 2 buổi/tháng)
-🎂 Độ tuổi: 20 – 30 tuổi
-👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
-
 👉 Bạn sẽ làm:
 - Hỗ trợ Quản Lý điều phối hoạt động ca trực (phân ca, sắp xếp bàn ghế, điều động nhân sự).
 - Giám sát chất lượng phục vụ, kiểm tra vệ sinh an toàn và công tác chuẩn bị trước giờ mở bán.
 - Hướng dẫn và kèm cặp các bạn nhân viên mới trong ca làm việc.`,
       points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "7 – 8 triệu/tháng + Thưởng khích lệ",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "16h00 – 01h00 (Nghỉ 2 buổi/tháng)",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "20 – 30 tuổi | Học việc từ số 0 hoặc đã có kinh nghiệm F&B",
+        },
         {
           icon: "🍚",
           label: "Chế độ ăn ở:",
@@ -538,17 +574,26 @@ Bạn muốn bước chân vào con đường quản lý chuyên nghiệp trong 
       intro: `🔥 [HỌC NGHỀ BẾP MIỄN PHÍ - VẪN CÓ LƯƠNG ĐỦ TẠI LẨU BÒ TRĂM RƯỠI] 🔥
 Bạn muốn có một cái nghề vững chắc, thu nhập ổn định và cơ hội thăng tiến rõ ràng nhưng chưa biết bắt đầu từ đâu? Tiệm Lẩu Bò Trăm Rưỡi mở rộng đào tạo học viên bếp!
 
-💰 Thu nhập khởi điểm: 7.500.000 – 11.000.000 VNĐ/tháng ngay trong thời gian học nghề!
-✨ Đánh giá tăng lương sau 1 tuần đầu nhiệt tình, cố gắng.
-⏰ Ca làm việc cố định: 14h00 – 24h00 mỗi ngày.
-🎂 Độ tuổi: 18 – 30 tuổi.
-👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
-
 👉 Bạn sẽ được đào tạo:
 - Kỹ năng dùng dao, thớt chuẩn mực, pha lóc và xử lý thịt bò tươi đúng cách.
 - Nấu nước lẩu gia truyền đậm đà, chuẩn vị Triều Châu độc quyền.
 - Quy trình kiểm soát chất lượng, định lượng món và tiêu chuẩn VSATTP.`,
       points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "7,5 – 11 triệu/tháng ngay trong thời gian học nghề (Xét tăng đãi ngộ sau 1 tuần)",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "14h00 – 00h00 mỗi ngày",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "18 – 30 tuổi | Không yêu cầu kinh nghiệm (Đào tạo thực chiến từ số 0)",
+        },
         {
           icon: "🍚",
           label: "Chế độ ăn ở:",
@@ -627,16 +672,26 @@ Bạn muốn có một cái nghề vững chắc, thu nhập ổn định và c�
       intro: `🔥 [CHƯƠNG TRÌNH ĐÀO TẠO PHÓ QUẢN LÝ TIỆM LẨU BÒ TRĂM RƯỠI] 🔥
 Cơ hội nâng tầm sự nghiệp quản lý F&B với mức lương hấp dẫn ngay trong thời gian học việc!
 
-💰 Thu nhập: 10 – 14 củ/tháng + Thưởng xứng đáng theo năng lực.
-⏰ Thời gian: 16h00 – 01h00
-🎂 Độ tuổi: 20 – 35 tuổi
-👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
-
 👉 Lộ trình đào tạo:
 - Quản trị vận hành ca: Điều phối nhân sự, xử lý tình huống phát sinh, nâng cao trải nghiệm khách hàng.
 - Quản trị số liệu: Báo cáo doanh thu, kiểm soát thất thoát, quản lý kho hàng và hàng tồn.
 - Năng lực lãnh đạo: Huấn luyện, truyền cảm hứng và xây dựng văn hóa đội ngũ vững mạnh.`,
       points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "10 – 14 triệu/tháng + Thưởng xứng đáng theo năng lực",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "16h00 – 01h00",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "20 – 35 tuổi | Đã có kinh nghiệm Tổ trưởng, Giám sát hoặc Quản lý ca F&B",
+        },
         {
           icon: "🍚",
           label: "Chế độ ăn ở:",
@@ -716,17 +771,7 @@ Cơ hội nâng tầm sự nghiệp quản lý F&B với mức lương hấp d�
     concisePost: {
       headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHỤ BẾP] 🔥",
       intro: `🔥 TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHỤ BẾP 🔥
-👉 THÔNG TIN TUYỂN DỤNG CHÍNH THỨC:
-- 16 tuổi - 25 tuổi
-- ko yêu cầu kinh nghiệm (đào tạo từ số 0)
-- full time/part time/thời vụ
-- 15h00 – 00h00 hoặc 16h00 – 01h00
-- full time : 8 - 10 triệu/tháng
-- part time/thời vụ: 27k - 35k/1 giờ
-👉 Chế độ đãi ngộ:
-- Không bao ăn, Không bao ở
-- Tiền Tip tự giữ
-- Cho phép ứng lương`,
+Cơ hội việc làm ổn định, thu nhập tốt, môi trường thân thiện và cơ hội phát triển tay nghề bếp tại hệ thống Lẩu Bò Trăm Rưỡi!`,
       points: [
         {
           icon: "💰",
@@ -826,17 +871,7 @@ Cơ hội nâng tầm sự nghiệp quản lý F&B với mức lương hấp d�
     concisePost: {
       headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG THU NGÂN] 🔥",
       intro: `🔥 TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG THU NGÂN 🔥
-👉 THÔNG TIN TUYỂN DỤNG CHÍNH THỨC:
-- 16 tuổi - 25 tuổi
-- ko yêu cầu kinh nghiệm (đào tạo từ số 0)
-- full time/part time/thời vụ
-- 15h00 – 00h00 hoặc 16h00 – 01h00
-- full time : 8 - 10 triệu/tháng
-- part time/thời vụ: 27k - 35k/1 giờ
-👉 Chế độ đãi ngộ:
-- Không bao ăn, Không bao ở
-- Tiền Tip tự giữ
-- Cho phép ứng lương`,
+Môi trường làm việc trẻ trung, năng động, kiểm soát thanh toán hiện đại và cơ hội thăng tiến cùng hệ thống Lẩu Bò Trăm Rưỡi!`,
       points: [
         {
           icon: "💰",
@@ -930,17 +965,7 @@ Cơ hội nâng tầm sự nghiệp quản lý F&B với mức lương hấp d�
     concisePost: {
       headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHA CHẾ] 🔥",
       intro: `🔥 TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHA CHẾ 🔥
-👉 THÔNG TIN TUYỂN DỤNG CHÍNH THỨC:
-- 16 tuổi - 25 tuổi
-- ko yêu cầu kinh nghiệm (đào tạo từ số 0)
-- full time/part time/thời vụ
-- 15h00 – 00h00 hoặc 16h00 – 01h00
-- full time : 8 - 10 triệu/tháng
-- part time/thời vụ: 27k - 35k/1 giờ
-👉 Chế độ đãi ngộ:
-- Không bao ăn, Không bao ở
-- Tiền Tip tự giữ
-- Cho phép ứng lương`,
+Gia nhập đội ngũ quầy pha chế tại chuỗi Lẩu Bò Trăm Rưỡi với công việc hấp dẫn, thu nhập ổn định và môi trường làm việc thân thiện!`,
       points: [
         {
           icon: "💰",
@@ -1039,17 +1064,7 @@ Cơ hội nâng tầm sự nghiệp quản lý F&B với mức lương hấp d�
     concisePost: {
       headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHỤC VỤ BÀN] 🔥",
       intro: `🔥 TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHỤC VỤ BÀN 🔥
-👉 THÔNG TIN TUYỂN DỤNG CHÍNH THỨC:
-- 16 tuổi - 25 tuổi
-- ko yêu cầu kinh nghiệm (đào tạo từ số 0)
-- full time/part time/thời vụ
-- 15h00 – 00h00 hoặc 16h00 – 01h00
-- full time : 8 - 10 triệu/tháng
-- part time/thời vụ: 27k - 35k/1 giờ
-👉 Chế độ đãi ngộ:
-- Không bao ăn, Không bao ở
-- Tiền Tip tự giữ
-- Cho phép ứng lương`,
+Môi trường năng động, thân thiện, đồng đội nhiệt tình, phỏng vấn và nhận việc ngay tại các chi nhánh Lẩu Bò Trăm Rưỡi!`,
       points: [
         {
           icon: "💰",
@@ -1146,17 +1161,7 @@ Cơ hội nâng tầm sự nghiệp quản lý F&B với mức lương hấp d�
     concisePost: {
       headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG LỄ TÂN, CHĂM SÓC KHÁCH HÀNG] 🔥",
       intro: `🔥 TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG LỄ TÂN, CHĂM SÓC KHÁCH HÀNG 🔥
-👉 THÔNG TIN TUYỂN DỤNG CHÍNH THỨC:
-- 16 tuổi - 25 tuổi
-- ko yêu cầu kinh nghiệm (đào tạo từ số 0)
-- full time/part time/thời vụ
-- 15h00 – 00h00 hoặc 16h00 – 01h00
-- full time : 8 - 10 triệu/tháng
-- part time/thời vụ: 27k - 35k/1 giờ
-👉 Chế độ đãi ngộ:
-- Không bao ăn, Không bao ở
-- Tiền Tip tự giữ
-- Cho phép ứng lương`,
+Là gương mặt đại diện đón tiếp khách hàng thân thương tại các chi nhánh của Lẩu Bò Trăm Rưỡi, công việc nhẹ nhàng, thu nhập tốt!`,
       points: [
         {
           icon: "💰",
@@ -1256,14 +1261,23 @@ Cơ hội nâng tầm sự nghiệp quản lý F&B với mức lương hấp d�
     concisePost: {
       headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG TẠP VỤ, RỬA CHÉN] 🔥",
       intro: `🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG TẠP VỤ, RỬA CHÉN] 🔥
-Hệ thống Tiệm Lẩu Bò Trăm Rưỡi tuyển dụng nhân sự Tạp vụ, Rửa chén ca ngày với công việc ổn định, gắn bó lâu dài.
-
-💰 Mức lương khởi điểm: 8.000.000 VNĐ/tháng.
-⏰ Giờ làm việc: 09h00 – 18h00 (Được nghỉ trưa 1 tiếng thoải mái).
-📅 Nghỉ 2 buổi/tháng. Định kỳ 3 tháng xét tăng đãi ngộ.
-🎂 Không giới hạn độ tuổi.
-👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương`,
+Hệ thống Tiệm Lẩu Bò Trăm Rưỡi tuyển dụng nhân sự Tạp vụ, Rửa chén ca ngày với công việc ổn định, gắn bó lâu dài. Môi trường làm việc thoải mái, đãi ngộ rõ ràng!`,
       points: [
+        {
+          icon: "💰",
+          label: "Mức thu nhập:",
+          content: "8.000.000 VNĐ/tháng (Định kỳ 3 tháng xét tăng đãi ngộ)",
+        },
+        {
+          icon: "⏰",
+          label: "Thời gian làm việc:",
+          content: "09h00 – 18h00 (Nghỉ trưa 1 tiếng thoải mái, nghỉ 2 buổi/tháng)",
+        },
+        {
+          icon: "🎂",
+          label: "Độ tuổi & Kinh nghiệm:",
+          content: "Không giới hạn độ tuổi | Không yêu cầu kinh nghiệm, chăm chỉ thật thà",
+        },
         {
           icon: "🍚",
           label: "Chế độ ăn ở:",
@@ -1339,15 +1353,7 @@ Hệ thống Tiệm Lẩu Bò Trăm Rưỡi tuyển dụng nhân sự Tạp vụ
       headline: "🔥 [VIỆC LÀM THỜI VỤ SIÊU LINH ĐỘNG TẠI TIỆM LẨU BÒ TRĂM RƯỠI] 🔥",
       intro: `🔥 [VIỆC LÀM THỜI VỤ SIÊU LINH ĐỘNG TẠI TIỆM LẨU BÒ TRĂM RƯỠI] 🔥
 Bạn cần tìm công việc kiếm thêm thu nhập ngắn hạn, lịch làm linh hoạt, nhận lương tuần? Đăng ký ngay thời vụ tại Lẩu Bò Trăm Rưỡi!
-
-💰 Mức lương hấp dẫn: 27k - 35k/1 giờ (Nhận lương tuần).
-⏰ Thời gian: 17h00 – 24h00 (Đăng ký lịch rảnh từ 3 buổi/tuần).
-🎂 Độ tuổi: 16 – 25 tuổi.
-👉 Chế độ đãi ngộ: Không bao ăn, Không bao ở | Tiền Tip tự giữ | Cho phép ứng lương
-
-👉 Công việc:
-- Hỗ trợ các công việc đơn giản như dọn bàn, tiếp thực, phục vụ thực khách tại quán.
-- Đào tạo 30 phút là làm được ngay, môi trường trẻ trung, thân thiện.`,
+Đào tạo 30 phút là làm được ngay, môi trường trẻ trung, thân thiện!`,
       points: [
         {
           icon: "💰",
