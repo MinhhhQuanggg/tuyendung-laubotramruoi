@@ -86,18 +86,18 @@ export function JobDetailImages({ images }: JobDetailImagesProps) {
               className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
             />
 
-            {/* Logo web gắn ở góc trên bên trái của ảnh đầu tiên (ẩn trên mobile/ipad, chỉ hiện từ lg desktop trở lên) */}
+            {/* Logo web gắn ở góc trên bên trái của ảnh đầu tiên (hiển thị trên mọi thiết bị: mobile, tablet, desktop) */}
             {idx === 0 && (
               <div
-                className="hidden lg:block absolute top-2 left-2 sm:top-2.5 sm:left-2.5 z-10 pointer-events-none select-none transition-all duration-300 group-hover:scale-105 group-hover:opacity-100 opacity-80 drop-shadow-[0_3px_10px_rgba(0,0,0,0.75)]"
+                className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 z-10 pointer-events-none select-none transition-all duration-300 group-hover:scale-105 group-hover:opacity-100 opacity-90 drop-shadow-[0_3px_10px_rgba(0,0,0,0.75)]"
                 title="Lẩu Bò Trăm Rưỡi"
               >
-                <div className="relative w-9 h-9 sm:w-11 sm:h-11">
+                <div className="relative w-7 h-7 sm:w-9 sm:h-9">
                   <Image
                     src="/images/logo/logo-brand.webp"
                     alt="Logo Lẩu Bò Trăm Rưỡi"
                     fill
-                    sizes="44px"
+                    sizes="(max-width: 640px) 28px, 36px"
                     priority
                     className="object-contain"
                   />
@@ -131,15 +131,15 @@ export function JobDetailImages({ images }: JobDetailImagesProps) {
               <X className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
-            {/* Logo web gắn ở góc trên bên trái khi xem ảnh đầu tiên trong modal (ẩn trên mobile/ipad) */}
+            {/* Logo web gắn ở góc trên bên trái khi xem ảnh đầu tiên trong modal (hiển thị trên mọi thiết bị) */}
             {selectedPhotoIndex === 0 && (
-              <div className="hidden lg:block fixed top-3 left-3 sm:top-5 sm:left-5 z-[100000] pointer-events-none select-none opacity-80 drop-shadow-[0_4px_14px_rgba(0,0,0,0.85)]">
-                <div className="relative w-11 h-11 sm:w-14 sm:h-14">
+              <div className="fixed top-3 left-3 sm:top-5 sm:left-5 z-[100000] pointer-events-none select-none opacity-85 drop-shadow-[0_4px_14px_rgba(0,0,0,0.85)]">
+                <div className="relative w-8 h-8 sm:w-12 sm:h-12">
                   <Image
                     src="/images/logo/logo-brand.webp"
                     alt="Logo Lẩu Bò Trăm Rưỡi"
                     fill
-                    sizes="56px"
+                    sizes="(max-width: 640px) 32px, 48px"
                     priority
                     className="object-contain"
                   />

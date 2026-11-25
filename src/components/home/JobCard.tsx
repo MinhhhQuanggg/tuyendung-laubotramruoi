@@ -77,17 +77,17 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
           );
         })()}
 
-        {/* Tiêu đề vị trí & Mức lương: Mobile xếp dọc (lương dưới tiêu đề), Desktop cùng hàng (lương bên phải) */}
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2.5 sm:gap-3 mb-4">
-          <h3 className="text-[19px] sm:text-[21px] font-bold text-gray-900 group-hover:text-brand-800 transition-colors line-clamp-2 leading-snug flex-1">
+        {/* Tiêu đề vị trí & Mức lương ngang hàng bên phải trên mobile/tablet/desktop (chuẩn image3.png) */}
+        <div className="flex flex-row items-start justify-between gap-2.5 sm:gap-3 mb-4">
+          <h3 className="text-[18px] sm:text-[20px] font-bold text-gray-900 group-hover:text-brand-800 transition-colors line-clamp-2 leading-snug flex-1 min-w-0 pr-1">
             <Link href={getJobUrl(job)}>{job.title}</Link>
           </h3>
           {salaryText && (
-            <span className="self-start w-fit shrink-0 text-[13px] sm:text-[15px] font-bold text-brand-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/80 sm:mt-0.5">
+            <span className="shrink-0 text-[13px] sm:text-[15px] font-bold text-brand-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/80 text-right self-start mt-0.5">
               {salaryText.includes("|") ? (
-                <span className="flex flex-col sm:items-end text-left sm:text-right leading-tight gap-0.5">
+                <span className="flex flex-col items-end text-right leading-tight gap-0.5">
                   <span>{salaryText.split("|")[0].trim()}</span>
-                  <span className="text-[12px] font-semibold text-amber-800">
+                  <span className="text-[11px] sm:text-[12px] font-semibold text-amber-800">
                     {salaryText.split("|")[1].trim()}
                   </span>
                 </span>
