@@ -146,7 +146,8 @@ export async function getJobByIdOrSlug(idOrSlug: string): Promise<JobItem | null
     lower === "quan-ly-vung" ||
     lower === "ql-vung" ||
     lower === "quan-ly-cum" ||
-    lower === "area-manager"
+    lower === "area-manager" ||
+    lower === "vung"
   ) {
     return jobs.find((j) => j.slug === "quan-ly-vung") || null;
   }
@@ -267,7 +268,8 @@ export async function getJobByPath(
       j.slug.toLowerCase() === targetJobSlug ||
       j.slug.toLowerCase() === `${targetJobSlug}-${targetCat}` ||
       j.slug.toLowerCase() === `${targetCat}-${targetJobSlug}` ||
-      j.id.toLowerCase() === targetJobSlug;
+      j.id.toLowerCase() === targetJobSlug ||
+      (j.slug === "quan-ly-vung" && targetJobSlug === "vung");
     return isCatMatch && isJobMatch;
   });
 

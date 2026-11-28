@@ -7,10 +7,10 @@ import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { extractFirstFrameFromVideo } from "@/lib/video-thumbnail";
 
 const DEFAULT_IMAGES = [
-  "/images/jobs/hoc-viec-bep-1.webp",
-  "/images/jobs/hoc-viec-bep-2.webp",
-  "/images/jobs/hoc-viec-bep-3.webp",
-  "/images/jobs/hoc-viec-bep-4.webp",
+  "/images/culture/phucvu-store-opening.webp",
+  "/images/culture/bep-operation.webp",
+  "/images/culture/phucvu-full.webp",
+  "/images/culture/quanly-birthday.webp",
 ];
 
 const DEFAULT_VIDEO = "https://www.w3schools.com/html/mov_bbb.mp4";
@@ -28,7 +28,7 @@ export function JobDetailImages({ images }: JobDetailImagesProps) {
   }, []);
 
   const validImages = (images || []).filter((src) => Boolean(src && src.trim() !== ""));
-  const displayImages = validImages.length > 0 ? validImages : (images === undefined ? DEFAULT_IMAGES : []);
+  const displayImages = validImages;
 
   // Xử lý phím tắt (Escape, ArrowLeft, ArrowRight) và khóa cuộn trang khi mở modal
   useEffect(() => {

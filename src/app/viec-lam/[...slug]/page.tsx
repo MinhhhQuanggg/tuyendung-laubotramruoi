@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getJobsList, getJobByPath } from "@/lib/jobs-store";
 import { getCategorySlug, getCleanJobSlug, getJobUrl } from "@/lib/job-url";
 import { siteConfig } from "@/config/site";
@@ -24,8 +24,8 @@ export async function generateStaticParams() {
   for (const job of jobs) {
     const catSlug = getCategorySlug(job.parentMenu || job.category);
     const cleanSlug = getCleanJobSlug(job.slug, catSlug);
-    // 1. Phân cấp 2 phân đoạn chuẩn: /viec-lam/full-time/phu-bep
-    if (catSlug && cleanSlug) {
+    // 1. Phân cấp 2 phân đoạn chuẩn: /viec-lam/full-time/phu-bep, /viec-lam/quan-ly/quan-ly-vung
+    if (catSlug && cleanSlug && catSlug !== cleanSlug) {
       params.push({ slug: [catSlug, cleanSlug] });
     }
     // 2. Slug danh mục cha trực tiếp (ví dụ /viec-lam/part-time)
@@ -96,6 +96,11 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
   const slugArray = params.slug || [];
   if (slugArray.length === 0 || slugArray[0] === "xem-truoc") {
     notFound();
+  }
+
+  // Chuyển hướng chuẩn SEO nếu người dùng truy cập URL cũ /viec-lam/quan-ly/vung
+  if (slugArray.length === 2 && slugArray[0] === "quan-ly" && slugArray[1] === "vung") {
+    redirect("/viec-lam/quan-ly/quan-ly-vung");
   }
 
   const job =

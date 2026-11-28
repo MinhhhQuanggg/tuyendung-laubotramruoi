@@ -336,7 +336,7 @@ export default function Header() {
                   alt="Logo Lẩu Bò Trăm Rưỡi"
                   width={897}
                   height={877}
-                  className="w-full h-full object-contain drop-shadow"
+                  className="w-full h-full aspect-square object-contain drop-shadow"
                   priority
                 />
               </div>

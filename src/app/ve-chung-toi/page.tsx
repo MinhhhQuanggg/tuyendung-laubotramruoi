@@ -133,17 +133,19 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* CỘT PHẢI (30% - Chỉ để lại Logo thương hiệu) */}
-          <div className="lg:col-span-4">
-            <div className="w-full sticky top-24">
-              <Image
-                src="/images/logo/logo-brand.webp"
-                alt="Tiệm Lẩu Bò Trăm Rưỡi"
-                width={897}
-                height={877}
-                priority
-                className="w-full h-auto rounded-3xl object-contain shadow-sm border border-gray-100 bg-white"
-              />
+          {/* CỘT PHẢI (Chỉ để lại Logo thương hiệu - đồng bộ tỉ lệ kích thước) */}
+          <div className="lg:col-span-4 flex justify-center">
+            <div className="w-full max-w-[240px] xl:max-w-[260px] p-3.5 bg-white rounded-3xl border border-gray-100 shadow-xs sticky top-24 flex items-center justify-center">
+              <div className="relative w-full aspect-square flex items-center justify-center">
+                <Image
+                  src="/images/logo/logo-brand.webp"
+                  alt="Tiệm Lẩu Bò Trăm Rưỡi"
+                  width={897}
+                  height={877}
+                  priority
+                  className="w-full h-full object-contain rounded-2xl"
+                />
+              </div>
             </div>
           </div>
         </div>
