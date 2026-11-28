@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getJobsList, getJobByPath } from "@/lib/jobs-store";
 import { getCategorySlug, getCleanJobSlug } from "@/lib/job-url";
 import JobDetailView from "@/components/job-detail/JobDetailView";
@@ -21,8 +21,8 @@ export async function generateStaticParams() {
   for (const job of jobs) {
     const catSlug = getCategorySlug(job.parentMenu || job.category);
     const cleanSlug = getCleanJobSlug(job.slug, catSlug);
-    // 1. URL 2 phân đoạn chuẩn: /admin/viec-lam/full-time/phu-bep
-    if (catSlug && cleanSlug) {
+    // 1. URL 2 phân đoạn chuẩn: /admin/viec-lam/full-time/phu-bep, /admin/viec-lam/quan-ly/quan-ly-vung
+    if (catSlug && cleanSlug && catSlug !== cleanSlug) {
       params.push({ slug: [catSlug, cleanSlug] });
     }
     // 2. Slug danh mục cha trực tiếp: /admin/viec-lam/part-time
@@ -62,6 +62,11 @@ export default async function AdminJobDetailPage({ params }: AdminJobDetailPageP
   const slugArray = params.slug || [];
   if (slugArray.length === 0) {
     notFound();
+  }
+
+  // Chuyển hướng nếu truy cập URL cũ /admin/viec-lam/quan-ly/vung
+  if (slugArray.length === 2 && slugArray[0] === "quan-ly" && slugArray[1] === "vung") {
+    redirect("/admin/viec-lam/quan-ly/quan-ly-vung");
   }
 
   const job =

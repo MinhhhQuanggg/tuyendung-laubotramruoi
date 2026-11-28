@@ -53,6 +53,8 @@ export const MOCK_JOBS_DATA: JobItem[] = [
     images: [
       "/images/posters/giamsatbep1.webp",
       "/images/posters/giamsatbep2.webp",
+      "/images/posters/giamsatbep3.webp",
+      "/images/posters/giamsatbep4.webp",
     ],
     concisePost: {
       headline: "🔥 [CƠ HỘI VÀNG CHO BẠN ĐẦU BẾP ĐAM MÊ THĂNG TIẾN TRONG NGÀNH] 🔥",
@@ -157,6 +159,8 @@ export const MOCK_JOBS_DATA: JobItem[] = [
     contactZalo: "0981256712",
     images: [
       "/images/posters/giamdocbep1.webp",
+      "/images/posters/giamdocbep2.webp",
+      "/images/posters/giamdocbep3.webp",
     ],
     concisePost: {
       headline: "🔥 [HỆ THỐNG TIỆM LẨU BÒ TRĂM RƯỠI TÌM KIẾM THỦ LĨNH BẾP XUẤT SẮC] 🔥",
@@ -267,6 +271,9 @@ Hệ thống Tiệm Lẩu Bò Trăm Rưỡi đang trên đà phát triển thầ
     contactZalo: "0981256712",
     images: [
       "/images/posters/quanly1.webp",
+      "/images/posters/quanly2.webp",
+      "/images/posters/quanly3.webp",
+      "/images/posters/quanly4.webp",
     ],
     concisePost: {
       headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG QUẢN LÝ CỬA HÀNG] 🔥",
@@ -363,7 +370,11 @@ Hệ thống Tiệm Lẩu Bò Trăm Rưỡi tiếp tục mở rộng quy mô và
     experienceRequirements: "Có kinh nghiệm thực chiến quản lý cụm từ 3–5 cửa hàng F&B trở lên, nắm chắc quản trị P&L chuỗi.",
     isActive: true,
     contactZalo: "0981256712",
-    images: [],
+    images: [
+      "/images/posters/quanlyvung1.webp",
+      "/images/posters/quanlyvung2.webp",
+      "/images/posters/quanlyvung3.webp",
+    ],
     concisePost: {
       headline: "🔥 [TUYỂN DỤNG QUẢN LÝ VÙNG CHUỖI F&B LẨU BÒ TRĂM RƯỠI] 🔥",
       intro: `🔥 [TUYỂN DỤNG QUẢN LÝ VÙNG CHUỖI F&B LẨU BÒ TRĂM RƯỠI] 🔥
@@ -464,6 +475,8 @@ Hệ thống Tiệm Lẩu Bò Trăm Rưỡi mở rộng cụm chi nhánh cần t
       "/images/posters/totruong2.webp",
       "/images/posters/totruong3.webp",
       "/images/posters/totruong4.webp",
+      "/images/posters/totruong5.webp",
+      "/images/posters/totruong6.webp",
     ],
     concisePost: {
       headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG TỔ TRƯỞNG CA] 🔥",
@@ -666,6 +679,8 @@ Bạn muốn có một cái nghề vững chắc, thu nhập ổn định và c�
       "/images/posters/HVphoquanly1.webp",
       "/images/posters/HVphoquanly2.webp",
       "/images/posters/HVphoquanly3.webp",
+      "/images/posters/phoquanly1.webp",
+      "/images/posters/phoquanly2.webp",
     ],
     concisePost: {
       headline: "🔥 [CHƯƠNG TRÌNH ĐÀO TẠO PHÓ QUẢN LÝ TIỆM LẨU BÒ TRĂM RƯỠI] 🔥",
@@ -961,7 +976,12 @@ Môi trường làm việc trẻ trung, năng động, kiểm soát thanh toán 
     experienceRequirements: "Không yêu cầu kinh nghiệm (Đào tạo từ số 0)",
     isActive: true,
     contactZalo: "0981256712",
-    images: [],
+    images: [
+      "/images/posters/phache1.webp",
+      "/images/posters/phache2.webp",
+      "/images/posters/phache3.webp",
+      "/images/posters/phache4.webp",
+    ],
     concisePost: {
       headline: "🔥 [TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHA CHẾ] 🔥",
       intro: `🔥 TIỆM LẨU BÒ TRĂM RƯỠI TUYỂN DỤNG PHA CHẾ 🔥
@@ -1056,9 +1076,10 @@ Gia nhập đội ngũ quầy pha chế tại chuỗi Lẩu Bò Trăm Rưỡi v�
     isActive: true,
     contactZalo: "0981256712",
     images: [
-      "/images/posters/phucvuban1.webp",
-      "/images/posters/phucvuban2.webp",
-      "/images/posters/phucvuban3.webp",
+      "/images/posters/phucvuban4.webp",
+      "/images/posters/phucvuban5.webp",
+      "/images/posters/phucvuban6.webp",
+      "/images/posters/phucvuban7.webp",
     ],
     videoUrl: "/videos/jobs/phucvu.mp4",
     concisePost: {

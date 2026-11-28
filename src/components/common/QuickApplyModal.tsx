@@ -714,9 +714,15 @@ export default function QuickApplyModal({
                 {/* Khối LƯƠNG & CA LÀM: Chỉ giữ icon & số lương/tháng, ca làm */}
                 <div className="mt-2 md:mt-2.5 px-3 md:px-4 py-2 sm:py-2.5 md:py-3 rounded-xl bg-gradient-to-r from-amber-50/90 via-red-50/30 to-white border border-amber-200/80 flex items-center justify-between gap-2 shadow-xs">
                   {/* Icon & Số lương/tháng */}
-                  <div className="flex items-center gap-1.5 md:gap-2 min-w-0">
-                    <DollarSign className="w-4 h-4 md:w-5 md:h-5 text-amber-700 shrink-0" />
-                    <span className="font-black text-sm sm:text-base md:text-lg bg-gradient-to-r from-[#8E1B24] via-[#B83232] to-[#C9963F] bg-clip-text text-transparent truncate">
+                  <div className="inline-flex items-center gap-1.5 md:gap-2 bg-emerald-50 border border-emerald-200/90 px-2.5 py-1 rounded-lg text-emerald-950 shadow-sm min-w-0">
+                    <Image
+                      src="/images/icon-salary.webp"
+                      alt="Lương"
+                      width={20}
+                      height={15}
+                      className="w-4 h-auto md:w-5 object-contain shrink-0"
+                    />
+                    <span className="font-bold text-xs sm:text-sm md:text-base text-emerald-950 truncate">
                       {formatModalSalary(selectedJob?.salaryDisplay)}
                     </span>
                   </div>

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { JobItem } from "@/types/job";
 import StickyJobSidebar from "@/components/job-detail/StickyJobSidebar";
 import { JobDetailImages, JobDetailVideo } from "@/components/job-detail/JobDetailMedia";
@@ -23,10 +24,6 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
     }
   }, [job?.title, job?.id, isAdmin]);
 
-  const hasImages = Boolean(
-    job.images && job.images.filter((src) => Boolean(src && src.trim())).length > 0
-  );
-
   return (
     <>
       {/* Header Banner với Breadcrumb - Gradient Option A */}
@@ -47,12 +44,12 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
         </div>
       </section>
 
-      {/* Bố cục: 3 cột khi có ảnh (tỷ lệ % widthFactor: 0.2 - 0.6 - 0.2), 2 cột cân đối thoáng rộng khi không có ảnh */}
+      {/* Bố cục: Luôn đồng nhất 3 cột (20% - 60% - 20%) chuẩn trên mọi trang công việc */}
       <div className="w-[94%] xl:w-[92%] 2xl:w-[90%] max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
-        <div className={`grid grid-cols-1 ${hasImages ? "lg:grid-cols-10" : "lg:grid-cols-10 max-w-[1400px] mx-auto"} gap-6 xl:gap-8 items-start`}>
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 xl:gap-8 items-start">
           
-          {/* CỘT 1 (BÊN TRÁI ~20%): Logo thương hiệu & Video thực tế */}
-          <div className={`order-2 lg:order-1 ${hasImages ? "lg:col-span-2" : "lg:col-span-3"} lg:row-start-1 lg:sticky lg:top-6 self-start space-y-4 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1`}>
+          {/* CỘT 1 (BÊN TRÁI 20%): Logo thương hiệu & Video thực tế - lg:col-span-2 */}
+          <div className="order-2 lg:order-1 lg:col-span-2 lg:row-start-1 lg:sticky lg:top-6 self-start space-y-4 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1">
             {/* Logo thương hiệu */}
             <StickyJobSidebar job={job} />
 
@@ -63,8 +60,8 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
             />
           </div>
 
-          {/* CỘT 2: Bảng mô tả công việc & FAQ (~60% khi có ảnh) */}
-          <div className={`order-1 lg:order-2 ${hasImages ? "lg:col-span-6" : "lg:col-span-7"} lg:row-start-1 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100`}>
+          {/* CỘT 2: Bảng mô tả công việc & FAQ (60% - lg:col-span-6) */}
+          <div className="order-1 lg:order-2 lg:col-span-6 lg:row-start-1 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
             {/* Badge & Tên vị trí */}
             <div className="border-b border-gray-100 pb-5 mb-6">
               {/* Pill Badges phân loại đưa lên trên tiêu đề thẻ: hiển thị từ Độ tuổi & Kinh nghiệm */}
@@ -103,10 +100,16 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
 
                 return (
                   <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FFFDF7] border border-[#F3E2B8] rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
-                    {/* Vế trái: $ Mức lương in đậm đỏ đô chuẩn thương hiệu */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#C9963F] font-bold text-[18px] sm:text-[20px] select-none">$</span>
-                      <span className="text-[16px] sm:text-[18px] font-bold text-brand-900 tracking-tight">
+                    {/* Vế trái: Icon tiền xanh lá + Mức lương đồng bộ [icon + text + background + border + radius + shadow] */}
+                    <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200/90 px-3 py-1.5 rounded-xl text-emerald-950 shadow-sm">
+                      <Image
+                        src="/images/icon-salary.webp"
+                        alt="Mức lương"
+                        width={22}
+                        height={16}
+                        className="w-5 h-auto sm:w-5.5 object-contain shrink-0"
+                      />
+                      <span className="text-[15px] sm:text-[17px] font-bold text-emerald-950 tracking-tight">
                         {job.salaryDisplay}
                       </span>
                     </div>
@@ -134,12 +137,28 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
                 <div className="space-y-3.5 pt-1">
                   {/* Danh sách các gạch đầu dòng ngắn gọn với Icon / Emoji chuẩn mẫu, ưu tiên lương lên đầu */}
                   {job.concisePost.points &&
-                    job.concisePost.points.map((point, i) => (
+                    job.concisePost.points.map((point, i) => {
+                      const isSalary =
+                        point.label &&
+                        (point.label.toLowerCase().includes("thu nhập") ||
+                          point.label.toLowerCase().includes("lương"));
+
+                      return (
                         <div
                           key={i}
                           className="flex items-start gap-3 text-[16px] sm:text-[17px] text-gray-800 leading-relaxed"
                         >
-                          <span className="text-xl shrink-0 mt-0.5 select-none">{point.icon}</span>
+                          {isSalary ? (
+                            <Image
+                              src="/images/icon-salary.webp"
+                              alt="Mức thu nhập"
+                              width={22}
+                              height={16}
+                              className="w-5 h-auto object-contain shrink-0 mt-1"
+                            />
+                          ) : (
+                            <span className="text-xl shrink-0 mt-0.5 select-none">{point.icon}</span>
+                          )}
                           <div>
                             {point.label && (
                               <span className="font-bold text-gray-950 mr-1.5">
@@ -149,7 +168,8 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
                             <span className="whitespace-pre-line">{point.content}</span>
                           </div>
                         </div>
-                      ))}
+                      );
+                    })}
                 </div>
               </div>
             ) : (
@@ -169,12 +189,10 @@ export default function JobDetailView({ job, isAdmin = false }: JobDetailViewPro
             )}
           </div>
 
-          {/* CỘT 3 (BÊN PHẢI ~20%): Ảnh thực tế dạng thumbnail thu nhỏ */}
-          {hasImages && (
-            <div className="order-3 lg:order-3 lg:col-span-2 lg:row-start-1 lg:sticky lg:top-6 self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1">
-              <JobDetailImages images={job.images} />
-            </div>
-          )}
+          {/* CỘT 3 (BÊN PHẢI 20%): Ảnh thực tế dạng thumbnail - Luôn hiển thị đồng nhất 3 cột */}
+          <div className="order-3 lg:order-3 lg:col-span-2 lg:row-start-1 lg:sticky lg:top-6 self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1">
+            <JobDetailImages images={job.images} />
+          </div>
 
         </div>
       </div>

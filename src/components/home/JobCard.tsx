@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { JobItem } from "@/types/job";
 import { Clock, Calendar, ArrowRight, Flame } from "lucide-react";
 import { getJobUrl } from "@/lib/job-url";
@@ -83,18 +84,27 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
             <Link href={getJobUrl(job)}>{job.title}</Link>
           </h3>
           {salaryText && (
-            <span className="shrink-0 text-[13px] sm:text-[15px] font-bold text-brand-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/80 text-right self-start mt-0.5">
+            <div className="shrink-0 inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-200/90 px-2.5 py-1 rounded-lg text-emerald-950 shadow-sm self-start mt-0.5">
+              <Image
+                src="/images/icon-salary.webp"
+                alt="Mức lương"
+                width={18}
+                height={14}
+                className="w-4 h-auto object-contain shrink-0"
+              />
               {salaryText.includes("|") ? (
-                <span className="flex flex-col items-end text-right leading-tight gap-0.5">
-                  <span>{salaryText.split("|")[0].trim()}</span>
-                  <span className="text-[11px] sm:text-[12px] font-semibold text-amber-800">
+                <span className="flex flex-col items-start sm:items-end text-left sm:text-right leading-tight gap-0.5 font-bold">
+                  <span className="text-[13px] sm:text-[14px] text-emerald-950">{salaryText.split("|")[0].trim()}</span>
+                  <span className="text-[11px] sm:text-[12px] font-semibold text-emerald-800">
                     {salaryText.split("|")[1].trim()}
                   </span>
                 </span>
               ) : (
-                <span className="whitespace-nowrap">{salaryText}</span>
+                <span className="text-[13px] sm:text-[14px] font-bold whitespace-nowrap text-emerald-950">
+                  {salaryText}
+                </span>
               )}
-            </span>
+            </div>
           )}
         </div>
 

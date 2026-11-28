@@ -32,7 +32,8 @@ export function getCleanJobSlug(slug: string, categorySlug?: string): string {
     if (clean.endsWith(`-${cat}`)) {
       clean = clean.slice(0, -(cat.length + 1));
     }
-    if (clean.startsWith(`${cat}-`)) {
+    // Không cắt tiền tố chức vụ nếu category là "quan-ly" (để bảo toàn chức danh Quản lý vùng, Quản lý tiệm...)
+    if (cat !== "quan-ly" && clean.startsWith(`${cat}-`)) {
       clean = clean.slice(cat.length + 1);
     }
   }
@@ -69,6 +70,10 @@ export function getJobUrl(
   const cleanSlug = getCleanJobSlug(job.slug, catSlug);
 
   if (catSlug && cleanSlug) {
+    // Nếu cleanSlug trùng hoàn toàn với catSlug (ví dụ: quan-ly / quan-ly) -> tránh lặp lại URL hai lần
+    if (catSlug === cleanSlug) {
+      return `${prefix}/${catSlug}`;
+    }
     return `${prefix}/${catSlug}/${cleanSlug}`;
   }
   return `${prefix}/${job.slug}`;
@@ -98,7 +103,11 @@ export function isJobActiveOnPath(
   if (!lastSegment) return false;
 
   const cleanSlug = getCleanJobSlug(jobSlug, categorySlug);
-  if (lastSegment === jobSlug.toLowerCase() || lastSegment === cleanSlug) {
+  if (
+    lastSegment === jobSlug.toLowerCase() ||
+    lastSegment === cleanSlug ||
+    (jobSlug.toLowerCase() === "quan-ly-vung" && lastSegment === "vung")
+  ) {
     // Nếu có 2 phân đoạn, kiểm tra thêm phân đoạn chuyên mục
     if (segments.length >= 3 && categorySlug) {
       const pathCat = segments[segments.length - 2];
